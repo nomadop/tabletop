@@ -41,7 +41,7 @@ class Lobby extends Component {
           <span>Welcome! {authentication.email}</span>
           <a rel="nofollow" data-method="delete" href="/users/sign_out">Log out</a>
         </Navigator>
-      )
+      );
     }
 
     return (

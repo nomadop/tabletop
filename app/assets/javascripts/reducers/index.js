@@ -1,5 +1,8 @@
-import lobbyReducer from './lobby_reducer';
+import lobby from './lobby';
+import game from './game';
+
 
 export default {
-  lobby: lobbyReducer,
+  lobby,
+  game,
 };

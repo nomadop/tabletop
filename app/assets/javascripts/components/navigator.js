@@ -9,3 +9,7 @@ export default class Navigator extends Component {
     );
   }
 }
+
+Navigator.propTypes = {
+  children: PropTypes.object,
+};
