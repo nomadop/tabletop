@@ -1,7 +1,7 @@
 import Lobby from './lobby';
-import GameWindow from './game_window';
+import Game from './game';
 
 export default {
   lobby: Lobby,
-  game: GameWindow,
+  game: Game,
 };
