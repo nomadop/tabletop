@@ -1,0 +1,41 @@
+import React, { Component, PropTypes } from 'react';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import createLogger from 'redux-logger';
+import appReducers from '../reducers/index';
+import appContainers from '../containers/index';
+
+const logger = createLogger({ collapsed: true });
+
+const createStoreWithMiddleware = applyMiddleware(
+  thunk,
+  logger
+)(createStore);
+
+
+export default class Root extends Component {
+  componentWillMount() {
+    const appReducer = appReducers[this.props.app];
+    this.store = createStoreWithMiddleware(appReducer, {
+      authentication: this.props.auth_info,
+    });
+  }
+
+  renderAppComponent() {
+    return React.createElement(appContainers[this.props.app]);
+  }
+
+  render() {
+    return (
+      <Provider store={this.store}>
+        {this.renderAppComponent()}
+      </Provider>
+    );
+  }
+}
+
+Root.propTypes = {
+  app: PropTypes.string.isRequired,
+  auth_info: PropTypes.object,
+};
