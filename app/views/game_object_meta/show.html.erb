@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @game_object_metum.name %>
+</p>
+
+<p>
+  <strong>Sub type:</strong>
+  <%= @game_object_metum.sub_type %>
+</p>
+
+<p>
+  <strong>Front img:</strong>
+  <%= @game_object_metum.front_img %>
+</p>
+
+<p>
+  <strong>Back img:</strong>
+  <%= @game_object_metum.back_img %>
+</p>
+
+<p>
+  <strong>Width:</strong>
+  <%= @game_object_metum.width %>
+</p>
+
+<p>
+  <strong>Height:</strong>
+  <%= @game_object_metum.height %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @game_object_metum.description %>
+</p>
+
+<%= link_to 'Edit', edit_game_object_metum_path(@game_object_metum) %> |
+<%= link_to 'Back', game_object_meta_path %>

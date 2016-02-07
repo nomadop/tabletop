@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Game Object Meta</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Sub type</th>
+      <th>Front img</th>
+      <th>Back img</th>
+      <th>Width</th>
+      <th>Height</th>
+      <th>Description</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @game_object_meta.each do |game_object_metum| %>
+      <tr>
+        <td><%= game_object_metum.name %></td>
+        <td><%= game_object_metum.sub_type %></td>
+        <td><%= game_object_metum.front_img %></td>
+        <td><%= game_object_metum.back_img %></td>
+        <td><%= game_object_metum.width %></td>
+        <td><%= game_object_metum.height %></td>
+        <td><%= game_object_metum.description %></td>
+        <td><%= link_to 'Show', game_object_metum %></td>
+        <td><%= link_to 'Edit', edit_game_object_metum_path(game_object_metum) %></td>
+        <td><%= link_to 'Destroy', game_object_metum, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Game Object Metum', new_game_object_metum_path %>

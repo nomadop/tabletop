@@ -11,7 +11,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160205073201) do
+ActiveRecord::Schema.define(version: 20160207085234) do
+
+  create_table "game_object_meta", force: :cascade do |t|
+    t.string   "name"
+    t.string   "sub_type"
+    t.string   "front_img"
+    t.string   "back_img"
+    t.float    "width"
+    t.float    "height"
+    t.text     "description"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  create_table "game_objects", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "meta_id",                      null: false
+    t.string   "meta_type",                    null: false
+    t.float    "center_x"
+    t.float    "center_y"
+    t.float    "rotate"
+    t.boolean  "is_locked",    default: false
+    t.boolean  "is_fliped",    default: false
+    t.integer  "lock_version", default: 0
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
