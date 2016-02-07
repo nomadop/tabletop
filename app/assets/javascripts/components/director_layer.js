@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import CoordinationLayer from './coordination_layer';
 
 export default class DirectorLayer extends Component {
   get style() {
@@ -18,6 +19,7 @@ export default class DirectorLayer extends Component {
   render() {
     return (
       <div className="director-layer" style={this.style}>
+        <CoordinationLayer rows={10} cols={10} size={100} />
       </div>
     );
   }

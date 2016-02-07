@@ -1,14 +1,21 @@
 .game-window {
   position: absolute;
-  left: 0;
-  top: 0;
   transform-style: preserve-3d;
 
   .perspective-layer {
+    position: absolute;
     pointer-events: none;
 
     .director-layer {
+      position: absolute;
       pointer-events: all;
+
+      .coordination-layer {
+        .coordination-unit {
+          position: absolute;
+          border: 1px solid black;
+        }
+      }
     }
   }
 }
