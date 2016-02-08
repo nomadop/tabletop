@@ -16,10 +16,16 @@ export default class DirectorLayer extends Component {
     };
   }
 
+  renderCoordination() {
+    if (this.props.debug) {
+      return <CoordinationLayer rows={10} cols={10} size={100}/>;
+    }
+  }
+
   render() {
     return (
       <div className="director-layer" style={this.style}>
-        <CoordinationLayer rows={10} cols={10} size={100} />
+        {this.renderCoordination()}
       </div>
     );
   }
@@ -29,4 +35,5 @@ DirectorLayer.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   camera: PropTypes.object,
+  debug: PropTypes.bool,
 };

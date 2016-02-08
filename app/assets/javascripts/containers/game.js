@@ -81,6 +81,7 @@ class Game extends Component {
 
   render() {
     const { width, height } = this.state;
+    const { camera, debug } = this.props;
 
     const style = {
       width,
@@ -92,15 +93,15 @@ class Game extends Component {
            tabIndex="1"
            ref="gameWindow"
            style={style}
-           onMouseWheel={this.handleMouseWheel.bind(this)}
            onKeyDown={this.handleKeyDown.bind(this)}>
-        <PerspectiveLayer {...this.props} width={width} height={height} />
+        <PerspectiveLayer width={width} height={height} camera={camera} debug={debug}/>
       </div>
     );
   }
 }
 
 Game.propTypes = {
+  debug: PropTypes.bool,
   camera: PropTypes.object,
   moveCameraHorizontal: PropTypes.func,
   moveCameraVertical: PropTypes.func,

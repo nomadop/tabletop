@@ -2,13 +2,18 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
 
   def lobby
-    render component: 'Root', props: { app: 'lobby', auth_info: current_user&.auth_info }
+    props = {
+      app: 'lobby',
+      authentication: current_user && current_user.auth_info,
+    }
+    render component: 'Root', props: props
   end
 
   def game
     props = {
       app: 'game',
-      auth_info: current_user&.auth_info,
+      authentication: current_user && current_user.auth_info,
+      debug: true,
     }
     render component: 'Root', props: props
   end

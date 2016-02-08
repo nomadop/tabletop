@@ -17,13 +17,11 @@ const createStoreWithMiddleware = applyMiddleware(
 export default class Root extends Component {
   componentWillMount() {
     const appReducer = appReducers[this.props.app];
-    this.store = createStoreWithMiddleware(appReducer, {
-      authentication: this.props.auth_info,
-    });
+    this.store = createStoreWithMiddleware(appReducer);
   }
 
   renderAppComponent() {
-    return React.createElement(appContainers[this.props.app]);
+    return React.createElement(appContainers[this.props.app], this.props);
   }
 
   render() {
@@ -37,5 +35,6 @@ export default class Root extends Component {
 
 Root.propTypes = {
   app: PropTypes.string.isRequired,
-  auth_info: PropTypes.object,
+  authentication: PropTypes.object,
+  debug: PropTypes.bool,
 };
