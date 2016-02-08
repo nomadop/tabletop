@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160207085234) do
+ActiveRecord::Schema.define(version: 20160208125009) do
 
   create_table "game_object_meta", force: :cascade do |t|
     t.string   "name"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20160207085234) do
     t.text     "description"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.integer  "game_id"
   end
 
   create_table "game_objects", force: :cascade do |t|
@@ -37,6 +38,16 @@ ActiveRecord::Schema.define(version: 20160207085234) do
     t.integer  "lock_version", default: 0
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+  end
+
+  create_table "games", force: :cascade do |t|
+    t.string   "name"
+    t.string   "module",      null: false
+    t.float    "start_scale"
+    t.string   "max_player"
+    t.text     "description"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "users", force: :cascade do |t|

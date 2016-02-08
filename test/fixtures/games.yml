@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  module: MyString
+  start_scale: 1.5
+  max_player: MyString
+  description: MyText
+
+two:
+  name: MyString
+  module: MyString
+  start_scale: 1.5
+  max_player: MyString
+  description: MyText

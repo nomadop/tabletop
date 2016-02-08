@@ -23,3 +23,5 @@ node_modules
 npm-debug.log
 
 config/secrets.yml
+config/meta
+public/res
