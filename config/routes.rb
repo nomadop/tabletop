@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  resources :games
+  resources :games do
+    member do
+      get 'meta'
+    end
+  end
   resources :game_object_meta
   devise_for :users, controllers: { sessions: :user_sessions }
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

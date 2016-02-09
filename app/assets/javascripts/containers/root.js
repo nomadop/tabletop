@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import React, { Component, PropTypes } from 'react';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
@@ -35,6 +36,4 @@ export default class Root extends Component {
 
 Root.propTypes = {
   app: PropTypes.string.isRequired,
-  authentication: PropTypes.object,
-  debug: PropTypes.bool,
 };

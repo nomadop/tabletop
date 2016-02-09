@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PerspectiveLayer from '../components/perspective_layer';
 import * as camera from '../actions/camera';
+import { fetchGameObjectMeta } from '../actions/meta';
 
 class Game extends Component {
   constructor() {
@@ -15,6 +16,7 @@ class Game extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchGameObjectMeta(this.props.game.id);
     setTimeout(this.resizeGameWindow.bind(this), 100);
 
     window.addEventListener('resize', this.resizeGameWindow.bind(this));
@@ -108,6 +110,9 @@ Game.propTypes = {
   rotateCameraHorizontal: PropTypes.func,
   rotateCameraVertical: PropTypes.func,
   zoomCamera: PropTypes.func,
+  game: PropTypes.object,
+  authentication: PropTypes.object,
+  fetchGameObjectMeta: PropTypes.func,
 };
 
 function selector(state) {
@@ -117,7 +122,10 @@ function selector(state) {
 }
 
 function dispatcher(dispatch) {
-  return bindActionCreators(camera, dispatch);
+  const actions = Object.assign({}, camera, {
+    fetchGameObjectMeta,
+  });
+  return bindActionCreators(actions, dispatch);
 }
 
 export default connect(selector, dispatcher)(Game);
