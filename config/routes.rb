@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :games do
     member do
-      get 'meta'
+      get 'game_data'
     end
   end
   resources :game_object_meta

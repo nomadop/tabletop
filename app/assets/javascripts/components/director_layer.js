@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import CoordinationLayer from './coordination_layer';
+import GameObjectContainer from '../containers/game_object';
 
 export default class DirectorLayer extends Component {
   get style() {
@@ -26,6 +27,7 @@ export default class DirectorLayer extends Component {
     return (
       <div className="director-layer" style={this.style}>
         {this.renderCoordination()}
+        <GameObjectContainer/>
       </div>
     );
   }

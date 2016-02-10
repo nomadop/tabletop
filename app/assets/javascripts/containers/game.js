@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PerspectiveLayer from '../components/perspective_layer';
 import * as camera from '../actions/camera';
-import { fetchGameObjectMeta } from '../actions/meta';
+import { fetchGameData } from '../actions/game';
 
 class Game extends Component {
   constructor() {
@@ -16,7 +16,7 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchGameObjectMeta(this.props.game.id);
+    this.props.fetchGameData(this.props.game.id);
     setTimeout(this.resizeGameWindow.bind(this), 100);
 
     window.addEventListener('resize', this.resizeGameWindow.bind(this));
@@ -112,7 +112,7 @@ Game.propTypes = {
   zoomCamera: PropTypes.func,
   game: PropTypes.object,
   authentication: PropTypes.object,
-  fetchGameObjectMeta: PropTypes.func,
+  fetchGameData: PropTypes.func,
 };
 
 function selector(state) {
@@ -123,7 +123,7 @@ function selector(state) {
 
 function dispatcher(dispatch) {
   const actions = Object.assign({}, camera, {
-    fetchGameObjectMeta,
+    fetchGameData,
   });
   return bindActionCreators(actions, dispatch);
 }

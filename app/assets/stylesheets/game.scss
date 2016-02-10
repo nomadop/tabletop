@@ -16,6 +16,12 @@
           border: 1px solid black;
         }
       }
+
+      .game-object-container {
+        .game-object {
+          position: absolute;
+        }
+      }
     }
   }
 }

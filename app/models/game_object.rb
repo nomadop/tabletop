@@ -17,12 +17,6 @@ class GameObject < ApplicationRecord
     center_y + height / 2
   end
 
-  def as_json(opts = {})
-    opts[:methods] ||= []
-    opts[:methods] += [:sub_type, :width, :height]
-    super(opts)
-  end
-
   def require_lock(uid)
     return user_id == uid if is_locked
 

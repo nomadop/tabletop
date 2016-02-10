@@ -1,8 +1,11 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:show, :edit, :update, :destroy, :meta]
+  before_action :set_game, only: [:show, :edit, :update, :destroy, :game_data]
 
-  def meta
-    render json: @game.game_object_meta.as_json(except: [:created_at, :updated_at])
+  def game_data
+    render json: {
+      game_object_meta: @game.game_object_meta,
+      game_objects: GameObject.where(meta: @game.game_object_meta),
+    }
   end
 
   # GET /games

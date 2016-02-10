@@ -15,7 +15,7 @@ class HomeController < ApplicationController
     props = {
       app: 'game',
       authentication: current_user && current_user.auth_info,
-      debug: true,
+      debug: false,
       game: @game.as_json(only: [:id, :name, :module]),
     }
     render component: 'Root', props: props
