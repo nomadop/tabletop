@@ -1,6 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import CoordinationLayer from './coordination_layer';
-import GameObjectContainer from '../containers/game_object';
 
 export default class DirectorLayer extends Component {
   get style() {
@@ -17,17 +15,10 @@ export default class DirectorLayer extends Component {
     };
   }
 
-  renderCoordination() {
-    if (this.props.debug) {
-      return <CoordinationLayer rows={10} cols={10} size={100}/>;
-    }
-  }
-
   render() {
     return (
       <div className="director-layer" style={this.style}>
-        {this.renderCoordination()}
-        <GameObjectContainer/>
+        {this.props.children}
       </div>
     );
   }
@@ -37,5 +28,4 @@ DirectorLayer.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   camera: PropTypes.object,
-  debug: PropTypes.bool,
 };

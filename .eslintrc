@@ -10,6 +10,7 @@
         "vars": "all",
         "varsIgnorePattern": "^_$"
       }
-    ]
+    ],
+    "camelcase": [2, {"properties": "never"}]
   }
 }

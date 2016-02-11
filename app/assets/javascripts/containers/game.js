@@ -91,12 +91,19 @@ class Game extends Component {
     };
 
     return (
-      <div className="game-window"
-           tabIndex="1"
-           ref="gameWindow"
-           style={style}
-           onKeyDown={this.handleKeyDown.bind(this)}>
-        <PerspectiveLayer width={width} height={height} camera={camera} debug={debug}/>
+      <div
+        className="game-window"
+        tabIndex="1"
+        ref="gameWindow"
+        style={style}
+        onKeyDown={this.handleKeyDown.bind(this)}
+      >
+        <PerspectiveLayer width={width} height={height} camera={camera}>
+          <DirectorLayer width={width} height={height} camera={camera}>
+            {this.renderCoordination()}
+            <GameObjectContainer/>
+          </DirectorLayer>
+        </PerspectiveLayer>
       </div>
     );
   }

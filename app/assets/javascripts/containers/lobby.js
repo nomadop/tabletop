@@ -28,7 +28,6 @@ class Lobby extends Component {
 
   render() {
     const { authentication, messages } = this.props;
-    console.log(authentication);
 
     let navNode;
     if (!authentication) {

@@ -108,7 +108,7 @@ function angle(state = 60, action) {
   }
 }
 
-function height(state = 1000, action) {
+function perspective(state = 1000, action) {
   switch (action.type) {
   default:
     return state;
@@ -121,5 +121,5 @@ export default combineReducers({
   rotate,
   scale,
   angle,
-  height,
+  perspective,
 });
