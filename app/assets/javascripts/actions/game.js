@@ -2,6 +2,8 @@ import fetch from 'isomorphic-fetch';
 import {
   RECEIVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
+  SELECT_GAME_OBJECT,
+  UNSELECT_GAME_OBJECTS,
 } from './action_types';
 
 export function receiveGameObjects(gameObjects) {
@@ -26,5 +28,19 @@ export function fetchGameData(gameId) {
         dispatch(receiveGameObjectMeta(json.game_object_meta));
         dispatch(receiveGameObjects(json.game_objects));
       });
+  };
+}
+
+export function selectGameObject(gameObjectId) {
+  return {
+    type: SELECT_GAME_OBJECT,
+    gameObjectId,
+  };
+}
+
+export function unselectGameObjects(gameObjectIds) {
+  return {
+    type: UNSELECT_GAME_OBJECTS,
+    gameObjectIds,
   };
 }

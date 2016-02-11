@@ -19,7 +19,31 @@
 
       .game-object-container {
         .game-object {
+          pointer-events: all;
+          background-size: 100%;
           position: absolute;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          &:hover {
+            cursor: pointer;
+          }
+          &:focus {
+            outline: none;
+          }
+          &.selected {
+            outline: -webkit-focus-ring-color auto 5px;
+            transform: translateZ(10px);
+            z-index: 10000;
+            &:hover {
+              cursor: -webkit-grab;
+            }
+          }
+          &.dragging {
+            opacity: 0.5;
+            cursor: -webkit-grabbing !important;
+            pointer-events: none;
+          }
         }
       }
     }

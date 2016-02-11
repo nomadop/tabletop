@@ -2,8 +2,11 @@ import { combineReducers } from 'redux';
 import {
   RECEIVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
+  SELECT_GAME_OBJECT,
+  UNSELECT_GAME_OBJECTS,
 } from '../actions/action_types';
 import camera from './camera';
+import arrayMinus from '../utils/array_minus';
 
 function metaById(state = {}, action) {
   if (action.type === RECEIVE_GAME_OBJECT_META) {
@@ -48,9 +51,23 @@ function gameObjectIds(state = [], action) {
   return state;
 }
 
+function selectedIds(state = [], action) {
+  const newState = state.slice();
+  switch (action.type) {
+  case SELECT_GAME_OBJECT:
+    newState.push(action.gameObjectId);
+    return newState;
+  case UNSELECT_GAME_OBJECTS:
+    return arrayMinus(newState, action.gameObjectIds);
+  default:
+    return state;
+  }
+}
+
 const gameObjects = combineReducers({
   byId: gameObjectById,
   ids: gameObjectIds,
+  selectedIds,
 });
 
 export default combineReducers({

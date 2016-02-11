@@ -2,8 +2,23 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PerspectiveLayer from '../components/perspective_layer';
-import * as camera from '../actions/camera';
+import DirectorLayer from '../components/director_layer';
+import CoordinationLayer from '../components/coordination_layer';
+import GameObjectContainer from './game_object';
+import {
+  moveCameraHorizontal,
+  moveCameraVertical,
+  zoomCamera,
+  rotateCameraHorizontal,
+  rotateCameraVertical,
+} from '../actions/camera';
 import { fetchGameData } from '../actions/game';
+import {
+  originalToPerspective,
+  perspectiveToOriginal,
+  perspectiveToScreen,
+  screenToPerspective,
+} from '../utils/coordination_transformer';
 
 class Game extends Component {
   constructor() {
@@ -25,21 +40,6 @@ class Game extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeGameWindow.bind(this));
-  }
-
-  handleMouseWheel(event) {
-    const deltaY = event.deltaY;
-    const deltaX = event.deltaX;
-    if (Math.abs(event.wheelDelta) >= 120) {
-      const offset = Math.abs(deltaY) >= 100 ? deltaY * Math.abs(event.wheelDelta) * 0.00001 : deltaY * -0.001;
-      this.props.zoomCamera(offset);
-    } else if (event.shiftKey) {
-      this.props.rotateCameraHorizontal(deltaX);
-      this.props.rotateCameraVertical(deltaY);
-    } else {
-      this.props.moveCameraHorizontal(deltaX * 3);
-      this.props.moveCameraVertical(deltaY * 3);
-    }
   }
 
   handleKeyDown(e) {
@@ -74,6 +74,33 @@ class Game extends Component {
     }
   }
 
+  handleMouseWheel(event) {
+    const deltaY = event.deltaY;
+    const deltaX = event.deltaX;
+    if (Math.abs(event.wheelDelta) >= 120) {
+      const offset = Math.abs(deltaY) >= 100 ? deltaY * Math.abs(event.wheelDelta) * 0.00001 : deltaY * -0.001;
+      this.props.zoomCamera(offset);
+    } else if (event.shiftKey) {
+      this.props.rotateCameraHorizontal(deltaX);
+      this.props.rotateCameraVertical(deltaY);
+    } else {
+      this.props.moveCameraHorizontal(deltaX * 3);
+      this.props.moveCameraVertical(deltaY * 3);
+    }
+  }
+
+  handleMouseDown(event) {
+    const mouseInfo = this.extractMouseEvent(event);
+    this.lastMouseX = mouseInfo.x;
+    this.lastMouseY = mouseInfo.y;
+    this.mouseDownX = mouseInfo.x;
+    this.mouseDownY = mouseInfo.y;
+  }
+
+  handleMouseUp(event) {
+
+  }
+
   resizeGameWindow() {
     this.setState({
       width: window.innerWidth,
@@ -81,9 +108,28 @@ class Game extends Component {
     });
   }
 
+  extractMouseEvent(event) {
+    const { width, height, camera } = this.props;
+    const { center_x, center_y, rotate, angle, perspective, scale } = camera;
+    const { clientX, clientY } = event;
+    const screenPoint = [clientX - width / 2, clientY - height / 2];
+    const perspectivePoint = screenToPerspective(screenPoint, perspective, angle);
+    const originalPoint = perspectiveToOriginal(perspectivePoint, center_x, center_y, rotate, scale);
+    return {
+      x: { screen: clientX, original: originalPoint[0] },
+      y: { screen: clientY, original: originalPoint[1] },
+    };
+  }
+
+  renderCoordination() {
+    if (this.props.debug) {
+      return <CoordinationLayer rows={10} cols={10} size={100}/>;
+    }
+  }
+
   render() {
     const { width, height } = this.state;
-    const { camera, debug } = this.props;
+    const { camera } = this.props;
 
     const style = {
       width,
@@ -129,10 +175,14 @@ function selector(state) {
 }
 
 function dispatcher(dispatch) {
-  const actions = Object.assign({}, camera, {
+  return bindActionCreators({
+    moveCameraHorizontal,
+    moveCameraVertical,
+    zoomCamera,
+    rotateCameraHorizontal,
+    rotateCameraVertical,
     fetchGameData,
-  });
-  return bindActionCreators(actions, dispatch);
+  }, dispatch);
 }
 
 export default connect(selector, dispatcher)(Game);

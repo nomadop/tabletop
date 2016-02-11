@@ -2,12 +2,27 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GameObject from '../components/game_object';
+import {
+  selectGameObject,
+  unselectGameObjects,
+} from '../actions/game';
 
 class GameObjectContainer extends Component {
   render() {
+    const { gameObjects, selectedIds } = this.props;
+
     return (
       <div className="game-object-container">
-        { this.props.gameObjects.map(object => <GameObject key={object.id} gameObject={object}/>) }
+        { gameObjects.map(object => (
+          <GameObject
+            key={object.id}
+            gameObject={object}
+            isSelected={selectedIds.indexOf(object.id) >= 0}
+            onSelect={this.props.selectGameObject.bind(null, object.id)}
+            onRelease={this.props.unselectGameObjects.bind(null, [object.id])}
+            releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
+          />
+        )) }
       </div>
     );
   }
@@ -15,6 +30,8 @@ class GameObjectContainer extends Component {
 
 GameObjectContainer.propTypes = {
   gameObjects: PropTypes.array,
+  selectGameObject: PropTypes.func,
+  unselectGameObjects: PropTypes.func,
 };
 
 function selector(state) {
@@ -25,11 +42,14 @@ function selector(state) {
   });
   return {
     gameObjects,
+    selectedIds: state.gameObjects.selectedIds,
   };
 }
 
 function dispatcher(dispatch) {
   return bindActionCreators({
+    selectGameObject,
+    unselectGameObjects,
   }, dispatch);
 }
 
