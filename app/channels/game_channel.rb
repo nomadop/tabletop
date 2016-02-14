@@ -14,4 +14,11 @@ class GameChannel < ApplicationCable::Channel
 
     ActionCable.server.broadcast('game', action: :create_game_object, object: object)
   end
+
+  def update_game_object(data)
+    object = GameObject.find(data['id'])
+    object.update(data['attrs'])
+
+    ActionCable.server.broadcast('game', action: :update_game_object, object: object)
+  end
 end

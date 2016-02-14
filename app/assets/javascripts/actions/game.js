@@ -47,17 +47,18 @@ export function unselectGameObjects(gameObjectIds) {
   };
 }
 
-export function flipGameObject(gameObjectId) {
+export function flipGameObject(gameObjectId, isFlipped) {
   return {
     type: FLIP_GAME_OBJECT,
     gameObjectId,
+    isFlipped,
   };
 }
 
-export function rotateGameObject(gameObjectId, offset) {
+export function rotateGameObject(gameObjectId, rotate) {
   return {
     type: ROTATE_GAME_OBJECT,
     gameObjectId,
-    offset,
+    rotate,
   };
 }

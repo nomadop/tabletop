@@ -1,3 +1,4 @@
+import update from 'react-addons-update';
 import { combineReducers } from 'redux';
 import {
   RECEIVE_GAME_OBJECT_META,
@@ -35,20 +36,17 @@ const meta = combineReducers({
 });
 
 function gameObjectById(state = {}, action) {
-  const newState = Object.assign({}, state);
+  const updater = {};
   switch (action.type) {
   case RECEIVE_GAME_OBJECTS:
-    return action.gameObjects.reduce((result, gameObjects) => {
-      result[gameObjects.id] = gameObjects;
-      return result;
-    }, {});
+    action.gameObjects.forEach(object => updater[object.id] = {$set: object});
+    return update(state, updater);
   case FLIP_GAME_OBJECT:
-    const isFliped = newState[action.gameObjectId].is_fliped;
-    newState[action.gameObjectId].is_fliped = !isFliped;
-    return newState;
+    updater[action.gameObjectId] = {is_fliped: {$set: action.isFlipped}};
+    return update(state, updater);
   case ROTATE_GAME_OBJECT:
-    newState[action.gameObjectId].rotate += action.offset;
-    return newState;
+    updater[action.gameObjectId] = {rotate: {$set: action.rotate}};
+    return update(state, updater);
   default:
     return state;
   }

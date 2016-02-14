@@ -10,6 +10,16 @@ import {
 } from '../actions/game';
 
 class GameObjectContainer extends Component {
+  handleFlipGameObject(id, isFlipped) {
+    this.props.flipGameObject(id, isFlipped);
+    App.game.update_game_object(id, {is_fliped: isFlipped});
+  }
+
+  handleRotateGameObject(id, rotate) {
+    this.props.rotateGameObject(id, rotate);
+    App.game.update_game_object(id, {rotate: rotate});
+  }
+
   render() {
     const { gameObjects, selectedIds } = this.props;
 
@@ -22,8 +32,8 @@ class GameObjectContainer extends Component {
             isSelected={selectedIds.indexOf(object.id) >= 0}
             onSelect={this.props.selectGameObject.bind(null, object.id)}
             onRelease={this.props.unselectGameObjects.bind(null, [object.id])}
-            onFlip={this.props.flipGameObject.bind(null, object.id)}
-            onRotate={this.props.rotateGameObject.bind(null, object.id)}
+            onFlip={this.handleFlipGameObject.bind(this, object.id)}
+            onRotate={this.handleRotateGameObject.bind(this, object.id)}
             releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
           />
         )) }
