@@ -10,7 +10,7 @@ function rayPlaneIntersection(linePoint, lineVector, planePoint, planeVector) {
   return [
     m1 + v1 * t,
     m2 + v2 * t,
-    m3 + v3 * t
+    m3 + v3 * t,
   ];
 }
 
@@ -25,7 +25,7 @@ export function originalToPerspective(originalPoint, translateX, translateY, rot
   const rotateCos = Math.cos(rotateRad);
   const rotatedPoint = [
     translatedPoint[0] * rotateCos - translatedPoint[1] * rotateSin,
-    translatedPoint[0] * rotateSin + translatedPoint[1] * rotateCos
+    translatedPoint[0] * rotateSin + translatedPoint[1] * rotateCos,
   ];
 
   return rotatedPoint.map(value => value * scale);
@@ -40,12 +40,12 @@ export function perspectiveToOriginal(perspectivePoint, translateX, translateY, 
   const unrotateCos = Math.cos(unrotateRad);
   const unrotatedPoint = [
     unscaledPoint[0] * unrotateCos - unscaledPoint[1] * unrotateSin,
-    unscaledPoint[0] * unrotateSin + unscaledPoint[1] * unrotateCos
+    unscaledPoint[0] * unrotateSin + unscaledPoint[1] * unrotateCos,
   ];
 
   return [
     unrotatedPoint[0] + translateX,
-    unrotatedPoint[1] + translateY
+    unrotatedPoint[1] + translateY,
   ];
 }
 
@@ -62,7 +62,7 @@ export function perspectiveToScreen(perspectivePoint, perspective, angle) {
   const viewVector = [
     perspectiveX - viewPoint[0],
     perspectiveY - viewPoint[1],
-    perspectiveZ - perspective
+    perspectiveZ - perspective,
   ];
   const planePoint = [0, 0, 0];
   const planeVector = [0, 0, 1];
@@ -82,7 +82,7 @@ export function screenToPerspective(screenPoint, perspective, angle) {
   const viewVector = [
     screenPoint[0] - viewPoint[0],
     screenPoint[1] - viewPoint[1],
-    -perspective
+    -perspective,
   ];
   const planePoint = [0, 0, 0];
   const planeVector = [0, -sin, cos];

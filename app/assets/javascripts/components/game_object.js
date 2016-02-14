@@ -1,11 +1,22 @@
 import React, { Component, PropTypes } from 'react';
 
 export default class GameObject extends Component {
+  constructor() {
+    super(...arguments);
+
+    this.state = {};
+    this.dragHandler = this.handleDragging.bind(this);
+    this.dropHandler = this.handleDrop.bind(this);
+  }
+
   get style() {
-    const { meta, center_x, center_y, rotate, is_fliped } = this.props.gameObject;
+    const { gameObject, isDragging } = this.props;
+    const { meta, center_x, center_y, rotate, is_fliped } = gameObject;
     const { height, width, front_img, back_img } = meta;
-    const left = center_x - width / 2;
-    const top = center_y - height / 2;
+    const centerX = isDragging && this.state.centerX ? this.state.centerX : center_x;
+    const centerY = isDragging && this.state.centerY ? this.state.centerY : center_y;
+    const left = centerX - width / 2;
+    const top = centerY - height / 2;
 
     const img = is_fliped ? back_img : front_img;
     const backgroundImage = `url(/res/poker/${img})`;
@@ -22,15 +33,20 @@ export default class GameObject extends Component {
   }
 
   get className() {
+    const { isSelected, isDragging } = this.props;
     const classNames = ['game-object'];
-    if (this.props.isSelected) {
+    if (isSelected) {
       classNames.push('selected');
+    }
+
+    if (isDragging) {
+      classNames.push('dragging');
     }
 
     return classNames.join(' ');
   }
 
-  handleClick(event) {
+  handleMouseDown(event) {
     const funcKey = event.ctrlKey || event.metaKey;
     const { isSelected, onSelect, onRelease, releaseAll } = this.props;
     if (isSelected) {
@@ -44,6 +60,30 @@ export default class GameObject extends Component {
 
       onSelect();
     }
+  }
+
+  handleMouseMove(event) {
+    const { isSelected, isDragging, onDrag } = this.props;
+    if (isSelected && !isDragging && event.buttons > 0) {
+      onDrag();
+      window.addEventListener('mousemove', this.dragHandler);
+      window.addEventListener('mouseup', this.dropHandler);
+    }
+  }
+
+  handleDragging(event) {
+    const mouseInfo = this.props.extractMouseEvent(event);
+    this.setState({
+      centerX: mouseInfo.x.original,
+      centerY: mouseInfo.y.original,
+    });
+  }
+
+  handleDrop() {
+    const { centerX, centerY } = this.state;
+    this.props.onDrop(centerX, centerY);
+    window.removeEventListener('mousemove', this.dragHandler);
+    window.removeEventListener('mouseup', this.dropHandler);
   }
 
   handleKeyDown(event) {
@@ -65,8 +105,9 @@ export default class GameObject extends Component {
         className={this.className}
         style={this.style}
         tabIndex="1"
-        onClick={this.handleClick.bind(this)}
         onKeyDown={this.handleKeyDown.bind(this)}
+        onMouseDown={this.handleMouseDown.bind(this)}
+        onMouseMove={this.handleMouseMove.bind(this)}
       ></div>
     );
   }
@@ -75,9 +116,13 @@ export default class GameObject extends Component {
 GameObject.propTypes = {
   gameObject: PropTypes.object,
   isSelected: PropTypes.bool,
+  isDragging: PropTypes.bool,
   onSelect: PropTypes.func,
   onFlip: PropTypes.func,
   onRotate: PropTypes.func,
   onRelease: PropTypes.func,
+  onDrag: PropTypes.func,
+  onDrop: PropTypes.func,
   releaseAll: PropTypes.func,
+  extractMouseEvent: PropTypes.func,
 };

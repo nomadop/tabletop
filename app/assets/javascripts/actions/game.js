@@ -5,6 +5,8 @@ import {
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECT,
   ROTATE_GAME_OBJECT,
+  DRAG_GAME_OBJECT,
+  DROP_GAME_OBJECT,
   UNSELECT_GAME_OBJECTS,
 } from './action_types';
 
@@ -60,5 +62,21 @@ export function rotateGameObject(gameObjectId, rotate) {
     type: ROTATE_GAME_OBJECT,
     gameObjectId,
     rotate,
+  };
+}
+
+export function dragGameObject(gameObjectId) {
+  return {
+    type: DRAG_GAME_OBJECT,
+    gameObjectId,
+  };
+}
+
+export function dropGameObject(gameObjectId, centerX, centerY) {
+  return {
+    type: DROP_GAME_OBJECT,
+    gameObjectId,
+    centerX,
+    centerY,
   };
 }

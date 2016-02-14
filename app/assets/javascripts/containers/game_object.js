@@ -7,6 +7,8 @@ import {
   unselectGameObjects,
   flipGameObject,
   rotateGameObject,
+  dragGameObject,
+  dropGameObject,
 } from '../actions/game';
 
 class GameObjectContainer extends Component {
@@ -20,23 +22,36 @@ class GameObjectContainer extends Component {
     App.game.update_game_object(id, {rotate: rotate});
   }
 
+  handleDropGameObject(id, centerX, centerY) {
+    this.props.dropGameObject(id, centerX, centerY);
+    App.game.update_game_object(id, {center_x: centerX, center_y: centerY});
+  }
+
+  renderGameObject(object, selectedIds, isDragging) {
+    const id = object.id;
+    const isSelected = selectedIds.indexOf(id) >= 0;
+    return <GameObject
+      key={id}
+      gameObject={object}
+      isSelected={isSelected}
+      isDragging={isSelected && isDragging}
+      onSelect={this.props.selectGameObject.bind(null, id)}
+      onRelease={this.props.unselectGameObjects.bind(null, [id])}
+      onFlip={this.handleFlipGameObject.bind(this, id)}
+      onRotate={this.handleRotateGameObject.bind(this, id)}
+      onDrag={this.props.dragGameObject.bind(null, id)}
+      onDrop={this.handleDropGameObject.bind(this, id)}
+      releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
+      extractMouseEvent={this.props.extractMouseEvent}
+    />
+  }
+
   render() {
-    const { gameObjects, selectedIds } = this.props;
+    const { gameObjects, selectedIds, isDragging } = this.props;
 
     return (
       <div className="game-object-container">
-        { gameObjects.map(object => (
-          <GameObject
-            key={object.id}
-            gameObject={object}
-            isSelected={selectedIds.indexOf(object.id) >= 0}
-            onSelect={this.props.selectGameObject.bind(null, object.id)}
-            onRelease={this.props.unselectGameObjects.bind(null, [object.id])}
-            onFlip={this.handleFlipGameObject.bind(this, object.id)}
-            onRotate={this.handleRotateGameObject.bind(this, object.id)}
-            releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
-          />
-        )) }
+        { gameObjects.map(object => this.renderGameObject(object, selectedIds, isDragging)) }
       </div>
     );
   }
@@ -48,6 +63,10 @@ GameObjectContainer.propTypes = {
   unselectGameObjects: PropTypes.func,
   flipGameObject: PropTypes.func,
   rotateGameObject: PropTypes.func,
+  isDragging: PropTypes.bool,
+  dragGameObject: PropTypes.func,
+  dropGameObject: PropTypes.func,
+  extractMouseEvent: PropTypes.func,
 };
 
 function selector(state) {
@@ -59,6 +78,7 @@ function selector(state) {
   return {
     gameObjects,
     selectedIds: state.gameObjects.selectedIds,
+    isDragging: state.gameObjects.isDragging,
   };
 }
 
@@ -68,6 +88,8 @@ function dispatcher(dispatch) {
     unselectGameObjects,
     flipGameObject,
     rotateGameObject,
+    dragGameObject,
+    dropGameObject,
   }, dispatch);
 }
 

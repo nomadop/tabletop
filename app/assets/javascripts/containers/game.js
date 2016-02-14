@@ -97,10 +97,6 @@ class Game extends Component {
     this.mouseDownY = mouseInfo.y;
   }
 
-  handleMouseUp(event) {
-
-  }
-
   resizeGameWindow() {
     this.setState({
       width: window.innerWidth,
@@ -109,12 +105,12 @@ class Game extends Component {
   }
 
   extractMouseEvent(event) {
-    const { width, height, camera } = this.props;
-    const { center_x, center_y, rotate, angle, perspective, scale } = camera;
+    const { width, height } = this.state;
+    const { centerX, centerY, rotate, angle, perspective, scale } = this.props.camera;
     const { clientX, clientY } = event;
     const screenPoint = [clientX - width / 2, clientY - height / 2];
     const perspectivePoint = screenToPerspective(screenPoint, perspective, angle);
-    const originalPoint = perspectiveToOriginal(perspectivePoint, center_x, center_y, rotate, scale);
+    const originalPoint = perspectiveToOriginal(perspectivePoint, centerX, centerY, rotate, scale);
     return {
       x: { screen: clientX, original: originalPoint[0] },
       y: { screen: clientY, original: originalPoint[1] },
@@ -147,7 +143,7 @@ class Game extends Component {
         <PerspectiveLayer width={width} height={height} camera={camera}>
           <DirectorLayer width={width} height={height} camera={camera}>
             {this.renderCoordination()}
-            <GameObjectContainer/>
+            <GameObjectContainer extractMouseEvent={this.extractMouseEvent.bind(this)}/>
           </DirectorLayer>
         </PerspectiveLayer>
       </div>

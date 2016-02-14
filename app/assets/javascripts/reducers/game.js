@@ -6,6 +6,8 @@ import {
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECT,
   ROTATE_GAME_OBJECT,
+  DRAG_GAME_OBJECT,
+  DROP_GAME_OBJECT,
   UNSELECT_GAME_OBJECTS,
 } from '../actions/action_types';
 import camera from './camera';
@@ -47,6 +49,12 @@ function gameObjectById(state = {}, action) {
   case ROTATE_GAME_OBJECT:
     updater[action.gameObjectId] = {rotate: {$set: action.rotate}};
     return update(state, updater);
+  case DROP_GAME_OBJECT:
+    updater[action.gameObjectId] = {
+      center_x: {$set: action.centerX},
+      center_y: {$set: action.centerY},
+    };
+    return update(state, updater);
   default:
     return state;
   }
@@ -73,10 +81,22 @@ function selectedIds(state = [], action) {
   }
 }
 
+function isDragging(state = false, action) {
+  switch (action.type) {
+  case DRAG_GAME_OBJECT:
+    return true;
+  case DROP_GAME_OBJECT:
+    return false;
+  default:
+    return state;
+  }
+}
+
 const gameObjects = combineReducers({
   byId: gameObjectById,
   ids: gameObjectIds,
   selectedIds,
+  isDragging,
 });
 
 export default combineReducers({
