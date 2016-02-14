@@ -3,6 +3,8 @@ import {
   RECEIVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
   SELECT_GAME_OBJECT,
+  FLIP_GAME_OBJECT,
+  ROTATE_GAME_OBJECT,
   UNSELECT_GAME_OBJECTS,
 } from './action_types';
 
@@ -42,5 +44,20 @@ export function unselectGameObjects(gameObjectIds) {
   return {
     type: UNSELECT_GAME_OBJECTS,
     gameObjectIds,
+  };
+}
+
+export function flipGameObject(gameObjectId) {
+  return {
+    type: FLIP_GAME_OBJECT,
+    gameObjectId,
+  };
+}
+
+export function rotateGameObject(gameObjectId, offset) {
+  return {
+    type: ROTATE_GAME_OBJECT,
+    gameObjectId,
+    offset,
   };
 }

@@ -46,12 +46,27 @@ export default class GameObject extends Component {
     }
   }
 
+  handleKeyDown(event) {
+    event.preventDefault();
+    const { onFlip, onRotate } = this.props;
+    switch (event.keyCode) {
+      case 70:
+        return onFlip();
+      case 82:
+        return onRotate(45);
+      default:
+        return;
+    }
+  }
+
   render() {
     return (
       <div
         className={this.className}
         style={this.style}
+        tabIndex="1"
         onClick={this.handleClick.bind(this)}
+        onKeyDown={this.handleKeyDown.bind(this)}
       ></div>
     );
   }
@@ -61,6 +76,8 @@ GameObject.propTypes = {
   gameObject: PropTypes.object,
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
+  onFlip: PropTypes.func,
+  onRotate: PropTypes.func,
   onRelease: PropTypes.func,
   releaseAll: PropTypes.func,
 };

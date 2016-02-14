@@ -5,6 +5,8 @@ import GameObject from '../components/game_object';
 import {
   selectGameObject,
   unselectGameObjects,
+  flipGameObject,
+  rotateGameObject,
 } from '../actions/game';
 
 class GameObjectContainer extends Component {
@@ -20,6 +22,8 @@ class GameObjectContainer extends Component {
             isSelected={selectedIds.indexOf(object.id) >= 0}
             onSelect={this.props.selectGameObject.bind(null, object.id)}
             onRelease={this.props.unselectGameObjects.bind(null, [object.id])}
+            onFlip={this.props.flipGameObject.bind(null, object.id)}
+            onRotate={this.props.rotateGameObject.bind(null, object.id)}
             releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
           />
         )) }
@@ -32,6 +36,8 @@ GameObjectContainer.propTypes = {
   gameObjects: PropTypes.array,
   selectGameObject: PropTypes.func,
   unselectGameObjects: PropTypes.func,
+  flipGameObject: PropTypes.func,
+  rotateGameObject: PropTypes.func,
 };
 
 function selector(state) {
@@ -50,6 +56,8 @@ function dispatcher(dispatch) {
   return bindActionCreators({
     selectGameObject,
     unselectGameObjects,
+    flipGameObject,
+    rotateGameObject,
   }, dispatch);
 }
 

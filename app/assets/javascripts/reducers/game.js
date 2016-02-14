@@ -3,6 +3,8 @@ import {
   RECEIVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
   SELECT_GAME_OBJECT,
+  FLIP_GAME_OBJECT,
+  ROTATE_GAME_OBJECT,
   UNSELECT_GAME_OBJECTS,
 } from '../actions/action_types';
 import camera from './camera';
@@ -33,14 +35,23 @@ const meta = combineReducers({
 });
 
 function gameObjectById(state = {}, action) {
-  if (action.type === RECEIVE_GAME_OBJECTS) {
+  const newState = Object.assign({}, state);
+  switch (action.type) {
+  case RECEIVE_GAME_OBJECTS:
     return action.gameObjects.reduce((result, gameObjects) => {
       result[gameObjects.id] = gameObjects;
       return result;
     }, {});
+  case FLIP_GAME_OBJECT:
+    const isFliped = newState[action.gameObjectId].is_fliped;
+    newState[action.gameObjectId].is_fliped = !isFliped;
+    return newState;
+  case ROTATE_GAME_OBJECT:
+    newState[action.gameObjectId].rotate += action.offset;
+    return newState;
+  default:
+    return state;
   }
-
-  return state;
 }
 
 function gameObjectIds(state = [], action) {
