@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import PerspectiveLayer from '../components/perspective_layer';
 import DirectorLayer from '../components/director_layer';
 import CoordinationLayer from '../components/coordination_layer';
+import GamePane from 'components/game_pane';
 import GameObjectContainer from './game_object';
 import {
   moveCameraHorizontal,
@@ -75,6 +76,10 @@ class Game extends Component {
   }
 
   handleMouseWheel(event) {
+    if (event.target.className === 'game-pane') {
+      return;
+    }
+
     const deltaY = event.deltaY;
     const deltaX = event.deltaX;
     if (Math.abs(event.wheelDelta) >= 120) {
@@ -117,6 +122,18 @@ class Game extends Component {
     };
   }
 
+  renderPopUpLayer() {
+    return (
+      <div className="pop-up-layer">
+        <div className="pane-container">
+          <GamePane width={640} height={480} title="Create Game Object">
+
+          </GamePane>
+        </div>
+      </div>
+    )
+  }
+
   renderCoordination() {
     if (this.props.debug) {
       return <CoordinationLayer rows={10} cols={10} size={100}/>;
@@ -140,6 +157,7 @@ class Game extends Component {
         style={style}
         onKeyDown={this.handleKeyDown.bind(this)}
       >
+        {this.renderPopUpLayer()}
         <PerspectiveLayer width={width} height={height} camera={camera}>
           <DirectorLayer width={width} height={height} camera={camera}>
             {this.renderCoordination()}
@@ -165,8 +183,11 @@ Game.propTypes = {
 };
 
 function selector(state) {
+  const metaById = state.meta.byId;
+  const meta = state.meta.ids.map(id => metaById[id]);
   return {
     camera: state.camera,
+    meta,
   };
 }
 

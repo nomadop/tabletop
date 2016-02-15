@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-
+# source 'https://ruby.taobao.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '>= 5.0.0.beta2', '< 5.1'
@@ -48,3 +48,4 @@ gem 'sass-rails'
 gem 'browserify-rails'
 gem 'devise', :github => 'plataformatec/devise', :branch => 'master'
 gem 'rubocop'
+gem 'font-awesome-rails'

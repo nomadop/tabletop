@@ -1,9 +1,63 @@
 .game-window {
-  position: absolute;
+  position: fixed;
+  left: 0;
+  top: 0;
   transform-style: preserve-3d;
+
+  .pop-up-layer {
+    transform: perspective(0) translateZ(10000px);
+    width: 100%;
+
+    .pane-container {
+      position: fixed;
+      bottom: 0;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .game-pane {
+      position: fixed;
+      background: white;
+      border: 1px solid black;
+      border-radius: 5px;
+      overflow: auto;
+
+      .pane-header {
+        background: lightgray;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+
+        .fa {
+          margin: 0 0.2em;
+          font-size: 1.5em;
+
+          &:hover {
+            cursor: pointer;
+            color: #6699cc;
+          }
+
+          &.disabled {
+            color: gray;
+
+            &:hover {
+              cursor: default;
+            }
+          }
+        }
+      }
+
+      .game-object-meta {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
 
   .perspective-layer {
     position: absolute;
+    top: 0;
+    left: 0;
     pointer-events: none;
 
     .director-layer {
@@ -11,6 +65,7 @@
       pointer-events: all;
 
       .coordination-layer {
+        pointer-events: none;
         .coordination-unit {
           position: absolute;
           border: 1px solid black;
