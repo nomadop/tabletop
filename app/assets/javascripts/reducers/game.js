@@ -6,8 +6,8 @@ import {
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECT,
   ROTATE_GAME_OBJECT,
-  DRAG_GAME_OBJECT,
-  DROP_GAME_OBJECT,
+  DRAG_GAME_OBJECTS,
+  DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
 } from '../actions/action_types';
 import camera from './camera';
@@ -49,11 +49,13 @@ function gameObjectById(state = {}, action) {
   case ROTATE_GAME_OBJECT:
     updater[action.gameObjectId] = {rotate: {$set: action.rotate}};
     return update(state, updater);
-  case DROP_GAME_OBJECT:
-    updater[action.gameObjectId] = {
-      center_x: {$set: action.centerX},
-      center_y: {$set: action.centerY},
-    };
+  case DROP_GAME_OBJECTS:
+    action.gameObjects.forEach(object => {
+      updater[object.id] = {
+        center_x: {$set: object.center_x},
+        center_y: {$set: object.center_y},
+      };
+    });
     return update(state, updater);
   default:
     return state;
@@ -83,9 +85,9 @@ function selectedIds(state = [], action) {
 
 function isDragging(state = false, action) {
   switch (action.type) {
-  case DRAG_GAME_OBJECT:
+  case DRAG_GAME_OBJECTS:
     return true;
-  case DROP_GAME_OBJECT:
+  case DROP_GAME_OBJECTS:
     return false;
   default:
     return state;

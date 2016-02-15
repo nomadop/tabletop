@@ -10,9 +10,9 @@
 
     .pane-container {
       position: fixed;
-      bottom: 0;
       display: flex;
       justify-content: flex-end;
+      padding: 5px;
     }
 
     .game-pane {
@@ -26,6 +26,7 @@
         display: flex;
         justify-content: space-between;
         padding: 0.5rem 1rem;
+        border-radius: 5px;
 
         .fa {
           margin: 0 0.2em;

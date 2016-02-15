@@ -21,4 +21,16 @@ class GameChannel < ApplicationCable::Channel
 
     ActionCable.server.broadcast('game', action: :update_game_object, object: object)
   end
+
+  def update_game_objects(data)
+    GameObject.transaction do
+      objects = data['objects'].map do |json|
+        object = GameObject.find(json['id'])
+        object.update(json)
+        object
+      end
+
+      ActionCable.server.broadcast('game', action: :update_game_objects, objects: objects)
+    end
+  end
 end

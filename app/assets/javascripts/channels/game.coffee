@@ -24,6 +24,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
   update_game_object: (id, attrs) ->
     @perform 'update_game_object', id: id, attrs: attrs
 
+  update_game_objects: (gameObjects) ->
+    @perform 'update_game_objects', objects: gameObjects
+
 window.addEventListener 'beforeunload', ->
   App.game.unsubscribe()
   return

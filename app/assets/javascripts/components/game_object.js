@@ -5,8 +5,6 @@ export default class GameObject extends Component {
     super(...arguments);
 
     this.state = {};
-    this.dragHandler = this.handleDragging.bind(this);
-    this.dropHandler = this.handleDrop.bind(this);
   }
 
   get style() {
@@ -63,27 +61,10 @@ export default class GameObject extends Component {
   }
 
   handleMouseMove(event) {
-    const { isSelected, isDragging, onDrag } = this.props;
+    const { isSelected, isDragging, onDragStart } = this.props;
     if (isSelected && !isDragging && event.buttons > 0) {
-      onDrag();
-      window.addEventListener('mousemove', this.dragHandler);
-      window.addEventListener('mouseup', this.dropHandler);
+      onDragStart(event);
     }
-  }
-
-  handleDragging(event) {
-    const mouseInfo = this.props.extractMouseEvent(event);
-    this.setState({
-      centerX: mouseInfo.x.original,
-      centerY: mouseInfo.y.original,
-    });
-  }
-
-  handleDrop() {
-    const { centerX, centerY } = this.state;
-    this.props.onDrop(centerX, centerY);
-    window.removeEventListener('mousemove', this.dragHandler);
-    window.removeEventListener('mouseup', this.dropHandler);
   }
 
   handleKeyDown(event) {
@@ -121,8 +102,6 @@ GameObject.propTypes = {
   onFlip: PropTypes.func,
   onRotate: PropTypes.func,
   onRelease: PropTypes.func,
-  onDrag: PropTypes.func,
-  onDrop: PropTypes.func,
+  onDragStart: PropTypes.func,
   releaseAll: PropTypes.func,
-  extractMouseEvent: PropTypes.func,
 };

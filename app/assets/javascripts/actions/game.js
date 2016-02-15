@@ -5,8 +5,8 @@ import {
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECT,
   ROTATE_GAME_OBJECT,
-  DRAG_GAME_OBJECT,
-  DROP_GAME_OBJECT,
+  DRAG_GAME_OBJECTS,
+  DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
 } from './action_types';
 
@@ -65,18 +65,16 @@ export function rotateGameObject(gameObjectId, rotate) {
   };
 }
 
-export function dragGameObject(gameObjectId) {
+export function dragGameObjects(gameObjectIds) {
   return {
-    type: DRAG_GAME_OBJECT,
-    gameObjectId,
+    type: DRAG_GAME_OBJECTS,
+    gameObjectIds,
   };
 }
 
-export function dropGameObject(gameObjectId, centerX, centerY) {
+export function dropGameObjects(gameObjects) {
   return {
-    type: DROP_GAME_OBJECT,
-    gameObjectId,
-    centerX,
-    centerY,
+    type: DROP_GAME_OBJECTS,
+    gameObjects,
   };
 }
