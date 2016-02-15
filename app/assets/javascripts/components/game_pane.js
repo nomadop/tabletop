@@ -117,15 +117,16 @@ export default class GamePane extends Component {
     );
   }
 
-  renderContent() {
-    return this.state.display === 'minimum' ? null : this.props.children;
+  renderBody() {
+    const content = this.state.display === 'minimum' ? null : this.props.children;
+    return <div className="pane-body">{content}</div>
   }
 
   render() {
     return (
-      <div className="game-pane" style={this.style}>
+      <div className={`game-pane ${this.props.className}`} style={this.style}>
         {this.renderHeader()}
-        {this.renderContent()}
+        {this.renderBody()}
       </div>
     );
   }
@@ -136,5 +137,6 @@ GamePane.propTypes = {
   height: PropTypes.number,
   title: PropTypes.string,
   resizeable: PropTypes.bool,
+  className: PropTypes.string,
   onClose: PropTypes.func,
 };

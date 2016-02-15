@@ -9,9 +9,19 @@ import {
   rotateGameObject,
   dragGameObject,
   dropGameObject,
+  receiveGameObjects,
 } from '../actions/game';
 
 class GameObjectContainer extends Component {
+  componentDidMount() {
+    this.createGameObjectHandler = (data) => this.props.receiveGameObjects([data.object]);
+    App.game.register_receiver(this.createGameObjectHandler);
+  }
+
+  componentWillUnmount() {
+    App.game.unregister_receiver(this.createGameObjectHandler);
+  }
+
   handleFlipGameObject(id, isFlipped) {
     this.props.flipGameObject(id, isFlipped);
     App.game.update_game_object(id, {is_fliped: isFlipped});
@@ -67,6 +77,7 @@ GameObjectContainer.propTypes = {
   dragGameObject: PropTypes.func,
   dropGameObject: PropTypes.func,
   extractMouseEvent: PropTypes.func,
+  receiveGameObjects: PropTypes.func,
 };
 
 function selector(state) {
@@ -90,6 +101,7 @@ function dispatcher(dispatch) {
     rotateGameObject,
     dragGameObject,
     dropGameObject,
+    receiveGameObjects,
   }, dispatch);
 }
 

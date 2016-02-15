@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import PerspectiveLayer from '../components/perspective_layer';
 import DirectorLayer from '../components/director_layer';
 import CoordinationLayer from '../components/coordination_layer';
-import GamePane from 'components/game_pane';
+import CreateObjectPane from 'components/create_object_pane';
 import GameObjectContainer from './game_object';
 import {
   moveCameraHorizontal,
@@ -76,10 +76,6 @@ class Game extends Component {
   }
 
   handleMouseWheel(event) {
-    if (event.target.className === 'game-pane') {
-      return;
-    }
-
     const deltaY = event.deltaY;
     const deltaX = event.deltaX;
     if (Math.abs(event.wheelDelta) >= 120) {
@@ -100,6 +96,10 @@ class Game extends Component {
     this.lastMouseY = mouseInfo.y;
     this.mouseDownX = mouseInfo.x;
     this.mouseDownY = mouseInfo.y;
+  }
+
+  handleCreateGameObject(meta_id) {
+    App.game.create_game_object(meta_id);
   }
 
   resizeGameWindow() {
@@ -123,12 +123,12 @@ class Game extends Component {
   }
 
   renderPopUpLayer() {
+    const { meta, game } = this.props;
+
     return (
       <div className="pop-up-layer">
         <div className="pane-container">
-          <GamePane width={640} height={480} title="Create Game Object">
-
-          </GamePane>
+          <CreateObjectPane meta={meta} module={game.module} createGameObject={this.handleCreateGameObject}/>
         </div>
       </div>
     )
