@@ -1,4 +1,4 @@
-export default function arrayMinus(a, b) {
+export function arrayMinus(a, b) {
   const sorter = (x, y) => x > y;
   const arrayA = a.sort(sorter);
   const arrayB = b.sort(sorter);
@@ -21,4 +21,16 @@ export default function arrayMinus(a, b) {
   }
 
   return result.concat(arrayA.slice(i));
+}
+
+export function arrayPlus(a, b) {
+  const result = a.slice();
+
+  b.forEach(x => {
+    if (a.indexOf(x) < 0) {
+      result.push(x);
+    }
+  });
+
+  return result;
 }

@@ -2,12 +2,14 @@ import fetch from 'isomorphic-fetch';
 import {
   RECEIVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
+  RECEIVE_DECKS,
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECT,
   ROTATE_GAME_OBJECT,
   DRAG_GAME_OBJECTS,
   DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
+  REMOVE_GAME_OBJECTS,
 } from './action_types';
 
 export function receiveGameObjects(gameObjects) {
@@ -24,12 +26,20 @@ export function receiveGameObjectMeta(meta) {
   };
 }
 
+export function receiveDecks(decks) {
+  return {
+    type: RECEIVE_DECKS,
+    decks,
+  };
+}
+
 export function fetchGameData(gameId) {
   return (dispatch) => {
     fetch(`/games/${gameId}/game_data`)
       .then(response => response.json())
       .then(json => {
         dispatch(receiveGameObjectMeta(json.game_object_meta));
+        dispatch(receiveDecks(json.decks));
         dispatch(receiveGameObjects(json.game_objects));
       });
   };
@@ -76,5 +86,12 @@ export function dropGameObjects(gameObjects) {
   return {
     type: DROP_GAME_OBJECTS,
     gameObjects,
+  };
+}
+
+export function removeGameObjects(gameObjectIds) {
+  return {
+    type: REMOVE_GAME_OBJECTS,
+    gameObjectIds,
   };
 }

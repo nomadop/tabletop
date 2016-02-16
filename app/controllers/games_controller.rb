@@ -4,7 +4,8 @@ class GamesController < ApplicationController
   def game_data
     render json: {
       game_object_meta: @game.game_object_meta,
-      game_objects: GameObject.where(meta: @game.game_object_meta),
+      game_objects: GameObject.where(container: nil),
+      decks: Deck.all,
     }
   end
 

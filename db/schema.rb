@@ -11,7 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160208125009) do
+ActiveRecord::Schema.define(version: 20160215064202) do
+
+  create_table "decks", force: :cascade do |t|
+    t.string   "sub_type",                    null: false
+    t.float    "width"
+    t.float    "height"
+    t.boolean  "is_expanded", default: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
 
   create_table "game_object_meta", force: :cascade do |t|
     t.string   "name"
@@ -28,16 +37,19 @@ ActiveRecord::Schema.define(version: 20160208125009) do
 
   create_table "game_objects", force: :cascade do |t|
     t.integer  "user_id"
-    t.integer  "meta_id",                      null: false
-    t.string   "meta_type",                    null: false
-    t.float    "center_x",     default: 0.0
-    t.float    "center_y",     default: 0.0
-    t.float    "rotate",       default: 0.0
-    t.boolean  "is_locked",    default: false
-    t.boolean  "is_fliped",    default: false
-    t.integer  "lock_version", default: 0
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.integer  "meta_id",                        null: false
+    t.string   "meta_type",                      null: false
+    t.float    "center_x",       default: 0.0
+    t.float    "center_y",       default: 0.0
+    t.float    "rotate",         default: 0.0
+    t.boolean  "is_locked",      default: false
+    t.boolean  "is_fliped",      default: false
+    t.integer  "lock_version",   default: 0
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.integer  "container_id"
+    t.string   "container_type"
+    t.integer  "deck_index"
   end
 
   create_table "games", force: :cascade do |t|

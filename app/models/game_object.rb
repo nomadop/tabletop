@@ -1,5 +1,10 @@
 class GameObject < ApplicationRecord
   belongs_to :meta, polymorphic: true
+  belongs_to :container, polymorphic: true, optional: true
+
+  def sub_type
+    meta.sub_type
+  end
 
   def left_x
     center_x - width / 2
@@ -25,9 +30,5 @@ class GameObject < ApplicationRecord
 
   def release_lock
     update(is_locked: false, user_id: nil)
-  end
-
-  def method_missing(method, *args, &block)
-    meta.respond_to?(method) ? meta.send(method, *args, &block) : super
   end
 end

@@ -3,15 +3,17 @@ import { combineReducers } from 'redux';
 import {
   RECEIVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
+  RECEIVE_DECKS,
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECT,
   ROTATE_GAME_OBJECT,
   DRAG_GAME_OBJECTS,
   DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
+  REMOVE_GAME_OBJECTS,
 } from '../actions/action_types';
 import camera from './camera';
-import arrayMinus from '../utils/array_minus';
+import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
 
 function metaById(state = {}, action) {
   if (action.type === RECEIVE_GAME_OBJECT_META) {
@@ -37,6 +39,32 @@ const meta = combineReducers({
   ids: metaIds,
 });
 
+function deckById(state = {}, action) {
+  const updater = {};
+  switch (action.type) {
+  case RECEIVE_DECKS:
+    action.decks.forEach(deck => updater[deck.id] = {$set: deck});
+    return update(state, updater);
+  default:
+    return state;
+  }
+}
+
+function deckIds(state = [], action) {
+  switch (action.type) {
+  case RECEIVE_DECKS:
+    const newIds = action.decks.map(deck => deck.id);
+    return arrayPlus(state, newIds);
+  default:
+    return state;
+  }
+}
+
+const decks = combineReducers({
+  byId: deckById,
+  ids: deckIds,
+});
+
 function gameObjectById(state = {}, action) {
   const updater = {};
   switch (action.type) {
@@ -57,17 +85,24 @@ function gameObjectById(state = {}, action) {
       };
     });
     return update(state, updater);
+  case REMOVE_GAME_OBJECTS:
+    action.gameObjectIds.forEach(id => updater[id] = {$set: undefined});
+    return update(state, updater);
   default:
     return state;
   }
 }
 
 function gameObjectIds(state = [], action) {
-  if (action.type === RECEIVE_GAME_OBJECTS) {
-    return action.gameObjects.map(gameObjects => gameObjects.id);
+  switch (action.type) {
+  case RECEIVE_GAME_OBJECTS:
+    const newIds = action.gameObjects.map(gameObjects => gameObjects.id);
+    return arrayPlus(state, newIds);
+  case REMOVE_GAME_OBJECTS:
+    return arrayMinus(state, action.gameObjectIds);
+  default:
+    return state;
   }
-
-  return state;
 }
 
 function selectedIds(state = [], action) {
@@ -77,6 +112,7 @@ function selectedIds(state = [], action) {
     newState.push(action.gameObjectId);
     return newState;
   case UNSELECT_GAME_OBJECTS:
+  case REMOVE_GAME_OBJECTS:
     return arrayMinus(newState, action.gameObjectIds);
   default:
     return state;
@@ -103,6 +139,7 @@ const gameObjects = combineReducers({
 
 export default combineReducers({
   meta,
+  decks,
   camera,
   gameObjects,
 });

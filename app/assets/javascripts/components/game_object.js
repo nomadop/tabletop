@@ -31,7 +31,7 @@ export default class GameObject extends Component {
   }
 
   get className() {
-    const { isSelected, isDragging } = this.props;
+    const { isSelected, isDragging, gameObject } = this.props;
     const classNames = ['game-object'];
     if (isSelected) {
       classNames.push('selected');
@@ -39,6 +39,10 @@ export default class GameObject extends Component {
 
     if (isDragging) {
       classNames.push('dragging');
+    }
+
+    if (gameObject.meta_type === 'Deck') {
+      classNames.push('deck-object');
     }
 
     return classNames.join(' ');
@@ -80,7 +84,7 @@ export default class GameObject extends Component {
     }
   }
 
-  render() {
+  renderNormalObject() {
     return (
       <div
         className={this.className}
@@ -91,6 +95,33 @@ export default class GameObject extends Component {
         onMouseMove={this.handleMouseMove.bind(this)}
       ></div>
     );
+  }
+
+  renderDeckObject() {
+    const { gameObject } = this.props;
+
+    return (
+      <div
+        className={this.className}
+        style={this.style}
+        tabIndex="1"
+        onKeyDown={this.handleKeyDown.bind(this)}
+        onMouseDown={this.handleMouseDown.bind(this)}
+        onMouseMove={this.handleMouseMove.bind(this)}
+      >
+        <span className="count unselectable">{gameObject.meta.count}</span>
+      </div>
+    );
+  }
+
+  render() {
+    switch (this.props.gameObject.meta_type) {
+    case 'Deck':
+      return this.renderDeckObject();
+    case 'GameObjectMetum':
+    default:
+      return this.renderNormalObject();
+    }
   }
 }
 

@@ -33,4 +33,26 @@ class GameChannel < ApplicationCable::Channel
       ActionCable.server.broadcast('game', action: :update_game_objects, objects: objects)
     end
   end
+
+  def create_deck(data)
+    game_objects = GameObject.includes(:meta).where(id: data['ids'])
+
+    if (deck = Deck.create_deck(game_objects))
+      ActionCable.server.broadcast('game', action: :create_deck, deck: deck, object: deck.game_object)
+      ActionCable.server.broadcast('game', action: :remove_game_objects, object_ids: game_objects.ids)
+    end
+  end
+
+  def join_deck(data)
+    game_objects = GameObject.find(data['ids'])
+    deck = Deck.find(data['deck_id'])
+
+    if deck.join(game_objects)
+      ActionCable.server.broadcast('game', action: :remove_game_objects, object_ids: game_objects.ids)
+    else
+      ActionCable.server.broadcast('game', action: :update_game_objects, objects: game_objects)
+    end
+
+    ActionCable.server.broadcast('game', action: :update_deck, deck: deck)
+  end
 end

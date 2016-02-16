@@ -10,31 +10,36 @@ import {
   dragGameObjects,
   dropGameObjects,
   receiveGameObjects,
+  receiveDecks,
+  removeGameObjects,
 } from '../actions/game';
 
 class GameObjectContainer extends Component {
   componentDidMount() {
-    this.createGameObjectHandler = (data) => {
-      if (data.action === 'create_game_object') {
-        this.props.receiveGameObjects([data.object]);
+    this.gameObjectReceivers = (data) => {
+      switch (data.action) {
+      case 'create_game_object':
+      case 'update_game_object':
+        return this.props.receiveGameObjects([data.object]);
+      case 'update_game_objects':
+        return this.props.receiveGameObjects(data.objects);
+      case 'create_deck':
+        this.props.receiveDecks([data.deck]);
+        return this.props.receiveGameObjects([data.object]);
+      case 'remove_game_objects':
+        return this.props.removeGameObjects(data.object_ids);
+      default:
+        return;
       }
     };
 
-    this.updateGameObjectsHandler = (data) => {
-      if (data.action === 'update_game_objects') {
-        this.props.receiveGameObjects(data.objects);
-      }
-    };
-
-    App.game.register_receiver(this.createGameObjectHandler);
-    App.game.register_receiver(this.updateGameObjectsHandler);
+    App.game.register_receiver(this.gameObjectReceivers);
     this.dragHandler = this.handleDragGameObjects.bind(this);
     this.dropHandler = this.handleDropGameObjects.bind(this);
   }
 
   componentWillUnmount() {
-    App.game.unregister_receiver(this.createGameObjectHandler);
-    App.game.unregister_receiver(this.updateGameObjectsHandler);
+    App.game.unregister_receiver(this.gameObjectReceivers);
   }
 
   handleFlipGameObject(id, isFlipped) {
@@ -45,6 +50,11 @@ class GameObjectContainer extends Component {
   handleRotateGameObject(id, rotate) {
     this.props.rotateGameObject(id, rotate);
     App.game.update_game_object(id, {rotate: rotate});
+  }
+
+  handleCreateDeck() {
+    const { selectedIds } = this.props;
+    App.game.create_deck(selectedIds);
   }
 
   handleDragStart(event) {
@@ -89,6 +99,15 @@ class GameObjectContainer extends Component {
     window.removeEventListener('mouseup', this.dropHandler);
   }
 
+  handleKeyDown(event) {
+    switch (event.keyCode) {
+    case 80:
+      return this.handleCreateDeck();
+    default:
+      return;
+    }
+  }
+
   renderGameObject(object, selectedIds, isDragging) {
     const id = object.id;
     const isSelected = selectedIds.indexOf(id) >= 0;
@@ -112,7 +131,7 @@ class GameObjectContainer extends Component {
     const { gameObjects, selectedIds, isDragging } = this.props;
 
     return (
-      <div className="game-object-container">
+      <div className="game-object-container" onKeyDown={this.handleKeyDown.bind(this)}>
         { gameObjects.map(object => this.renderGameObject(object, selectedIds, isDragging)) }
       </div>
     );
@@ -130,14 +149,22 @@ GameObjectContainer.propTypes = {
   dragGameObjects: PropTypes.func,
   dropGameObjects: PropTypes.func,
   receiveGameObjects: PropTypes.func,
+  receiveDecks: PropTypes.func,
+  removeGameObjects: PropTypes.func,
 };
 
 function selector(state) {
   const metaById = state.meta.byId;
+  const deckById = state.decks.byId;
   const gameObjectById = state.gameObjects.byId;
-  const gameObjects = Object.values(gameObjectById);
-  gameObjects.forEach(object => {
-    object.meta = metaById[object.meta_id];
+  const gameObjects = state.gameObjects.ids.map(id => {
+    const object = gameObjectById[id];
+    if (object.meta_type === 'Deck') {
+      object.meta = deckById[object.meta_id];
+    } else {
+      object.meta = metaById[object.meta_id];
+    }
+    return object;
   });
   const selectedIds = state.gameObjects.selectedIds;
   return {
@@ -156,6 +183,8 @@ function dispatcher(dispatch) {
     dragGameObjects,
     dropGameObjects,
     receiveGameObjects,
+    receiveDecks,
+    removeGameObjects,
   }, dispatch);
 }
 
