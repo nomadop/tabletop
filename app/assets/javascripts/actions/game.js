@@ -4,8 +4,8 @@ import {
   RECEIVE_GAME_OBJECTS,
   RECEIVE_DECKS,
   SELECT_GAME_OBJECT,
-  FLIP_GAME_OBJECT,
-  ROTATE_GAME_OBJECT,
+  FLIP_GAME_OBJECTS,
+  ROTATE_GAME_OBJECTS,
   DRAG_GAME_OBJECTS,
   DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
@@ -59,19 +59,18 @@ export function unselectGameObjects(gameObjectIds) {
   };
 }
 
-export function flipGameObject(gameObjectId, isFlipped) {
+export function flipGameObjects(gameObjectIds, isFlipped) {
   return {
-    type: FLIP_GAME_OBJECT,
-    gameObjectId,
+    type: FLIP_GAME_OBJECTS,
+    gameObjectIds,
     isFlipped,
   };
 }
 
-export function rotateGameObject(gameObjectId, rotate) {
+export function rotateGameObjects(gameObjectUpdates) {
   return {
-    type: ROTATE_GAME_OBJECT,
-    gameObjectId,
-    rotate,
+    type: ROTATE_GAME_OBJECTS,
+    gameObjectUpdates,
   };
 }
 

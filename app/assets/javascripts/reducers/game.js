@@ -5,8 +5,8 @@ import {
   RECEIVE_GAME_OBJECTS,
   RECEIVE_DECKS,
   SELECT_GAME_OBJECT,
-  FLIP_GAME_OBJECT,
-  ROTATE_GAME_OBJECT,
+  FLIP_GAME_OBJECTS,
+  ROTATE_GAME_OBJECTS,
   DRAG_GAME_OBJECTS,
   DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
@@ -71,11 +71,18 @@ function gameObjectById(state = {}, action) {
   case RECEIVE_GAME_OBJECTS:
     action.gameObjects.forEach(object => updater[object.id] = {$set: object});
     return update(state, updater);
-  case FLIP_GAME_OBJECT:
-    updater[action.gameObjectId] = {is_fliped: {$set: action.isFlipped}};
+  case FLIP_GAME_OBJECTS:
+    const singleUpdater = {is_fliped: {$set: action.isFlipped}};
+    action.gameObjectIds.forEach(id => updater[id] = singleUpdater);
     return update(state, updater);
-  case ROTATE_GAME_OBJECT:
-    updater[action.gameObjectId] = {rotate: {$set: action.rotate}};
+  case ROTATE_GAME_OBJECTS:
+    action.gameObjectUpdates.forEach(object => {
+      updater[object.id] = {
+        rotate: {$set: object.rotate},
+        center_x: {$set: object.center_x},
+        center_y: {$set: object.center_y},
+      }
+    });
     return update(state, updater);
   case DROP_GAME_OBJECTS:
     action.gameObjects.forEach(object => {

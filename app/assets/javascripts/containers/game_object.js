@@ -5,14 +5,15 @@ import GameObject from '../components/game_object';
 import {
   selectGameObject,
   unselectGameObjects,
-  flipGameObject,
-  rotateGameObject,
+  flipGameObjects,
+  rotateGameObjects,
   dragGameObjects,
   dropGameObjects,
   receiveGameObjects,
   receiveDecks,
   removeGameObjects,
 } from '../actions/game';
+import { rotateByPoint } from '../utils/coordination_transformer';
 
 class GameObjectContainer extends Component {
   componentDidMount() {
@@ -42,14 +43,33 @@ class GameObjectContainer extends Component {
     App.game.unregister_receiver(this.gameObjectReceivers);
   }
 
-  handleFlipGameObject(id, isFlipped) {
-    this.props.flipGameObject(id, isFlipped);
-    App.game.update_game_object(id, {is_fliped: isFlipped});
+  handleFlipGameObjects() {
+    const { selectedIds, selectedObjects } = this.props;
+    const isFlipped = !selectedObjects.some(object => object.is_fliped);
+    this.props.flipGameObjects(selectedIds, isFlipped);
+    const updates = selectedIds.map(id => {
+      return {id, is_fliped: isFlipped};
+    });
+    App.game.update_game_objects(updates);
   }
 
-  handleRotateGameObject(id, rotate) {
-    this.props.rotateGameObject(id, rotate);
-    App.game.update_game_object(id, {rotate: rotate});
+  handleRotateGameObjects(rotate) {
+    const { selectedObjects, isDragging } = this.props;
+    if (!isDragging) {
+      const middleX = selectedObjects.reduce((result, object) => result + object.center_x, 0) / selectedObjects.length;
+      const middleY = selectedObjects.reduce((result, object) => result + object.center_y, 0) / selectedObjects.length;
+      const updates = selectedObjects.map(object => {
+        const rotatedPosition = rotateByPoint([object.center_x, object.center_y], [middleX, middleY], rotate);
+        return {
+          id: object.id,
+          rotate: object.rotate + rotate,
+          center_x: rotatedPosition[0],
+          center_y: rotatedPosition[1],
+        };
+      });
+      this.props.rotateGameObjects(updates);
+      App.game.update_game_objects(updates);
+    }
   }
 
   handleCreateDeck() {
@@ -103,6 +123,10 @@ class GameObjectContainer extends Component {
     switch (event.keyCode) {
     case 80:
       return this.handleCreateDeck();
+    case 70:
+      return this.handleFlipGameObjects();
+    case 82:
+      return this.handleRotateGameObjects(45);
     default:
       return;
     }
@@ -119,11 +143,8 @@ class GameObjectContainer extends Component {
       isDragging={isSelected && isDragging}
       onSelect={this.props.selectGameObject.bind(null, id)}
       onRelease={this.props.unselectGameObjects.bind(null, [id])}
-      onFlip={this.handleFlipGameObject.bind(this, id)}
-      onRotate={this.handleRotateGameObject.bind(this, id)}
       onDragStart={this.handleDragStart.bind(this)}
       releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
-      extractMouseEvent={this.props.extractMouseEvent}
     />
   }
 
@@ -141,10 +162,11 @@ class GameObjectContainer extends Component {
 GameObjectContainer.propTypes = {
   gameObjects: PropTypes.array,
   selectedIds: PropTypes.array,
+  selectedObjects: PropTypes.array,
   selectGameObject: PropTypes.func,
   unselectGameObjects: PropTypes.func,
-  flipGameObject: PropTypes.func,
-  rotateGameObject: PropTypes.func,
+  flipGameObjects: PropTypes.func,
+  rotateGameObjects: PropTypes.func,
   isDragging: PropTypes.bool,
   dragGameObjects: PropTypes.func,
   dropGameObjects: PropTypes.func,
@@ -167,9 +189,11 @@ function selector(state) {
     return object;
   });
   const selectedIds = state.gameObjects.selectedIds;
+  const selectedObjects = selectedIds.map(id => gameObjectById[id]);
   return {
     gameObjects,
     selectedIds,
+    selectedObjects,
     isDragging: state.gameObjects.isDragging,
   };
 }
@@ -178,8 +202,8 @@ function dispatcher(dispatch) {
   return bindActionCreators({
     selectGameObject,
     unselectGameObjects,
-    flipGameObject,
-    rotateGameObject,
+    flipGameObjects,
+    rotateGameObjects,
     dragGameObjects,
     dropGameObjects,
     receiveGameObjects,

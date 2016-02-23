@@ -94,3 +94,15 @@ export function screenToPerspective(screenPoint, perspective, angle) {
   const resultX = interX;
   return [resultX, resultY];
 }
+
+export function rotateByPoint(targetPoint, rotatePoint, angle) {
+  const rad = Math.PI * angle / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+
+  const [targetX, targetY] = targetPoint;
+  const [rotateX, rotateY] = rotatePoint;
+  const resultX = (targetX - rotateX) * cos - (targetY - rotateY) * sin + rotateX;
+  const resultY = (targetX - rotateX) * sin + (targetY - rotateY) * cos + rotateY;
+  return [resultX, resultY];
+}
