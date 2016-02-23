@@ -84,7 +84,8 @@ export default class GameObject extends Component {
   }
 
   renderDeckObject() {
-    const { gameObject } = this.props;
+    const { gameObject, joinDeck } = this.props;
+    const deck = gameObject.meta;
 
     return (
       <div
@@ -93,8 +94,9 @@ export default class GameObject extends Component {
         tabIndex="1"
         onMouseDown={this.handleMouseDown.bind(this)}
         onMouseMove={this.handleMouseMove.bind(this)}
+        onMouseUp={joinDeck.bind(null, deck)}
       >
-        <span className="count unselectable">{gameObject.meta.count}</span>
+        <span className="count unselectable">{deck.count}</span>
       </div>
     );
   }
@@ -118,4 +120,5 @@ GameObject.propTypes = {
   onRelease: PropTypes.func,
   onDragStart: PropTypes.func,
   releaseAll: PropTypes.func,
+  joinDeck: PropTypes.func,
 };

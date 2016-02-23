@@ -30,6 +30,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
   create_deck: (ids) ->
     @perform 'create_deck', ids: ids
 
+  join_deck: (deck_id, ids) ->
+    @perform 'join_deck', deck_id: deck_id, ids: ids
+
 window.addEventListener 'beforeunload', ->
   App.game.unsubscribe()
   return

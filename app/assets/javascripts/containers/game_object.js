@@ -27,8 +27,13 @@ class GameObjectContainer extends Component {
       case 'create_deck':
         this.props.receiveDecks([data.deck]);
         return this.props.receiveGameObjects([data.object]);
+      case 'update_deck':
+        return this.props.receiveDecks([data.deck]);
       case 'remove_game_objects':
         return this.props.removeGameObjects(data.object_ids);
+      case 'error':
+        alert(JSON.stringify(data.error));
+        return;
       default:
         return;
       }
@@ -114,9 +119,32 @@ class GameObjectContainer extends Component {
       };
     });
     this.props.dropGameObjects(objects);
-    App.game.update_game_objects(objects);
+    if (this.joiningDeck) {
+      this.joiningDeck = false;
+    } else {
+      App.game.update_game_objects(objects);
+    }
+
     window.removeEventListener('mousemove', this.dragHandler);
     window.removeEventListener('mouseup', this.dropHandler);
+  }
+
+  handleJoinDeck(deck) {
+    const { selectedIds, selectedObjects, isDragging } = this.props;
+    if (!isDragging || selectedIds.length < 1) {
+      return;
+    }
+
+    const typeUnmatch = selectedObjects.some(object => object.meta_type !== 'GameObjectMetum');
+    const subTypeUnmatch = selectedObjects.some(object => object.meta.sub_type !== deck.sub_type);
+    if (typeUnmatch || subTypeUnmatch) {
+      console.log('Type Error', typeUnmatch, subTypeUnmatch);
+      console.log(selectedObjects.map(object => object.meta.sub_type), deck.sub_type);
+      return false;
+    }
+
+    this.joiningDeck = true;
+    App.game.join_deck(deck.id, selectedIds);
   }
 
   handleKeyDown(event) {
@@ -145,6 +173,7 @@ class GameObjectContainer extends Component {
       onRelease={this.props.unselectGameObjects.bind(null, [id])}
       onDragStart={this.handleDragStart.bind(this)}
       releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
+      joinDeck={this.handleJoinDeck.bind(this)}
     />
   }
 
