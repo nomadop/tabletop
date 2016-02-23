@@ -13,7 +13,10 @@ import {
   rotateCameraHorizontal,
   rotateCameraVertical,
 } from '../actions/camera';
-import { fetchGameData } from '../actions/game';
+import {
+  fetchGameData,
+  unselectGameObjects,
+} from '../actions/game';
 import {
   originalToPerspective,
   perspectiveToOriginal,
@@ -91,11 +94,11 @@ class Game extends Component {
   }
 
   handleMouseDown(event) {
-    const mouseInfo = this.extractMouseEvent(event);
-    this.lastMouseX = mouseInfo.x;
-    this.lastMouseY = mouseInfo.y;
-    this.mouseDownX = mouseInfo.x;
-    this.mouseDownY = mouseInfo.y;
+    const selectedIds = this.props.selectedIds;
+    const onGameObject = event.target.className.search('game-object') >= 0;
+    if (!onGameObject && selectedIds.length > 0) {
+      this.props.unselectGameObjects(selectedIds);
+    }
   }
 
   handleCreateGameObject(meta_id) {
@@ -156,6 +159,7 @@ class Game extends Component {
         ref="gameWindow"
         style={style}
         onKeyDown={this.handleKeyDown.bind(this)}
+        onMouseDown={this.handleMouseDown.bind(this)}
       >
         {this.renderPopUpLayer()}
         <PerspectiveLayer width={width} height={height} camera={camera}>
@@ -180,6 +184,8 @@ Game.propTypes = {
   game: PropTypes.object,
   authentication: PropTypes.object,
   fetchGameData: PropTypes.func,
+  unselectGameObjects: PropTypes.func,
+  selectedIds: PropTypes.array,
 };
 
 function selector(state) {
@@ -188,6 +194,7 @@ function selector(state) {
   return {
     camera: state.camera,
     meta,
+    selectedIds: state.gameObjects.selectedIds,
   };
 }
 
@@ -199,6 +206,7 @@ function dispatcher(dispatch) {
     rotateCameraHorizontal,
     rotateCameraVertical,
     fetchGameData,
+    unselectGameObjects,
   }, dispatch);
 }
 
