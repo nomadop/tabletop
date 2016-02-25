@@ -12,6 +12,8 @@ import {
   receiveGameObjects,
   receiveDecks,
   removeGameObjects,
+  startDrawingGameObject,
+  endDrawingGameObject,
 } from '../actions/game';
 import { rotateByPoint } from '../utils/coordination_transformer';
 
@@ -31,6 +33,14 @@ class GameObjectContainer extends Component {
         return this.props.receiveDecks([data.deck]);
       case 'remove_game_objects':
         return this.props.removeGameObjects(data.object_ids);
+      case 'draw_success':
+        const fakeDraggingComponent = this.refs.gameObjectfakeDragging;
+        const object = Object.assign(data.object, {
+          isDragging: true,
+          center_x: fakeDraggingComponent.state.centerX,
+          center_y: fakeDraggingComponent.state.centerY,
+        });
+        return this.props.endDrawingGameObject(object);
       case 'error':
         alert(JSON.stringify(data.error));
         return;
@@ -42,10 +52,35 @@ class GameObjectContainer extends Component {
     App.game.register_receiver(this.gameObjectReceivers);
     this.dragHandler = this.handleDragGameObjects.bind(this);
     this.dropHandler = this.handleDropGameObjects.bind(this);
+    this.draggingComponents = [];
+    window.addEventListener('mousemove', this.dragHandler);
+    window.addEventListener('mouseup', this.dropHandler);
   }
 
   componentWillUnmount() {
     App.game.unregister_receiver(this.gameObjectReceivers);
+    window.removeEventListener('mousemove', this.dragHandler);
+    window.removeEventListener('mouseup', this.dropHandler);
+  }
+
+  componentDidUpdate() {
+    const { selectedObjects, isDragging } = this.props;
+
+    this.draggingComponents = [];
+
+    if (isDragging) {
+      selectedObjects.forEach(object => {
+        if (object.isDragging) {
+          this.draggingComponents.push(this.refs[`gameObject${object.id}`]);
+        }
+      });
+
+      this.draggingComponents.forEach(component => {
+        const gameObject = component.props.gameObject;
+        component.multipleDragOffsetX = gameObject.center_x - this.dragStartMouseInfo.x.original;
+        component.multipleDragOffsetY = gameObject.center_y - this.dragStartMouseInfo.y.original;
+      });
+    }
   }
 
   handleFlipGameObjects() {
@@ -83,22 +118,17 @@ class GameObjectContainer extends Component {
   }
 
   handleDragStart(event) {
-    const mouseInfo = this.props.extractMouseEvent(event);
     const { selectedIds } = this.props;
 
+    this.dragStartMouseInfo = this.props.extractMouseEvent(event);
     this.props.dragGameObjects(selectedIds);
-    this.draggingComponents = selectedIds.map(id => this.refs[`gameObject${id}`]);
-    this.draggingComponents.forEach(component => {
-      const gameObject = component.props.gameObject;
-      component.multipleDragOffsetX = gameObject.center_x - mouseInfo.x.original;
-      component.multipleDragOffsetY = gameObject.center_y - mouseInfo.y.original;
-    });
-
-    window.addEventListener('mousemove', this.dragHandler);
-    window.addEventListener('mouseup', this.dropHandler);
   }
 
   handleDragGameObjects(event) {
+    if (!this.draggingComponents.length) {
+      return;
+    }
+
     const mouseInfo = this.props.extractMouseEvent(event);
     this.draggingComponents.forEach(component => {
       component.setState({
@@ -109,10 +139,18 @@ class GameObjectContainer extends Component {
   }
 
   handleDropGameObjects() {
+    if (!this.draggingComponents.length) {
+      return;
+    }
+
     const objects = this.draggingComponents.map(component => {
       const gameObject = component.props.gameObject;
+      if (gameObject.id === 'fakeDragging') {
+        return alert('Fetal error: drop before draw success');
+      }
       return {
         id: gameObject.id,
+        container_id: null,
         lock_version: gameObject.lock_version,
         center_x: component.state.centerX,
         center_y: component.state.centerY,
@@ -124,9 +162,6 @@ class GameObjectContainer extends Component {
     } else {
       App.game.update_game_objects(objects);
     }
-
-    window.removeEventListener('mousemove', this.dragHandler);
-    window.removeEventListener('mouseup', this.dropHandler);
   }
 
   handleJoinDeck(deck) {
@@ -147,6 +182,20 @@ class GameObjectContainer extends Component {
     App.game.join_deck(deck.id, selectedIds);
   }
 
+  handleDrawGameObject(deckObject, targetObject, event) {
+    const { selectedIds } = this.props;
+    if (selectedIds.length > 1 || selectedIds[0] !== deckObject.id) {
+      return;
+    }
+
+    this.dragStartMouseInfo = this.props.extractMouseEvent(event);
+    const deckId = deckObject.meta.id;
+    const templateId = targetObject ? targetObject.id : deckObject.id;
+    const targetId = targetObject ? targetObject.id : undefined;
+    this.props.startDrawingGameObject(deckId, deckObject.id, templateId);
+    App.game.draw(deckId, targetId)
+  }
+
   handleKeyDown(event) {
     switch (event.keyCode) {
     case 80:
@@ -160,7 +209,7 @@ class GameObjectContainer extends Component {
     }
   }
 
-  renderGameObject(object, selectedIds, isDragging) {
+  renderGameObject(object, selectedIds) {
     const id = object.id;
     const isSelected = selectedIds.indexOf(id) >= 0;
     return <GameObject
@@ -168,21 +217,21 @@ class GameObjectContainer extends Component {
       ref={`gameObject${id}`}
       gameObject={object}
       isSelected={isSelected}
-      isDragging={isSelected && isDragging}
       onSelect={this.props.selectGameObject.bind(null, id)}
       onRelease={this.props.unselectGameObjects.bind(null, [id])}
       onDragStart={this.handleDragStart.bind(this)}
       releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
       joinDeck={this.handleJoinDeck.bind(this)}
+      draw={this.handleDrawGameObject.bind(this, object)}
     />
   }
 
   render() {
-    const { gameObjects, selectedIds, isDragging } = this.props;
+    const { gameObjects, selectedIds } = this.props;
 
     return (
       <div className="game-object-container" onKeyDown={this.handleKeyDown.bind(this)}>
-        { gameObjects.map(object => this.renderGameObject(object, selectedIds, isDragging)) }
+        { gameObjects.map(object => this.renderGameObject(object, selectedIds)) }
       </div>
     );
   }
@@ -202,6 +251,8 @@ GameObjectContainer.propTypes = {
   receiveGameObjects: PropTypes.func,
   receiveDecks: PropTypes.func,
   removeGameObjects: PropTypes.func,
+  startDrawingGameObject: PropTypes.func,
+  endDrawingGameObject: PropTypes.func,
 };
 
 function selector(state) {
@@ -238,6 +289,8 @@ function dispatcher(dispatch) {
     receiveGameObjects,
     receiveDecks,
     removeGameObjects,
+    startDrawingGameObject,
+    endDrawingGameObject,
   }, dispatch);
 }
 

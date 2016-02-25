@@ -1,11 +1,15 @@
 # Be sure to restart your server when you modify this file. Action Cable runs in an EventMachine loop that does not support auto reloading.
 class GameChannel < ApplicationCable::Channel
+  def game_stream
+    'game'
+  end
+
   def user_stream
     "game##{current_user.id}"
   end
 
   def subscribed
-    stream_from 'game'
+    stream_from game_stream
     stream_from user_stream
   end
 
@@ -17,8 +21,9 @@ class GameChannel < ApplicationCable::Channel
     meta = GameObjectMetum.find(data['meta_id'])
     object = meta.game_objects.create
 
-    ActionCable.server.broadcast('game', action: :create_game_object, object: object)
+    ActionCable.server.broadcast(game_stream, action: :create_game_object, object: object)
   rescue StandardError => e
+    puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
@@ -26,8 +31,9 @@ class GameChannel < ApplicationCable::Channel
     object = GameObject.find(data['id'])
     object.update(data['attrs'])
 
-    ActionCable.server.broadcast('game', action: :update_game_object, object: object)
+    ActionCable.server.broadcast(game_stream, action: :update_game_object, object: object)
   rescue StandardError => e
+    puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
@@ -39,9 +45,10 @@ class GameChannel < ApplicationCable::Channel
         object
       end
 
-      ActionCable.server.broadcast('game', action: :update_game_objects, objects: objects)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: objects)
     end
   rescue StandardError => e
+    puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
@@ -49,10 +56,11 @@ class GameChannel < ApplicationCable::Channel
     game_objects = GameObject.includes(:meta).where(id: data['ids'])
 
     if (deck = Deck.create_deck(game_objects))
-      ActionCable.server.broadcast('game', action: :create_deck, deck: deck, object: deck.game_object)
-      ActionCable.server.broadcast('game', action: :remove_game_objects, object_ids: game_objects.ids)
+      ActionCable.server.broadcast(game_stream, action: :create_deck, deck: deck, object: deck.game_object)
+      ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: game_objects.ids)
     end
   rescue StandardError => e
+    puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
@@ -61,13 +69,31 @@ class GameChannel < ApplicationCable::Channel
     deck = Deck.find(data['deck_id'])
 
     if deck.join(game_objects)
-      ActionCable.server.broadcast('game', action: :remove_game_objects, object_ids: data['ids'])
+      ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: data['ids'])
     else
-      ActionCable.server.broadcast('game', action: :update_game_objects, objects: game_objects)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects)
     end
 
-    ActionCable.server.broadcast('game', action: :update_deck, deck: deck)
+    ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
   rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+  end
+
+  def draw(data)
+    deck = Deck.find(data['deck_id'])
+    return ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'invalid deck id') unless deck
+
+    game_object = deck.draw(user_id: current_user.id, target_id: data['target_id'])
+    if game_object
+      ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
+      ActionCable.server.broadcast(user_stream, action: :draw_success, object: game_object)
+    else
+      ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'no target')
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'system error')
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 end

@@ -11,6 +11,8 @@ import {
   DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
   REMOVE_GAME_OBJECTS,
+  START_DRAWING_GAME_OBJECT,
+  END_DRAWING_GAME_OBJECT,
 } from '../actions/action_types';
 import camera from './camera';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
@@ -44,6 +46,10 @@ function deckById(state = {}, action) {
   switch (action.type) {
   case RECEIVE_DECKS:
     action.decks.forEach(deck => updater[deck.id] = {$set: deck});
+    return update(state, updater);
+  case START_DRAWING_GAME_OBJECT:
+    const deck = state[action.deckId];
+    updater[deck.id] = {count: {$set: deck.count - 1}};
     return update(state, updater);
   default:
     return state;
@@ -84,16 +90,29 @@ function gameObjectById(state = {}, action) {
       }
     });
     return update(state, updater);
+  case DRAG_GAME_OBJECTS:
+    action.gameObjectIds.forEach(id => updater[id] = {isDragging: {$set: true}});
+    return update(state, updater);
   case DROP_GAME_OBJECTS:
     action.gameObjects.forEach(object => {
       updater[object.id] = {
         center_x: {$set: object.center_x},
         center_y: {$set: object.center_y},
+        isDragging: {$set: false},
       };
     });
     return update(state, updater);
   case REMOVE_GAME_OBJECTS:
     action.gameObjectIds.forEach(id => updater[id] = {$set: undefined});
+    return update(state, updater);
+  case START_DRAWING_GAME_OBJECT:
+    const template = Object.assign({}, state[action.templateId], {id: 'fakeDragging', isDragging: true});
+    updater['fakeDragging'] = {$set: template};
+    return update(state, updater);
+  case END_DRAWING_GAME_OBJECT:
+    const object = action.gameObject;
+    updater[object.id] = {$set: object};
+    updater['fakeDragging'] = {$set: null};
     return update(state, updater);
   default:
     return state;
@@ -107,20 +126,27 @@ function gameObjectIds(state = [], action) {
     return arrayPlus(state, newIds);
   case REMOVE_GAME_OBJECTS:
     return arrayMinus(state, action.gameObjectIds);
+  case START_DRAWING_GAME_OBJECT:
+    return arrayPlus(state, ['fakeDragging']);
+  case END_DRAWING_GAME_OBJECT:
+    const newState = arrayPlus(state, [action.gameObject.id]);
+    return arrayMinus(newState, ['fakeDragging']);
   default:
     return state;
   }
 }
 
 function selectedIds(state = [], action) {
-  const newState = state.slice();
   switch (action.type) {
   case SELECT_GAME_OBJECT:
-    newState.push(action.gameObjectId);
-    return newState;
+    return arrayPlus(state, [action.gameObjectId]);
   case UNSELECT_GAME_OBJECTS:
   case REMOVE_GAME_OBJECTS:
-    return arrayMinus(newState, action.gameObjectIds);
+    return arrayMinus(state, action.gameObjectIds);
+  case START_DRAWING_GAME_OBJECT:
+    return arrayPlus(arrayMinus(state, [action.deckObjectId]), ['fakeDragging']);
+  case END_DRAWING_GAME_OBJECT:
+    return arrayMinus(arrayPlus(state, [action.gameObject.id]), ['fakeDragging']);
   default:
     return state;
   }
@@ -129,6 +155,7 @@ function selectedIds(state = [], action) {
 function isDragging(state = false, action) {
   switch (action.type) {
   case DRAG_GAME_OBJECTS:
+  case START_DRAWING_GAME_OBJECT:
     return true;
   case DROP_GAME_OBJECTS:
     return false;

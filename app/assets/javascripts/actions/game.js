@@ -10,6 +10,8 @@ import {
   DROP_GAME_OBJECTS,
   UNSELECT_GAME_OBJECTS,
   REMOVE_GAME_OBJECTS,
+  START_DRAWING_GAME_OBJECT,
+  END_DRAWING_GAME_OBJECT,
 } from './action_types';
 
 export function receiveGameObjects(gameObjects) {
@@ -93,4 +95,20 @@ export function removeGameObjects(gameObjectIds) {
     type: REMOVE_GAME_OBJECTS,
     gameObjectIds,
   };
+}
+
+export function startDrawingGameObject(deckId, deckObjectId, templateId) {
+  return {
+    type: START_DRAWING_GAME_OBJECT,
+    deckId,
+    deckObjectId,
+    templateId,
+  };
+}
+
+export function endDrawingGameObject(gameObject) {
+  return {
+    type: END_DRAWING_GAME_OBJECT,
+    gameObject,
+  }
 }

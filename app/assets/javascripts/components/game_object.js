@@ -8,8 +8,8 @@ export default class GameObject extends Component {
   }
 
   get style() {
-    const { gameObject, isDragging } = this.props;
-    const { meta, center_x, center_y, rotate, is_fliped } = gameObject;
+    const { gameObject } = this.props;
+    const { meta, center_x, center_y, rotate, is_fliped, isDragging } = gameObject;
     const { height, width, front_img, back_img } = meta;
     const centerX = isDragging && this.state.centerX ? this.state.centerX : center_x;
     const centerY = isDragging && this.state.centerY ? this.state.centerY : center_y;
@@ -31,13 +31,13 @@ export default class GameObject extends Component {
   }
 
   get className() {
-    const { isSelected, isDragging, gameObject } = this.props;
-    const classNames = ['game-object'];
+    const { isSelected, gameObject } = this.props;
+    const classNames = ['game-object', 'unselectable', 'undraggable'];
     if (isSelected) {
       classNames.push('selected');
     }
 
-    if (isDragging) {
+    if (gameObject.isDragging) {
       classNames.push('dragging');
     }
 
@@ -65,9 +65,21 @@ export default class GameObject extends Component {
   }
 
   handleMouseMove(event) {
-    const { isSelected, isDragging, onDragStart } = this.props;
-    if (isSelected && !isDragging && event.buttons > 0) {
+    const { isSelected, onDragStart, gameObject } = this.props;
+    if (isSelected && !gameObject.isDragging && event.buttons > 0) {
       onDragStart(event);
+    }
+  }
+
+  handleDeckObjectMouseMove(event) {
+    const { isSelected, onDragStart, gameObject, draw } = this.props;
+    const funcKey = event.metaKey || event.ctrlKey;
+    if (isSelected && event.buttons > 0) {
+      if (!gameObject.isDragging && funcKey) {
+        onDragStart(event);
+      } else {
+        draw(null, event);
+      }
     }
   }
 
@@ -93,7 +105,7 @@ export default class GameObject extends Component {
         style={this.style}
         tabIndex="1"
         onMouseDown={this.handleMouseDown.bind(this)}
-        onMouseMove={this.handleMouseMove.bind(this)}
+        onMouseMove={this.handleDeckObjectMouseMove.bind(this)}
         onMouseUp={joinDeck.bind(null, deck)}
       >
         <span className="count unselectable">{deck.count}</span>
@@ -102,11 +114,10 @@ export default class GameObject extends Component {
   }
 
   render() {
-    switch (this.props.gameObject.meta_type) {
-    case 'Deck':
+    const { gameObject } = this.props;
+    if (gameObject.meta_type === 'Deck' && gameObject.id !== 'fakeDragging') {
       return this.renderDeckObject();
-    case 'GameObjectMetum':
-    default:
+    } else {
       return this.renderNormalObject();
     }
   }
@@ -115,10 +126,10 @@ export default class GameObject extends Component {
 GameObject.propTypes = {
   gameObject: PropTypes.object,
   isSelected: PropTypes.bool,
-  isDragging: PropTypes.bool,
   onSelect: PropTypes.func,
   onRelease: PropTypes.func,
   onDragStart: PropTypes.func,
   releaseAll: PropTypes.func,
   joinDeck: PropTypes.func,
+  draw: PropTypes.func,
 };

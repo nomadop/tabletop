@@ -23,6 +23,8 @@ class Deck < ApplicationRecord
   def as_json(opts = {})
     opts[:methods] ||= []
     opts[:methods] << :front_img << :back_img << :count
+    opts[:except] ||= []
+    opts[:except] << :created_at << :updated_at
     super(opts)
   end
 
@@ -31,6 +33,17 @@ class Deck < ApplicationRecord
     GameObject.transaction do
       inner_objects.order(:id).each_with_index { |o, i| o.update(deck_index: index[i]) }
     end
+  end
+
+  def draw(user_id: nil, target_id: nil)
+    object = target_id.nil? ? top : inner_objects.find(target_id)
+    if object
+      attrs = game_object
+                .as_json(only: [:center_x, :center_y, :rotate, :is_fliped])
+                .merge(user_id.nil? ? {container_id: nil} : {container_id: 0, user_id: user_id, is_locked: true})
+      object.update(attrs)
+    end
+    object
   end
 
   def join(game_objects)
