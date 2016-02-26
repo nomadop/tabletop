@@ -117,7 +117,12 @@ class GameObjectContainer extends Component {
   }
 
   handleCreateDeck() {
-    const { selectedIds } = this.props;
+    const { selectedIds, selectedObjects } = this.props;
+    if (selectedObjects.some(object => object.meta_type !== 'GameObjectMetum')) {
+      alert('invalid objects');
+      return;
+    }
+
     App.game.create_deck(selectedIds);
   }
 
@@ -196,11 +201,10 @@ class GameObjectContainer extends Component {
 
     this.dragStartMouseInfo = this.props.extractMouseEvent(event);
     this.dragStarting = true;
-    const deckId = deckObject.meta.id;
     const templateId = targetObject ? targetObject.id : deckObject.id;
     const targetId = targetObject ? targetObject.id : undefined;
-    this.props.startDrawingGameObject(deckId, deckObject.id, templateId);
-    App.game.draw(deckId, targetId)
+    this.props.startDrawingGameObject(deckObject.id, templateId);
+    App.game.draw(deckObject.meta.id, targetId)
   }
 
   handleKeyDown(event) {
@@ -238,7 +242,7 @@ class GameObjectContainer extends Component {
 
     return (
       <div className="game-object-container" onKeyDown={this.handleKeyDown.bind(this)}>
-        { gameObjects.map(object => this.renderGameObject(object, selectedIds)) }
+        { gameObjects.filter(object => !object.container_id).map(object => this.renderGameObject(object, selectedIds)) }
       </div>
     );
   }
@@ -265,6 +269,8 @@ GameObjectContainer.propTypes = {
 function selector(state) {
   const metaById = state.meta.byId;
   const deckById = state.decks.byId;
+  Object.values(deckById).forEach(deck => deck.innerObjects = []);
+
   const gameObjectById = state.gameObjects.byId;
   const gameObjects = state.gameObjects.ids.map(id => {
     const object = gameObjectById[id];
@@ -273,6 +279,12 @@ function selector(state) {
     } else {
       object.meta = metaById[object.meta_id];
     }
+
+    if (object.container_type === 'Deck') {
+      const deck = deckById[object.container_id];
+      deck.innerObjects.push(object);
+    }
+
     return object;
   });
   const selectedIds = state.gameObjects.selectedIds;

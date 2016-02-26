@@ -5,7 +5,12 @@ class Deck < ApplicationRecord
   has_many :inner_objects, class_name: 'GameObject', as: :container
 
   def top
-    @top ||= inner_objects.order(:deck_index).first
+    @top ||= inner_objects.order(deck_index: :desc).first
+  end
+
+  def reload
+    @top = nil
+    super
   end
 
   def front_img
@@ -22,7 +27,7 @@ class Deck < ApplicationRecord
 
   def as_json(opts = {})
     opts[:methods] ||= []
-    opts[:methods] |= [:front_img, :back_img, :count]
+    opts[:methods] |= [:front_img, :back_img]
     opts[:except] ||= []
     opts[:except] |= [:created_at, :updated_at]
     super(opts)
@@ -40,7 +45,7 @@ class Deck < ApplicationRecord
     if object
       attrs = game_object
                 .as_json(only: [:center_x, :center_y, :rotate, :is_fliped])
-                .merge(user_id.nil? ? {container_id: nil} : {container_id: 0, user_id: user_id, is_locked: true})
+                .merge(user_id.nil? ? {container: nil} : {container: nil, user_id: user_id, is_locked: true})
       object.update(attrs)
     end
     object

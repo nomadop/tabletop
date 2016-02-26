@@ -47,10 +47,6 @@ function deckById(state = {}, action) {
   case RECEIVE_DECKS:
     action.decks.forEach(deck => updater[deck.id] = {$set: deck});
     return update(state, updater);
-  case START_DRAWING_GAME_OBJECT:
-    const deck = state[action.deckId];
-    updater[deck.id] = {count: {$set: deck.count - 1}};
-    return update(state, updater);
   default:
     return state;
   }
@@ -115,6 +111,10 @@ function gameObjectById(state = {}, action) {
   case START_DRAWING_GAME_OBJECT:
     const template = Object.assign({}, state[action.templateId], {id: 'fakeDragging', isDragging: true});
     updater['fakeDragging'] = {$set: template};
+    updater[action.deckObjectId] = {
+      container_id: {$set: null},
+      container_type: {$set: null},
+    };
     return update(state, updater);
   case END_DRAWING_GAME_OBJECT:
     const object = action.gameObject;

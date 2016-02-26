@@ -74,7 +74,7 @@ class GameChannel < ApplicationCable::Channel
 
     if (deck = Deck.create_deck(game_objects))
       ActionCable.server.broadcast(game_stream, action: :create_deck, deck: deck, object: serialize(deck.game_object))
-      ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: game_objects.ids)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects.map(&serializer))
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
@@ -85,13 +85,9 @@ class GameChannel < ApplicationCable::Channel
     game_objects = GameObject.find(data['ids'])
     deck = Deck.find(data['deck_id'])
 
-    if deck.join(game_objects)
-      ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: data['ids'])
-    else
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects.map(&serializer))
-    end
-
-    ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
+    deck.join(game_objects)
+    ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects.map(&serializer))
+    ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck.reload)
   rescue StandardError => e
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
@@ -103,7 +99,7 @@ class GameChannel < ApplicationCable::Channel
 
     game_object = deck.draw(user_id: current_user.id, target_id: data['target_id'])
     if game_object
-      ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
+      ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck.reload)
       ActionCable.server.broadcast(user_stream, action: :draw_success, object: serialize(game_object))
     else
       ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'no target')

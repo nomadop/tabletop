@@ -97,10 +97,9 @@ export function removeGameObjects(gameObjectIds) {
   };
 }
 
-export function startDrawingGameObject(deckId, deckObjectId, templateId) {
+export function startDrawingGameObject(deckObjectId, templateId) {
   return {
     type: START_DRAWING_GAME_OBJECT,
-    deckId,
     deckObjectId,
     templateId,
   };

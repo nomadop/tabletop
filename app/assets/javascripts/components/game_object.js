@@ -73,9 +73,8 @@ export default class GameObject extends Component {
 
   handleDeckObjectMouseMove(event) {
     const { isSelected, onDragStart, gameObject, draw } = this.props;
-    const funcKey = event.metaKey || event.ctrlKey;
     if (isSelected && event.buttons > 0) {
-      if (!gameObject.isDragging && funcKey) {
+      if (!gameObject.isDragging && event.shiftKey) {
         onDragStart(event);
       } else {
         draw(null, event);
@@ -108,7 +107,7 @@ export default class GameObject extends Component {
         onMouseMove={this.handleDeckObjectMouseMove.bind(this)}
         onMouseUp={joinDeck.bind(null, deck)}
       >
-        <span className="count unselectable">{deck.count}</span>
+        <span className="count unselectable">{deck.innerObjects.length}</span>
       </div>
     );
   }

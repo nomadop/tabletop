@@ -79,6 +79,7 @@ class Game extends Component {
   }
 
   handleMouseWheel(event) {
+    event.preventDefault();
     const deltaY = event.deltaY;
     const deltaX = event.deltaX;
     if (Math.abs(event.wheelDelta) >= 120) {
