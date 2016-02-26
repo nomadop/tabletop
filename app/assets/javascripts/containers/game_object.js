@@ -16,6 +16,7 @@ import {
   endDrawingGameObject,
 } from '../actions/game';
 import { rotateByPoint } from '../utils/coordination_transformer';
+import { serializeGameObject, unserializeGameObject } from '../serializers/game_object';
 
 class GameObjectContainer extends Component {
   componentDidMount() {
@@ -23,23 +24,25 @@ class GameObjectContainer extends Component {
       switch (data.action) {
       case 'create_game_object':
       case 'update_game_object':
-        return this.props.receiveGameObjects([data.object]);
+        return this.props.receiveGameObjects([unserializeGameObject(data.object)]);
       case 'update_game_objects':
-        return this.props.receiveGameObjects(data.objects);
+        const objects = data.objects.map(unserializeGameObject);
+        return this.props.receiveGameObjects(objects);
       case 'create_deck':
         this.props.receiveDecks([data.deck]);
-        return this.props.receiveGameObjects([data.object]);
+        return this.props.receiveGameObjects([unserializeGameObject(data.object)]);
       case 'update_deck':
         return this.props.receiveDecks([data.deck]);
       case 'remove_game_objects':
         return this.props.removeGameObjects(data.object_ids);
       case 'draw_success':
         const fakeDraggingComponent = this.refs.gameObjectfakeDragging;
-        const object = Object.assign(data.object, {
+        const object = Object.assign(unserializeGameObject(data.object), {
           isDragging: true,
-          center_x: fakeDraggingComponent.state.centerX,
-          center_y: fakeDraggingComponent.state.centerY,
+          center_x: fakeDraggingComponent.state.centerX || fakeDraggingComponent.props.gameObject.center_x,
+          center_y: fakeDraggingComponent.state.centerY || fakeDraggingComponent.props.gameObject.center_y,
         });
+        this.dragStarting = true;
         return this.props.endDrawingGameObject(object);
       case 'error':
         alert(JSON.stringify(data.error));
@@ -64,11 +67,12 @@ class GameObjectContainer extends Component {
   }
 
   componentDidUpdate() {
-    const { selectedObjects, isDragging } = this.props;
+    const { selectedObjects } = this.props;
 
-    this.draggingComponents = [];
 
-    if (isDragging) {
+    if (this.dragStarting) {
+      this.dragStarting = false;
+      this.draggingComponents = [];
       selectedObjects.forEach(object => {
         if (object.isDragging) {
           this.draggingComponents.push(this.refs[`gameObject${object.id}`]);
@@ -88,7 +92,7 @@ class GameObjectContainer extends Component {
     const isFlipped = !selectedObjects.some(object => object.is_fliped);
     this.props.flipGameObjects(selectedIds, isFlipped);
     const updates = selectedIds.map(id => {
-      return {id, is_fliped: isFlipped};
+      return serializeGameObject({id, is_fliped: isFlipped});
     });
     App.game.update_game_objects(updates);
   }
@@ -108,7 +112,7 @@ class GameObjectContainer extends Component {
         };
       });
       this.props.rotateGameObjects(updates);
-      App.game.update_game_objects(updates);
+      App.game.update_game_objects(updates.map(serializeGameObject));
     }
   }
 
@@ -121,6 +125,7 @@ class GameObjectContainer extends Component {
     const { selectedIds } = this.props;
 
     this.dragStartMouseInfo = this.props.extractMouseEvent(event);
+    this.dragStarting = true;
     this.props.dragGameObjects(selectedIds);
   }
 
@@ -156,11 +161,12 @@ class GameObjectContainer extends Component {
         center_y: component.state.centerY,
       };
     });
+    this.draggingComponents = [];
     this.props.dropGameObjects(objects);
     if (this.joiningDeck) {
       this.joiningDeck = false;
     } else {
-      App.game.update_game_objects(objects);
+      App.game.update_game_objects(objects.map(serializeGameObject));
     }
   }
 
@@ -185,10 +191,11 @@ class GameObjectContainer extends Component {
   handleDrawGameObject(deckObject, targetObject, event) {
     const { selectedIds } = this.props;
     if (selectedIds.length > 1 || selectedIds[0] !== deckObject.id) {
-      return;
+      return this.handleDragStart(event);
     }
 
     this.dragStartMouseInfo = this.props.extractMouseEvent(event);
+    this.dragStarting = true;
     const deckId = deckObject.meta.id;
     const templateId = targetObject ? targetObject.id : deckObject.id;
     const targetId = targetObject ? targetObject.id : undefined;

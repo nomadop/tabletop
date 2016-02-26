@@ -75,7 +75,14 @@ function gameObjectById(state = {}, action) {
   const updater = {};
   switch (action.type) {
   case RECEIVE_GAME_OBJECTS:
-    action.gameObjects.forEach(object => updater[object.id] = {$set: object});
+    action.gameObjects.forEach(object => {
+      const oldObject = state[object.id];
+      if (oldObject && object.lock_version < oldObject.lock_version) {
+        return;
+      }
+
+      updater[object.id] = {$set: object}
+    });
     return update(state, updater);
   case FLIP_GAME_OBJECTS:
     const singleUpdater = {is_fliped: {$set: action.isFlipped}};

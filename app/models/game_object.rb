@@ -1,4 +1,6 @@
 class GameObject < ApplicationRecord
+  SERIALIZE_KEYS = %w(id user_id meta_id meta_type container_id container_type center_x center_y rotate is_fliped is_locked lock_version)
+
   before_save :round_position
 
   belongs_to :meta, polymorphic: true
@@ -6,7 +8,7 @@ class GameObject < ApplicationRecord
 
   def as_json(opts = {})
     opts[:except] ||= []
-    opts[:except] << :deck_index << :created_at << :updated_at
+    opts[:except] |= [:deck_index, :created_at, :updated_at]
     super(opts)
   end
 
@@ -38,6 +40,20 @@ class GameObject < ApplicationRecord
 
   def release_lock
     update(is_locked: false, user_id: nil)
+  end
+
+  def self.serialize_game_object(object)
+    SERIALIZE_KEYS.map{ |key| object.send(key) }.join(',')
+  end
+
+  def self.unserialize_game_object(serial)
+    result = {}
+    serial.split(',').each_with_index do |attr, index|
+      next if attr.blank?
+
+      result[SERIALIZE_KEYS[index]] = attr == 'null' ? nil : attr
+    end
+    result
   end
 
   private

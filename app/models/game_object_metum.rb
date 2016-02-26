@@ -4,7 +4,7 @@ class GameObjectMetum < ApplicationRecord
 
   def as_json(opts = {})
     opts[:except] ||= []
-    opts[:except] << :created_at << :updated_at
+    opts[:except] |= [:created_at, :updated_at]
     super(opts)
   end
 end

@@ -8,6 +8,22 @@ class GameChannel < ApplicationCable::Channel
     "game##{current_user.id}"
   end
 
+  def serializer
+    GameObject.method(:serialize_game_object)
+  end
+
+  def serialize(object)
+    GameObject.serialize_game_object(object)
+  end
+
+  def unserializer
+    GameObject.method(:unserialize_game_object)
+  end
+
+  def unserialize(serial)
+    GameObject.unserialize_game_object(serial)
+  end
+
   def subscribed
     stream_from game_stream
     stream_from user_stream
@@ -21,7 +37,7 @@ class GameChannel < ApplicationCable::Channel
     meta = GameObjectMetum.find(data['meta_id'])
     object = meta.game_objects.create
 
-    ActionCable.server.broadcast(game_stream, action: :create_game_object, object: object)
+    ActionCable.server.broadcast(game_stream, action: :create_game_object, object: serialize(object))
   rescue StandardError => e
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
@@ -31,21 +47,22 @@ class GameChannel < ApplicationCable::Channel
     object = GameObject.find(data['id'])
     object.update(data['attrs'])
 
-    ActionCable.server.broadcast(game_stream, action: :update_game_object, object: object)
+    ActionCable.server.broadcast(game_stream, action: :update_game_object, object: serialize(object))
   rescue StandardError => e
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
   def update_game_objects(data)
+    unserialzed_objects = data['objects'].map(&unserializer)
     GameObject.transaction do
-      objects = data['objects'].map do |json|
-        object = GameObject.find(json['id'])
+      objects = GameObject.includes(:meta).where(id: unserialzed_objects.map{ |obj| obj['id'] })
+      objects.find_each do |object|
+        json = unserialzed_objects.find { |obj| obj['id'] == object.id.to_s }
         object.update(json)
-        object
       end
 
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: objects)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: objects.map(&serializer))
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
@@ -56,7 +73,7 @@ class GameChannel < ApplicationCable::Channel
     game_objects = GameObject.includes(:meta).where(id: data['ids'])
 
     if (deck = Deck.create_deck(game_objects))
-      ActionCable.server.broadcast(game_stream, action: :create_deck, deck: deck, object: deck.game_object)
+      ActionCable.server.broadcast(game_stream, action: :create_deck, deck: deck, object: serialize(deck.game_object))
       ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: game_objects.ids)
     end
   rescue StandardError => e
@@ -71,7 +88,7 @@ class GameChannel < ApplicationCable::Channel
     if deck.join(game_objects)
       ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: data['ids'])
     else
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects.map(&serializer))
     end
 
     ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
@@ -87,7 +104,7 @@ class GameChannel < ApplicationCable::Channel
     game_object = deck.draw(user_id: current_user.id, target_id: data['target_id'])
     if game_object
       ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
-      ActionCable.server.broadcast(user_stream, action: :draw_success, object: game_object)
+      ActionCable.server.broadcast(user_stream, action: :draw_success, object: serialize(game_object))
     else
       ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'no target')
     end

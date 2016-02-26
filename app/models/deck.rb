@@ -22,9 +22,9 @@ class Deck < ApplicationRecord
 
   def as_json(opts = {})
     opts[:methods] ||= []
-    opts[:methods] << :front_img << :back_img << :count
+    opts[:methods] |= [:front_img, :back_img, :count]
     opts[:except] ||= []
-    opts[:except] << :created_at << :updated_at
+    opts[:except] |= [:created_at, :updated_at]
     super(opts)
   end
 
