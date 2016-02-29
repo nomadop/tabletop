@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file. Action Cable runs in an EventMachine loop that does not support auto reloading.
 class GameChannel < ApplicationCable::Channel
   def game_stream
-    'game'
+    "game@#{current_user.room_id}"
   end
 
   def user_stream
@@ -35,7 +35,8 @@ class GameChannel < ApplicationCable::Channel
 
   def create_game_object(data)
     meta = GameObjectMetum.find(data['meta_id'])
-    object = meta.game_objects.create
+    room = current_user.room
+    object = room.game_objects.create(meta: meta)
 
     ActionCable.server.broadcast(game_stream, action: :create_game_object, object: serialize(object))
   rescue StandardError => e
@@ -72,7 +73,7 @@ class GameChannel < ApplicationCable::Channel
   def create_deck(data)
     game_objects = GameObject.includes(:meta).where(id: data['ids'])
 
-    if (deck = Deck.create_deck(game_objects))
+    if (deck = Deck.create_deck(current_user.room, game_objects))
       ActionCable.server.broadcast(game_stream, action: :create_deck, deck: deck, object: serialize(deck.game_object))
       ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects.map(&serializer))
     end

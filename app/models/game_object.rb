@@ -4,7 +4,7 @@ class GameObject < ApplicationRecord
   before_save :round_position
 
   belongs_to :room
-  belongs_to :player
+  belongs_to :player, optional: true
   belongs_to :meta, polymorphic: true
   belongs_to :container, polymorphic: true, optional: true
 

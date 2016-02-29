@@ -79,8 +79,9 @@ ActiveRecord::Schema.define(version: 20160229080933) do
     t.integer  "host_id"
     t.string   "name"
     t.string   "password"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer  "max_player", default: 8
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "users", force: :cascade do |t|

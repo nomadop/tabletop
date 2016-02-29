@@ -30,7 +30,8 @@ export default class GamePane extends Component {
       };
     case MINIMUM:
       return {
-        display: 'relative',
+        position: 'relative',
+        marginRight: 10,
       };
     case NORMAL:
     default:

@@ -26,37 +26,46 @@ class Lobby extends Component {
     }
   }
 
-  render() {
-    const { authentication, messages } = this.props;
+  renderRoom(room) {
+    return (
+      <li key={room.join_path}>
+        <span className="name">{room.name}</span>
+        <span className="join-path"><a href={room.join_path} data-method="post">join</a></span>
+      </li>
+    )
+  }
 
-    let navNode;
-    if (!authentication) {
-      navNode = (
-        <Navigator>
-          <a href="/users/sign_in">Log in</a>
-        </Navigator>
-      );
-    } else {
-      navNode = (
-        <Navigator>
-          <span>Welcome! {authentication.email}</span>
-          <a rel="nofollow" data-method="delete" href="/users/sign_out">Log out</a>
-        </Navigator>
-      );
-    }
+  render() {
+    const { authentication, messages, rooms, games } = this.props;
+
+    const navNode = (
+      <Navigator>
+        <span>Welcome! {authentication.email}</span>
+        <a rel="nofollow" data-method="delete" href="/users/sign_out">Log out</a>
+      </Navigator>
+    );
 
     return (
       <div className="lobby-app">
         {navNode}
         <h1>Lobby</h1>
         <ul>{messages.map(msg => <li>{msg}</li>)}</ul>
-        <input type="text" onKeyDown={this.handleInput}/>
+        <ul>{rooms.map(room => this.renderRoom(room))}</ul>
+        <form action="/rooms" method="post">
+          <select name="game_id" id="create_room_game_id">
+            {games.map(game => <option key={game.id} value={game.id}>{game.name}</option>)}
+          </select>
+          <input type="text" name="name" id="create_room_name" />
+          <input type="submit" value="create" />
+        </form>
       </div>
     );
   }
 }
 
 Lobby.propTypes = {
+  rooms: PropTypes.array,
+  games: PropTypes.array,
   authentication: PropTypes.object,
   messages: PropTypes.arrayOf(PropTypes.string),
   newMessage: PropTypes.func,

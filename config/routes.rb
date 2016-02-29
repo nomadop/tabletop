@@ -1,10 +1,12 @@
 Rails.application.routes.draw do
-  resources :rooms
-  resources :games do
+  resources :rooms do
     member do
       get 'game_data'
+      post 'join'
+      post 'leave'
     end
   end
+  resources :games
   resources :game_object_meta
   devise_for :users, controllers: { sessions: :user_sessions }
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

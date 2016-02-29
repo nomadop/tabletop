@@ -1,14 +1,6 @@
 class GamesController < ApplicationController
   before_action :set_game, only: [:show, :edit, :update, :destroy, :game_data]
 
-  def game_data
-    render json: {
-      game_object_meta: @game.game_object_meta,
-      game_objects: GameObject.all,
-      decks: Deck.all,
-    }
-  end
-
   # GET /games
   # GET /games.json
   def index

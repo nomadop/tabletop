@@ -37,9 +37,9 @@ export function receiveDecks(decks) {
   };
 }
 
-export function fetchGameData(gameId) {
+export function fetchGameData(roomId) {
   return (dispatch) => {
-    fetch(`/games/${gameId}/game_data`)
+    fetch(`/rooms/${roomId}/game_data`)
       .then(response => response.json())
       .then(json => {
         dispatch(receiveGameObjectMeta(json.game_object_meta));

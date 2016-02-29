@@ -83,19 +83,21 @@ class Deck < ApplicationRecord
     inner_objects.update_all(position.merge(container_id: nil, container_type: nil))
   end
 
-  def self.create_deck(game_objects)
+  def self.create_deck(room, game_objects)
     game_objects = Array(game_objects)
     return nil if game_objects.map(&:meta_type).uniq != ['GameObjectMetum']
     return nil if game_objects.map(&:sub_type).uniq.size > 1
 
+    deck = nil
     meta = game_objects.first.meta
-    deck = Deck.create(meta.as_json(only: [:sub_type, :width, :height]))
-
-    GameObject.transaction do
-      center_x = game_objects.map(&:center_x).sum / game_objects.size
-      center_y = game_objects.map(&:center_y).sum / game_objects.size
-      deck.create_game_object(center_x: center_x, center_y: center_y, is_fliped: true)
-      deck.join(game_objects)
+    Deck.transaction do
+      GameObject.transaction do
+        deck = room.decks.create(meta.as_json(only: [:sub_type, :width, :height]))
+        center_x = game_objects.map(&:center_x).sum / game_objects.size
+        center_y = game_objects.map(&:center_y).sum / game_objects.size
+        deck.create_game_object(room: room, center_x: center_x, center_y: center_y, is_fliped: true)
+        deck.join(game_objects)
+      end
     end
     deck
   end

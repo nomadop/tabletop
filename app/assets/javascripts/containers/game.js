@@ -5,6 +5,7 @@ import PerspectiveLayer from '../components/perspective_layer';
 import DirectorLayer from '../components/director_layer';
 import CoordinationLayer from '../components/coordination_layer';
 import CreateObjectPane from 'components/create_object_pane';
+import GamePane from 'components/game_pane';
 import GameObjectContainer from './game_object';
 import {
   moveCameraHorizontal,
@@ -35,7 +36,20 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchGameData(this.props.game.id);
+    this.gameReceiver = (data) => {
+      switch (data.action) {
+      case 'close_room':
+        alert('Room is closed by host');
+        window.location.href = '/';
+        return;
+      default:
+        return;
+      }
+    };
+
+    App.game.register_receiver(this.gameReceiver);
+
+    this.props.fetchGameData(this.props.room.id);
     setTimeout(this.resizeGameWindow.bind(this), 100);
 
     window.addEventListener('resize', this.resizeGameWindow.bind(this));
@@ -130,12 +144,24 @@ class Game extends Component {
     };
   }
 
+  renderGameMenu() {
+    const { room } = this.props;
+
+    return (
+      <GamePane className="game-menu" title="Game Menu" width={240} height={480}>
+        <a href={`/rooms/${room.id}/leave`} data-method="post">Leave</a>
+        <a href={`/rooms/${room.id}`} data-method="delete">Close</a>
+      </GamePane>
+    )
+  }
+
   renderPopUpLayer() {
     const { meta, game } = this.props;
 
     return (
       <div className="pop-up-layer">
         <div className="pane-container">
+          {this.renderGameMenu()}
           <CreateObjectPane meta={meta} module={game.module} createGameObject={this.handleCreateGameObject}/>
         </div>
       </div>
@@ -187,6 +213,7 @@ Game.propTypes = {
   rotateCameraVertical: PropTypes.func,
   zoomCamera: PropTypes.func,
   game: PropTypes.object,
+  room: PropTypes.object,
   authentication: PropTypes.object,
   fetchGameData: PropTypes.func,
   unselectGameObjects: PropTypes.func,

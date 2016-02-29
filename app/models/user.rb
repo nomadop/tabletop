@@ -7,11 +7,15 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  def player_id
-    player.id if player
+  def room_id
+    room.nil? ? 'lobby' : "room#{room.id}"
+  end
+
+  def player_num
+    player.number if player
   end
 
   def auth_info
-    as_json(only: :email, methods: :player_id)
+    as_json(only: :email, methods: :player_num)
   end
 end

@@ -5,6 +5,7 @@ class CreateRooms < ActiveRecord::Migration[5.0]
       t.integer :host_id
       t.string :name
       t.string :password
+      t.integer :max_player, default: 8
 
       t.timestamps
     end
