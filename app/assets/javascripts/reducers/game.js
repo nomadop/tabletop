@@ -109,7 +109,12 @@ function gameObjectById(state = {}, action) {
     action.gameObjectIds.forEach(id => updater[id] = {$set: undefined});
     return update(state, updater);
   case START_DRAWING_GAME_OBJECT:
-    const template = Object.assign({}, state[action.templateId], {id: 'fakeDragging', isDragging: true});
+    const template = Object.assign({}, state[action.templateId], {
+      id: 'fakeDragging',
+      isDragging: true,
+      container_id: null,
+      container_type: null,
+    });
     updater['fakeDragging'] = {$set: template};
     updater[action.deckObjectId] = {
       container_id: {$set: null},

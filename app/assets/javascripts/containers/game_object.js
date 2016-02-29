@@ -41,6 +41,8 @@ class GameObjectContainer extends Component {
           isDragging: true,
           center_x: fakeDraggingComponent.state.centerX || fakeDraggingComponent.props.gameObject.center_x,
           center_y: fakeDraggingComponent.state.centerY || fakeDraggingComponent.props.gameObject.center_y,
+          multipleDragOffsetX: fakeDraggingComponent.multipleDragOffsetX,
+          multipleDragOffsetY: fakeDraggingComponent.multipleDragOffsetY,
         });
         this.dragStarting = true;
         return this.props.endDrawingGameObject(object);
@@ -81,8 +83,8 @@ class GameObjectContainer extends Component {
 
       this.draggingComponents.forEach(component => {
         const gameObject = component.props.gameObject;
-        component.multipleDragOffsetX = gameObject.center_x - this.dragStartMouseInfo.x.original;
-        component.multipleDragOffsetY = gameObject.center_y - this.dragStartMouseInfo.y.original;
+        component.multipleDragOffsetX = gameObject.multipleDragOffsetX || gameObject.center_x - this.dragStartMouseInfo.x.original;
+        component.multipleDragOffsetY = gameObject.multipleDragOffsetY || gameObject.center_y - this.dragStartMouseInfo.y.original;
       });
     }
   }
@@ -207,6 +209,17 @@ class GameObjectContainer extends Component {
     App.game.draw(deckObject.meta.id, targetId)
   }
 
+  handleToggleDeck() {
+    const { selectedObjects } = this.props;
+    if (selectedObjects.length > 1 || selectedObjects[0].meta_type !== 'Deck') {
+      console.log('invalid selects');
+      return;
+    }
+
+    const deck = selectedObjects[0].meta;
+    App.game.toggle_deck(deck.id, !deck.is_expanded);
+  }
+
   handleKeyDown(event) {
     switch (event.keyCode) {
     case 80:
@@ -215,10 +228,13 @@ class GameObjectContainer extends Component {
       return this.handleFlipGameObjects();
     case 82:
       return this.handleRotateGameObjects(45);
+    case 69:
+      return this.handleToggleDeck();
     default:
       return;
     }
   }
+
 
   renderGameObject(object, selectedIds) {
     const id = object.id;

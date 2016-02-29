@@ -12,6 +12,8 @@ import {
   REMOVE_GAME_OBJECTS,
   START_DRAWING_GAME_OBJECT,
   END_DRAWING_GAME_OBJECT,
+  EXPAND_DECK,
+  COLLAPSE_DECK,
 } from './action_types';
 
 export function receiveGameObjects(gameObjects) {
@@ -109,5 +111,5 @@ export function endDrawingGameObject(gameObject) {
   return {
     type: END_DRAWING_GAME_OBJECT,
     gameObject,
-  }
+  };
 }

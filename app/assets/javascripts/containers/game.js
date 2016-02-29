@@ -52,6 +52,10 @@ class Game extends Component {
       return true;
     }
 
+    if (altKey) {
+      console.log(keyCode);
+    }
+
     switch (keyCode.toString()) {
     case '65':
       return this.props.moveCameraHorizontal(-50);

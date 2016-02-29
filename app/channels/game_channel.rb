@@ -100,6 +100,7 @@ class GameChannel < ApplicationCable::Channel
     game_object = deck.draw(user_id: current_user.id, target_id: data['target_id'])
     if game_object
       ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck.reload)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: Array(serialize(deck.game_object)))
       ActionCable.server.broadcast(user_stream, action: :draw_success, object: serialize(game_object))
     else
       ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'no target')
@@ -108,5 +109,19 @@ class GameChannel < ApplicationCable::Channel
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'system error')
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
+  end
+
+  def toggle_deck(data)
+    deck = Deck.find(data['deck_id'])
+    is_expanded = data['is_expanded'] == 't' ? true : false
+    Deck.transaction do
+      GameObject.transaction do
+        deck.update(is_expanded: is_expanded)
+        deck.game_object.update(is_fliped: !is_expanded)
+      end
+    end
+
+    ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
+    ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: Array(serialize(deck.game_object)))
   end
 end

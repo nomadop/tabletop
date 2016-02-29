@@ -7,6 +7,13 @@ export default class GameObject extends Component {
     this.state = {};
   }
 
+  componentWillMount() {
+    const innerObjects = this.props.gameObject.meta.innerObjects;
+    if (innerObjects) {
+      this.setState({expandIndex: Math.floor(innerObjects.length / 2)});
+    }
+  }
+
   get style() {
     const { gameObject } = this.props;
     const { meta, center_x, center_y, rotate, is_fliped, isDragging } = gameObject;
@@ -77,9 +84,22 @@ export default class GameObject extends Component {
       if (!gameObject.isDragging && event.shiftKey) {
         onDragStart(event);
       } else {
-        draw(null, event);
+        const deck = gameObject.meta;
+        const target = deck.is_expanded ? deck.innerObjects[this.state.expandIndex] : null;
+        draw(target, event);
       }
     }
+  }
+
+  handleExpandIndexMove(left) {
+    console.log('index move', left);
+    const offset = left ? -1 : 1;
+    const expandIndex = this.state.expandIndex + offset;
+    if (expandIndex < 0 || expandIndex >= this.props.gameObject.meta.innerObjects.length) {
+      return;
+    }
+
+    this.setState({expandIndex});
   }
 
   renderNormalObject() {
@@ -92,6 +112,41 @@ export default class GameObject extends Component {
         onMouseMove={this.handleMouseMove.bind(this)}
       ></div>
     );
+  }
+
+  renderInnerObjects(deck) {
+    if (!deck.is_expanded) {
+      return;
+    }
+
+    const nodes = [];
+    const length = deck.innerObjects.length;
+    const expandIndex = this.state.expandIndex;
+    const offsetWidth = deck.width * 1.5 / length;
+    for (let i = 0; i < length; i++) {
+      const object = deck.innerObjects[i];
+      const { width, height, front_img } = object.meta;
+      const isTop = i === expandIndex;
+      const left = (i - expandIndex) * offsetWidth;
+      const style = {
+        width: isTop ? width * 1.2 : width,
+        height: isTop ? height * 1.2 : height,
+        top: isTop ? height * -0.1 : 0,
+        left: isTop ? left - width * 0.1 : left,
+        zIndex: expandIndex - Math.abs(i - expandIndex),
+        background: `url(/res/poker/${front_img}) round`,
+      };
+      const onClick = isTop ? () => {} : this.handleExpandIndexMove.bind(this, i < expandIndex);
+      nodes.push(
+        <div className="game-object inner-object"
+             key={object.id}
+             style={style}
+             onClick={onClick}
+        ></div>
+      );
+    }
+
+    return nodes;
   }
 
   renderDeckObject() {
@@ -108,6 +163,7 @@ export default class GameObject extends Component {
         onMouseUp={joinDeck.bind(null, deck)}
       >
         <span className="count unselectable">{deck.innerObjects.length}</span>
+        {this.renderInnerObjects(deck)}
       </div>
     );
   }

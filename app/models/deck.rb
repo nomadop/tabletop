@@ -46,7 +46,13 @@ class Deck < ApplicationRecord
       attrs = game_object
                 .as_json(only: [:center_x, :center_y, :rotate, :is_fliped])
                 .merge(user_id.nil? ? {container: nil} : {container: nil, user_id: user_id, is_locked: true})
-      object.update(attrs)
+      Deck.transaction do
+        GameObject.transaction do
+          object.update(attrs)
+          self.update(is_expanded: false)
+          game_object.update(is_fliped: true)
+        end
+      end
     end
     object
   end
