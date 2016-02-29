@@ -177,6 +177,14 @@ class GameObjectContainer extends Component {
     }
   }
 
+  handleDestroyGameObjects() {
+    const { selectedIds } = this.props;
+
+    if (confirm('Sure to destroy selected objects?')) {
+      App.game.destroy_game_objects(selectedIds);
+    }
+  }
+
   handleJoinDeck(deck) {
     const { selectedIds, selectedObjects, isDragging } = this.props;
     if (!isDragging || selectedIds.length < 1) {
@@ -230,6 +238,8 @@ class GameObjectContainer extends Component {
       return this.handleRotateGameObjects(45);
     case 69:
       return this.handleToggleDeck();
+    case 46:
+      return this.handleDestroyGameObjects();
     default:
       return;
     }

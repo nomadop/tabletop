@@ -39,6 +39,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
   toggle_deck: (deck_id, is_expanded) ->
     @perform 'toggle_deck', deck_id: deck_id, is_expanded: if is_expanded then 't' else 'f'
 
+  destroy_game_objects: (ids) ->
+    @perform 'destroy_game_objects', ids: ids
+
 window.addEventListener 'beforeunload', ->
   App.game.unsubscribe()
   return

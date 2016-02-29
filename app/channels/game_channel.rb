@@ -124,4 +124,22 @@ class GameChannel < ApplicationCable::Channel
     ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck)
     ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: Array(serialize(deck.game_object)))
   end
+
+  def destroy_game_objects(data)
+    decks = Deck.joins(:game_object).where(game_objects: {id: data['ids']})
+    inner_object_ids = decks.flat_map(&:inner_object_ids)
+
+    Deck.transaction do
+      GameObject.transaction do
+        decks.destroy_all
+        GameObject.where(id: data['ids']).delete_all
+      end
+    end
+
+    if inner_object_ids.any?
+      inner_objects = GameObject.find(inner_object_ids)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: inner_objects.map(&serializer))
+    end
+    ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: data['ids'])
+  end
 end

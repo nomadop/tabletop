@@ -76,7 +76,9 @@ class Deck < ApplicationRecord
   end
 
   def resume_inner_objects
-    position = game_object.as_json(only: [:center_x, :center_y, :rotate])
+    position = game_object.nil? ?
+      {center_x: 0, center_y: 0, rotate: 0} :
+      game_object.as_json(only: [:center_x, :center_y, :rotate])
     inner_objects.update_all(position.merge(container_id: nil, container_type: nil))
   end
 
