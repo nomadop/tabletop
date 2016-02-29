@@ -1,14 +1,16 @@
 class GameObject < ApplicationRecord
-  SERIALIZE_KEYS = %w(id user_id meta_id meta_type container_id container_type center_x center_y rotate is_fliped is_locked lock_version)
+  SERIALIZE_KEYS = %w(id player_id meta_id meta_type container_id container_type center_x center_y rotate is_fliped is_locked lock_version)
 
   before_save :round_position
 
+  belongs_to :room
+  belongs_to :player
   belongs_to :meta, polymorphic: true
   belongs_to :container, polymorphic: true, optional: true
 
   def as_json(opts = {})
     opts[:except] ||= []
-    opts[:except] |= [:deck_index, :created_at, :updated_at]
+    opts[:except] |= [:room_id, :deck_index, :created_at, :updated_at]
     super(opts)
   end
 
@@ -32,14 +34,14 @@ class GameObject < ApplicationRecord
     center_y + height / 2
   end
 
-  def require_lock(uid)
-    return user_id == uid if is_locked
+  def require_lock(pid)
+    return player_id == pid if is_locked
 
-    update(is_locked: true, user_id: uid)
+    update(is_locked: true, player_id: pid)
   end
 
   def release_lock
-    update(is_locked: false, user_id: nil)
+    update(is_locked: false, player_id: nil)
   end
 
   def self.serialize_game_object(object)

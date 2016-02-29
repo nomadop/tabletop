@@ -2,6 +2,7 @@ class Game < ApplicationRecord
   after_create :setup
 
   has_many :game_object_meta, dependent: :destroy
+  has_many :rooms, dependent: :destroy
 
   private
 

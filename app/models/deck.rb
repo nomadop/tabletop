@@ -1,6 +1,7 @@
 class Deck < ApplicationRecord
   before_destroy :resume_inner_objects
 
+  belongs_to :room
   has_one :game_object, as: :meta, dependent: :destroy
   has_many :inner_objects, class_name: 'GameObject', as: :container
 
@@ -40,12 +41,12 @@ class Deck < ApplicationRecord
     end
   end
 
-  def draw(user_id: nil, target_id: nil)
+  def draw(player_id: nil, target_id: nil)
     object = target_id.nil? ? top : inner_objects.find(target_id)
     if object
       attrs = game_object
                 .as_json(only: [:center_x, :center_y, :rotate, :is_fliped])
-                .merge(user_id.nil? ? {container: nil} : {container: nil, user_id: user_id, is_locked: true})
+                .merge(player_id.nil? ? {container: nil} : {container: nil, player_id: player_id, is_locked: true})
       Deck.transaction do
         GameObject.transaction do
           object.update(attrs)

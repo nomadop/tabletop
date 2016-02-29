@@ -97,7 +97,7 @@ class GameChannel < ApplicationCable::Channel
     deck = Deck.find(data['deck_id'])
     return ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'invalid deck id') unless deck
 
-    game_object = deck.draw(user_id: current_user.id, target_id: data['target_id'])
+    game_object = deck.draw(player_id: current_user.player_id, target_id: data['target_id'])
     if game_object
       ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck.reload)
       ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: Array(serialize(deck.game_object)))

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160215064202) do
+ActiveRecord::Schema.define(version: 20160229080933) do
 
   create_table "decks", force: :cascade do |t|
     t.string   "sub_type",                    null: false
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20160215064202) do
     t.boolean  "is_expanded", default: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+    t.integer  "room_id"
   end
 
   create_table "game_object_meta", force: :cascade do |t|
@@ -36,7 +37,6 @@ ActiveRecord::Schema.define(version: 20160215064202) do
   end
 
   create_table "game_objects", force: :cascade do |t|
-    t.integer  "user_id"
     t.integer  "meta_id",                        null: false
     t.string   "meta_type",                      null: false
     t.float    "center_x",       default: 0.0
@@ -50,6 +50,8 @@ ActiveRecord::Schema.define(version: 20160215064202) do
     t.integer  "container_id"
     t.string   "container_type"
     t.integer  "deck_index"
+    t.integer  "player_id"
+    t.integer  "room_id"
   end
 
   create_table "games", force: :cascade do |t|
@@ -60,6 +62,25 @@ ActiveRecord::Schema.define(version: 20160215064202) do
     t.text     "description"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+  end
+
+  create_table "players", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "room_id"
+    t.integer  "number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["room_id", "number"], name: "index_players_on_room_id_and_number", unique: true
+    t.index ["user_id"], name: "index_players_on_user_id", unique: true
+  end
+
+  create_table "rooms", force: :cascade do |t|
+    t.integer  "game_id"
+    t.integer  "host_id"
+    t.string   "name"
+    t.string   "password"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :rooms
   resources :games do
     member do
       get 'game_data'

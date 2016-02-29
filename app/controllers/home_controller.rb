@@ -10,13 +10,15 @@ class HomeController < ApplicationController
   end
 
   def game
-    @game = Game.find(params[:game_id])
+    room = current_user.room
+    redirect_to :root unless room
 
     props = {
       app: 'game',
       authentication: current_user && current_user.auth_info,
       debug: false,
-      game: @game.as_json(only: [:id, :name, :module]),
+      room: room.as_json(only: [:id]),
+      game: room.game.as_json(only: [:id, :name, :module]),
     }
     render component: 'Root', props: props
   end
