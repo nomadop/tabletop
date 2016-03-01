@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 
+const authenticationSelector = (state, props) => props.authentication;
 const cameraSelector = state => state.camera;
 const metaByIdSelector = state => state.meta.byId;
 const metaIdsSelector = state => state.meta.ids;
@@ -8,7 +9,6 @@ const deckIdsSelector = state => state.decks.ids;
 const gameObjectByIdSelector = state => state.gameObjects.byId;
 const gameObjectIdsSelector = state => state.gameObjects.ids;
 const isDraggingSelector = state => state.gameObjects.isDragging;
-const selectedIdsSelector = state => state.gameObjects.selectedIds;
 
 const metaSelector = createSelector(
   metaByIdSelector,
@@ -38,6 +38,20 @@ const gameObjectsSelector = createSelector(
 
       return object;
     });
+  }
+);
+
+const selectedIdsSelector = createSelector(
+  authenticationSelector,
+  gameObjectByIdSelector,
+  (authentication, gameObjectById) => {
+    const ids = [];
+    Object.values(gameObjectById).forEach(object => {
+      if (object && object.is_locked && object.player_num === authentication.player_num) {
+        ids.push(object.id);
+      }
+    });
+    return ids;
   }
 );
 

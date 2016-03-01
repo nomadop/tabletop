@@ -25,6 +25,7 @@ class GameObjectContainer extends Component {
       switch (data.action) {
       case 'create_game_object':
       case 'update_game_object':
+      case 'lock_failed':
         return this.props.receiveGameObjects([unserializeGameObject(data.object)]);
       case 'update_game_objects':
         const objects = data.objects.map(unserializeGameObject);
@@ -47,6 +48,10 @@ class GameObjectContainer extends Component {
         });
         this.dragStarting = true;
         return this.props.endDrawingGameObject(object);
+      case 'lock_game_object':
+        return this.props.selectGameObject(data.player_num, data.object_id);
+      case 'release_game_objects':
+        return this.props.unselectGameObjects(data.object_ids);
       case 'error':
         alert(JSON.stringify(data.error));
         return;
@@ -246,36 +251,49 @@ class GameObjectContainer extends Component {
     }
   }
 
+  handleSelectGameObject(id) {
+    const playerNum = this.props.authentication.player_num;
+    this.props.selectGameObject(playerNum, id);
+    App.game.lock_game_object(id);
+  }
 
-  renderGameObject(object, selectedIds) {
+  handleUnselectGameObjects(ids) {
+    this.props.unselectGameObjects(ids);
+    App.game.release_game_objects(ids);
+  }
+
+  renderGameObject(object, player_num) {
     const id = object.id;
-    const isSelected = selectedIds.indexOf(id) >= 0;
+    const isSelected = object.is_locked && object.player_num === player_num;
+    const isLocked = object.is_locked && object.player_num !== player_num;
     return <GameObject
       key={id}
       ref={`gameObject${id}`}
       gameObject={object}
       isSelected={isSelected}
-      onSelect={this.props.selectGameObject.bind(null, id)}
-      onRelease={this.props.unselectGameObjects.bind(null, [id])}
+      isLocked={isLocked}
+      onSelect={this.handleSelectGameObject.bind(this, id)}
+      onRelease={this.handleUnselectGameObjects.bind(this, [id])}
       onDragStart={this.handleDragStart.bind(this)}
-      releaseAll={this.props.unselectGameObjects.bind(null, selectedIds)}
+      releaseAll={this.handleUnselectGameObjects.bind(this, selectedIds)}
       joinDeck={this.handleJoinDeck.bind(this)}
       draw={this.handleDrawGameObject.bind(this, object)}
     />
   }
 
   render() {
-    const { gameObjects, selectedIds } = this.props;
+    const { gameObjects, authentication } = this.props;
 
     return (
       <div className="game-object-container" onKeyDown={this.handleKeyDown.bind(this)}>
-        { gameObjects.filter(object => !object.container_id).map(object => this.renderGameObject(object, selectedIds)) }
+        { gameObjects.filter(object => !object.container_id).map(object => this.renderGameObject(object, authentication.player_num)) }
       </div>
     );
   }
 }
 
 GameObjectContainer.propTypes = {
+  authentication: PropTypes.object,
   gameObjects: PropTypes.array,
   selectedIds: PropTypes.array,
   selectedObjects: PropTypes.array,

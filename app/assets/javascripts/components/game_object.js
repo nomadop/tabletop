@@ -24,7 +24,7 @@ export default class GameObject extends Component {
     const top = centerY - height / 2;
 
     const img = is_fliped ? back_img : front_img;
-    const backgroundImage = `url(/res/poker/${img})`;
+    const backgroundImage = img ? `url(/res/poker/${img})` : null;
     const transform = `rotate(${rotate}deg)`;
 
     return {
@@ -52,17 +52,22 @@ export default class GameObject extends Component {
       classNames.push('deck-object');
     }
 
+    if (gameObject.player_num) {
+      classNames.push(`player${gameObject.player_num}`);
+    }
+
     return classNames.join(' ');
   }
 
   handleMouseDown(event) {
     const funcKey = event.ctrlKey || event.metaKey;
-    const { isSelected, onSelect, onRelease, releaseAll } = this.props;
+    const { isSelected, onSelect, onRelease, releaseAll, isLocked } = this.props;
+
     if (isSelected) {
       if (funcKey) {
         onRelease();
       }
-    } else {
+    } else if (!isLocked) {
       if (!funcKey) {
         releaseAll()
       }
@@ -181,6 +186,7 @@ export default class GameObject extends Component {
 GameObject.propTypes = {
   gameObject: PropTypes.object,
   isSelected: PropTypes.bool,
+  isLocked: PropTypes.bool,
   onSelect: PropTypes.func,
   onRelease: PropTypes.func,
   onDragStart: PropTypes.func,

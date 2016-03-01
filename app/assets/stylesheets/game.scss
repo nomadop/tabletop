@@ -19,6 +19,22 @@
   user-select: none;
 }
 
+.player1 {
+  outline-color: darkred !important;
+}
+
+.player2 {
+  outline-color: darkblue !important;
+}
+
+.player3 {
+  outline-color: darkgreen !important;
+}
+
+.player4 {
+  outline-color: darkgoldenrod !important;
+}
+
 .game-window {
   position: fixed;
   left: 0;

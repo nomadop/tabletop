@@ -1,5 +1,6 @@
 class GameObject < ApplicationRecord
-  SERIALIZE_KEYS = %w(id player_id meta_id meta_type container_id container_type center_x center_y rotate is_fliped is_locked lock_version)
+  SERIALIZE_KEYS = %w(id meta_id meta_type container_id container_type center_x center_y rotate is_fliped is_locked
+                      lock_version player_num)
 
   before_save :round_position
 
@@ -10,8 +11,12 @@ class GameObject < ApplicationRecord
 
   def as_json(opts = {})
     opts[:except] ||= []
-    opts[:except] |= [:room_id, :deck_index, :created_at, :updated_at]
+    opts[:except] |= [:room_id, :player_id, :deck_index, :created_at, :updated_at]
     super(opts)
+  end
+
+  def player_num
+    player.number if player
   end
 
   def sub_type
@@ -45,7 +50,7 @@ class GameObject < ApplicationRecord
   end
 
   def self.serialize_game_object(object)
-    SERIALIZE_KEYS.map{ |key| object.send(key) }.join(',')
+    SERIALIZE_KEYS.map { |key| object.send(key) }.join(',')
   end
 
   def self.unserialize_game_object(serial)

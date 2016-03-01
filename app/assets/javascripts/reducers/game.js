@@ -45,7 +45,7 @@ function deckById(state = {}, action) {
   const updater = {};
   switch (action.type) {
   case RECEIVE_DECKS:
-    action.decks.forEach(deck => updater[deck.id] = {$set: deck});
+    action.decks.forEach(deck => updater[deck.id] = { $set: deck });
     return update(state, updater);
   default:
     return state;
@@ -77,36 +77,42 @@ function gameObjectById(state = {}, action) {
         return;
       }
 
-      updater[object.id] = {$set: object}
+      updater[object.id] = { $set: object }
     });
     return update(state, updater);
   case FLIP_GAME_OBJECTS:
-    const singleUpdater = {is_fliped: {$set: action.isFlipped}};
+    const singleUpdater = { is_fliped: { $set: action.isFlipped } };
     action.gameObjectIds.forEach(id => updater[id] = singleUpdater);
     return update(state, updater);
   case ROTATE_GAME_OBJECTS:
     action.gameObjectUpdates.forEach(object => {
       updater[object.id] = {
-        rotate: {$set: object.rotate},
-        center_x: {$set: object.center_x},
-        center_y: {$set: object.center_y},
+        rotate: { $set: object.rotate },
+        center_x: { $set: object.center_x },
+        center_y: { $set: object.center_y },
       }
     });
     return update(state, updater);
   case DRAG_GAME_OBJECTS:
-    action.gameObjectIds.forEach(id => updater[id] = {isDragging: {$set: true}});
+    action.gameObjectIds.forEach(id => updater[id] = { isDragging: { $set: true } });
     return update(state, updater);
   case DROP_GAME_OBJECTS:
     action.gameObjects.forEach(object => {
       updater[object.id] = {
-        center_x: {$set: object.center_x},
-        center_y: {$set: object.center_y},
-        isDragging: {$set: false},
+        center_x: { $set: object.center_x },
+        center_y: { $set: object.center_y },
+        isDragging: { $set: false },
       };
     });
     return update(state, updater);
   case REMOVE_GAME_OBJECTS:
-    action.gameObjectIds.forEach(id => updater[id] = {$set: undefined});
+    action.gameObjectIds.forEach(id => updater[id] = { $set: undefined });
+    return update(state, updater);
+  case SELECT_GAME_OBJECT:
+    updater[action.gameObjectId] = { player_num: { $set: action.playerNum } };
+    return update(state, updater);
+  case UNSELECT_GAME_OBJECTS:
+    action.gameObjectIds.forEach(id => updater[id] = { player_num: { $set: null } });
     return update(state, updater);
   case START_DRAWING_GAME_OBJECT:
     const template = Object.assign({}, state[action.templateId], {
@@ -115,16 +121,17 @@ function gameObjectById(state = {}, action) {
       container_id: null,
       container_type: null,
     });
-    updater['fakeDragging'] = {$set: template};
+    updater['fakeDragging'] = { $set: template };
     updater[action.deckObjectId] = {
-      container_id: {$set: null},
-      container_type: {$set: null},
+      player_num: { $set: null },
+      container_id: { $set: null },
+      container_type: { $set: null },
     };
     return update(state, updater);
   case END_DRAWING_GAME_OBJECT:
     const object = action.gameObject;
-    updater[object.id] = {$set: object};
-    updater['fakeDragging'] = {$set: null};
+    updater[object.id] = { $set: object };
+    updater['fakeDragging'] = { $set: null };
     return update(state, updater);
   default:
     return state;

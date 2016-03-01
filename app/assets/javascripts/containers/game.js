@@ -118,6 +118,7 @@ class Game extends Component {
     const onGameObject = event.target.className.search('game-object') >= 0;
     if (!onGameObject && selectedIds.length > 0) {
       this.props.unselectGameObjects(selectedIds);
+      App.game.release_game_objects(selectedIds);
     }
   }
 
@@ -177,7 +178,7 @@ class Game extends Component {
 
   render() {
     const { width, height } = this.state;
-    const { camera } = this.props;
+    const { camera, authentication } = this.props;
 
     const style = {
       width,
@@ -197,7 +198,7 @@ class Game extends Component {
         <PerspectiveLayer width={width} height={height} camera={camera}>
           <DirectorLayer width={width} height={height} camera={camera}>
             {this.renderCoordination()}
-            <GameObjectContainer extractMouseEvent={this.extractMouseEvent.bind(this)}/>
+            <GameObjectContainer authentication={authentication} extractMouseEvent={this.extractMouseEvent.bind(this)}/>
           </DirectorLayer>
         </PerspectiveLayer>
       </div>
