@@ -133,6 +133,9 @@ class GameChannel < ApplicationCable::Channel
     else
       ActionCable.server.broadcast(user_stream, action: :error, error: {message: 'no access'})
     end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
   def destroy_game_objects(data)
@@ -156,6 +159,9 @@ class GameChannel < ApplicationCable::Channel
       ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: inner_objects.map(&serializer))
     end
     ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: data['ids'])
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
   def lock_game_object(data)
@@ -166,6 +172,9 @@ class GameChannel < ApplicationCable::Channel
     else
       ActionCable.server.broadcast(user_stream, action: :lock_failed, object: serialize(object))
     end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
   def release_game_objects(data)
@@ -177,5 +186,21 @@ class GameChannel < ApplicationCable::Channel
     else
       ActionCable.server.broadcast(user_stream, action: :release_failed, objects: objects.map(&serializer))
     end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+  end
+
+  def create_player_area(data)
+    area = PlayerArea.new(data['area'].merge(room: current_user.room, player: current_user.player))
+
+    if area.save
+      ActionCable.server.broadcast(game_stream, action: :create_player_area, area: area.as_json(methods: :player_num))
+    else
+      ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'Create area failed'})
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 end

@@ -6,6 +6,8 @@ const metaByIdSelector = state => state.meta.byId;
 const metaIdsSelector = state => state.meta.ids;
 const deckByIdSelector = state => state.decks.byId;
 const deckIdsSelector = state => state.decks.ids;
+const playerAreaByIdSelector = state => state.playerAreas.byId;
+const playerAreaIdsSelector = state => state.playerAreas.ids;
 const gameObjectByIdSelector = state => state.gameObjects.byId;
 const gameObjectIdsSelector = state => state.gameObjects.ids;
 const isDraggingSelector = state => state.gameObjects.isDragging;
@@ -14,6 +16,12 @@ const metaSelector = createSelector(
   metaByIdSelector,
   metaIdsSelector,
   (metaById, metaIds) => metaIds.map(id => metaById[id])
+);
+
+const playerAreasSelector = createSelector(
+  playerAreaByIdSelector,
+  playerAreaIdsSelector,
+  (playerAreaById, playerAreaIds) => playerAreaIds.map(id => playerAreaById[id])
 );
 
 const gameObjectsSelector = createSelector(
@@ -71,11 +79,12 @@ export const gameContainerSelector = createSelector(
 );
 
 export const gameObjectContainerSelector = createSelector(
+  playerAreasSelector,
   gameObjectsSelector,
   selectedIdsSelector,
   selectedObjectsSelector,
   isDraggingSelector,
-  (gameObjects, selectedIds, selectedObjects, isDragging) => {
-    return { gameObjects, selectedIds, selectedObjects, isDragging };
+  (playerAreas, gameObjects, selectedIds, selectedObjects, isDragging) => {
+    return { playerAreas, gameObjects, selectedIds, selectedObjects, isDragging };
   }
 );

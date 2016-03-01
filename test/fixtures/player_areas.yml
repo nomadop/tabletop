@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  room_id: 1
+  player_id: 1
+  center_x: 1.5
+  center_y: 1.5
+  width: 1.5
+  height: 1.5
+  rotate: 
+
+two:
+  room_id: 1
+  player_id: 1
+  center_x: 1.5
+  center_y: 1.5
+  width: 1.5
+  height: 1.5
+  rotate: 

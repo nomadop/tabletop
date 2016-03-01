@@ -43,7 +43,14 @@
 
   .pop-up-layer {
     transform: perspective(0) translateZ(10000px);
-    width: 100%;
+    pointer-events: none;
+
+    .draw-blocker {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.7);
+      pointer-events: all;
+      z-index: 1000;
+    }
 
     .pane-container {
       position: fixed;
@@ -57,6 +64,7 @@
       background: white;
       border: 1px solid black;
       border-radius: 5px;
+      pointer-events: all;
 
       .pane-header {
         background: lightgray;
@@ -135,6 +143,12 @@
       position: absolute;
       pointer-events: all;
 
+      .draw-box {
+        position: absolute;
+        border: 1px solid black;
+        display: block;
+      }
+
       .coordination-layer {
         pointer-events: none;
         .coordination-unit {
@@ -144,6 +158,12 @@
       }
 
       .game-object-container {
+        .player-area {
+          position: absolute;
+          outline: -webkit-focus-ring-color auto 5px;
+          display: block;
+        }
+
         .game-object {
           pointer-events: all;
           background-size: 100%;
@@ -153,6 +173,9 @@
           }
           &:focus {
             outline: none;
+          }
+          &.locked {
+            pointer-events: none;
           }
           &.selected {
             outline: -webkit-focus-ring-color auto 5px;

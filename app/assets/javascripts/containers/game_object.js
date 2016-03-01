@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GameObject from '../components/game_object';
+import PlayerArea from '../components/player_area';
 import {
   selectGameObject,
   unselectGameObjects,
@@ -11,6 +12,7 @@ import {
   dropGameObjects,
   receiveGameObjects,
   receiveDecks,
+  receivePlayerAreas,
   removeGameObjects,
   startDrawingGameObject,
   endDrawingGameObject,
@@ -33,6 +35,8 @@ class GameObjectContainer extends Component {
       case 'create_deck':
         this.props.receiveDecks([data.deck]);
         return this.props.receiveGameObjects([unserializeGameObject(data.object)]);
+      case 'create_player_area':
+        return this.props.receivePlayerAreas([data.area]);
       case 'update_deck':
         return this.props.receiveDecks([data.deck]);
       case 'remove_game_objects':
@@ -258,14 +262,15 @@ class GameObjectContainer extends Component {
   }
 
   handleUnselectGameObjects(ids) {
-    this.props.unselectGameObjects(ids);
-    App.game.release_game_objects(ids);
+    const unselectIds = ids || this.props.selectedIds;
+    this.props.unselectGameObjects(unselectIds);
+    App.game.release_game_objects(unselectIds);
   }
 
-  renderGameObject(object, player_num) {
+  renderGameObject(object, playerNum) {
     const id = object.id;
-    const isSelected = object.is_locked && object.player_num === player_num;
-    const isLocked = object.is_locked && object.player_num !== player_num;
+    const isSelected = object.is_locked && object.player_num === playerNum;
+    const isLocked = object.is_locked && object.player_num !== playerNum;
     return <GameObject
       key={id}
       ref={`gameObject${id}`}
@@ -275,17 +280,28 @@ class GameObjectContainer extends Component {
       onSelect={this.handleSelectGameObject.bind(this, id)}
       onRelease={this.handleUnselectGameObjects.bind(this, [id])}
       onDragStart={this.handleDragStart.bind(this)}
-      releaseAll={this.handleUnselectGameObjects.bind(this, selectedIds)}
+      releaseAll={this.handleUnselectGameObjects.bind(this)}
       joinDeck={this.handleJoinDeck.bind(this)}
       draw={this.handleDrawGameObject.bind(this, object)}
     />
   }
 
+  renderPlayerArea(area, playerNum) {
+    const id = area.id;
+    return <PlayerArea
+      key={id}
+      ref={`playerArea${id}`}
+      playerArea={area}
+      isOwner={area.player_num === playerNum}
+    />
+  }
+
   render() {
-    const { gameObjects, authentication } = this.props;
+    const { playerAreas, gameObjects, authentication } = this.props;
 
     return (
       <div className="game-object-container" onKeyDown={this.handleKeyDown.bind(this)}>
+        { playerAreas.map(area => this.renderPlayerArea(area, authentication.player_num)) }
         { gameObjects.filter(object => !object.container_id).map(object => this.renderGameObject(object, authentication.player_num)) }
       </div>
     );
@@ -294,6 +310,7 @@ class GameObjectContainer extends Component {
 
 GameObjectContainer.propTypes = {
   authentication: PropTypes.object,
+  playerAreas: PropTypes.array,
   gameObjects: PropTypes.array,
   selectedIds: PropTypes.array,
   selectedObjects: PropTypes.array,
@@ -306,6 +323,7 @@ GameObjectContainer.propTypes = {
   dropGameObjects: PropTypes.func,
   receiveGameObjects: PropTypes.func,
   receiveDecks: PropTypes.func,
+  receivePlayerAreas: PropTypes.func,
   removeGameObjects: PropTypes.func,
   startDrawingGameObject: PropTypes.func,
   endDrawingGameObject: PropTypes.func,
@@ -321,6 +339,7 @@ function dispatcher(dispatch) {
     dropGameObjects,
     receiveGameObjects,
     receiveDecks,
+    receivePlayerAreas,
     removeGameObjects,
     startDrawingGameObject,
     endDrawingGameObject,

@@ -6,6 +6,7 @@ import DirectorLayer from '../components/director_layer';
 import CoordinationLayer from '../components/coordination_layer';
 import CreateObjectPane from 'components/create_object_pane';
 import GamePane from 'components/game_pane';
+import DrawBox from '../components/draw_box';
 import GameObjectContainer from './game_object';
 import {
   moveCameraHorizontal,
@@ -33,6 +34,7 @@ class Game extends Component {
     this.state = {
       width: undefined,
       height: undefined,
+      drawMode: false,
     };
   }
 
@@ -61,6 +63,12 @@ class Game extends Component {
     window.removeEventListener('resize', this.resizeGameWindow.bind(this));
   }
 
+  componentWillReceiveProps() {
+    if (this.state.drawMode) {
+      return false;
+    }
+  }
+
   handleKeyDown(e) {
     const { keyCode, metaKey, altKey } = e;
     if (metaKey && altKey && keyCode === 73) {
@@ -70,7 +78,6 @@ class Game extends Component {
     if (altKey) {
       console.log(keyCode);
     }
-
     switch (keyCode.toString()) {
     case '65':
       return this.props.moveCameraHorizontal(-50);
@@ -92,6 +99,9 @@ class Game extends Component {
       return this.props.rotateCameraVertical(1);
     case '40':
       return this.props.rotateCameraVertical(-1);
+    case '72':
+      this.drawStartMouseInfo = null;
+      return this.setState({drawMode: !this.state.drawMode});
     default:
       return null;
     }
@@ -114,11 +124,58 @@ class Game extends Component {
   }
 
   handleMouseDown(event) {
+    if (this.state.drawMode) {
+      if (!this.drawStartMouseInfo) {
+        this.drawStartMouseInfo = this.extractMouseEvent(event);
+        console.log('draw start');
+      }
+      return;
+    }
+
     const selectedIds = this.props.selectedIds;
     const onGameObject = event.target.className.search('game-object') >= 0;
     if (!onGameObject && selectedIds.length > 0) {
       this.props.unselectGameObjects(selectedIds);
       App.game.release_game_objects(selectedIds);
+    }
+  }
+
+  handleMouseMove(event) {
+    if (this.state.drawMode && this.drawStartMouseInfo) {
+      const mouseInfo = this.extractMouseEvent(event);
+      const drawBox = this.refs.drawBox;
+      const top = this.drawStartMouseInfo.y.original;
+      const left = this.drawStartMouseInfo.x.original;
+      const width = mouseInfo.x.original - left;
+      const height = mouseInfo.y.original - top;
+      drawBox.setState({
+        top,
+        left,
+        width: width < 0 ? 0 : width,
+        height: height < 0 ? 0 : height,
+      });
+    }
+  }
+
+  handleMouseUp(event) {
+    if (this.state.drawMode) {
+      if (confirm('Create player area?')) {
+        const mouseInfo = this.extractMouseEvent(event);
+        const top = this.drawStartMouseInfo.y.original;
+        const left = this.drawStartMouseInfo.x.original;
+        const width = mouseInfo.x.original - left;
+        const height = mouseInfo.y.original - top;
+        const center_x = left + width / 2;
+        const center_y = top + height / 2;
+        App.game.create_player_area({
+          center_x,
+          center_y,
+          width,
+          height,
+        });
+      }
+
+      this.setState({ drawMode: false });
     }
   }
 
@@ -157,11 +214,22 @@ class Game extends Component {
     )
   }
 
-  renderPopUpLayer() {
+  renderDrawBlocker(style) {
+    if (this.state.drawMode) {
+      return <div className="draw-blocker" style={style}></div>;
+    }
+  }
+
+  renderPopUpLayer(width, height) {
     const { meta, game } = this.props;
+    const style = {
+      width,
+      height,
+    };
 
     return (
-      <div className="pop-up-layer">
+      <div className="pop-up-layer" style={style}>
+        {this.renderDrawBlocker(style)}
         <div className="pane-container">
           {this.renderGameMenu()}
           <CreateObjectPane meta={meta} module={game.module} createGameObject={this.handleCreateGameObject}/>
@@ -173,6 +241,12 @@ class Game extends Component {
   renderCoordination() {
     if (this.props.debug) {
       return <CoordinationLayer rows={10} cols={10} size={100}/>;
+    }
+  }
+
+  renderDrawBox() {
+    if (this.state.drawMode) {
+      return <DrawBox ref="drawBox" />;
     }
   }
 
@@ -193,12 +267,15 @@ class Game extends Component {
         style={style}
         onKeyDown={this.handleKeyDown.bind(this)}
         onMouseDown={this.handleMouseDown.bind(this)}
+        onMouseMove={this.handleMouseMove.bind(this)}
+        onMouseUp={this.handleMouseUp.bind(this)}
       >
-        {this.renderPopUpLayer()}
+        {this.renderPopUpLayer(width, height)}
         <PerspectiveLayer width={width} height={height} camera={camera}>
           <DirectorLayer width={width} height={height} camera={camera}>
             {this.renderCoordination()}
             <GameObjectContainer authentication={authentication} extractMouseEvent={this.extractMouseEvent.bind(this)}/>
+            {this.renderDrawBox()}
           </DirectorLayer>
         </PerspectiveLayer>
       </div>

@@ -4,6 +4,7 @@ import {
   RECEIVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
   RECEIVE_DECKS,
+  RECEIVE_PLAYER_AREAS,
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECTS,
   ROTATE_GAME_OBJECTS,
@@ -65,6 +66,32 @@ function deckIds(state = [], action) {
 const decks = combineReducers({
   byId: deckById,
   ids: deckIds,
+});
+
+function playerAreaById(state = {}, action) {
+  const updater = {};
+  switch (action.type) {
+  case RECEIVE_PLAYER_AREAS:
+    action.playerAreas.forEach(playerArea => updater[playerArea.id] = { $set: playerArea });
+    return update(state, updater);
+  default:
+    return state;
+  }
+}
+
+function playerAreaIds(state = [], action) {
+  switch (action.type) {
+  case RECEIVE_PLAYER_AREAS:
+    const newIds = action.playerAreas.map(playerArea => playerArea.id);
+    return arrayPlus(state, newIds);
+  default:
+    return state;
+  }
+}
+
+const playerAreas = combineReducers({
+  byId: playerAreaById,
+  ids: playerAreaIds,
 });
 
 function gameObjectById(state = {}, action) {
@@ -195,4 +222,5 @@ export default combineReducers({
   decks,
   camera,
   gameObjects,
+  playerAreas,
 });
