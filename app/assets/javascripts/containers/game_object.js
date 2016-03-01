@@ -17,6 +17,7 @@ import {
 } from '../actions/game';
 import { rotateByPoint } from '../utils/coordination_transformer';
 import { serializeGameObject, unserializeGameObject } from '../serializers/game_object';
+import { gameObjectContainerSelector} from '../selectors/game';
 
 class GameObjectContainer extends Component {
   componentDidMount() {
@@ -292,37 +293,6 @@ GameObjectContainer.propTypes = {
   endDrawingGameObject: PropTypes.func,
 };
 
-function selector(state) {
-  const metaById = state.meta.byId;
-  const deckById = state.decks.byId;
-  Object.values(deckById).forEach(deck => deck.innerObjects = []);
-
-  const gameObjectById = state.gameObjects.byId;
-  const gameObjects = state.gameObjects.ids.map(id => {
-    const object = gameObjectById[id];
-    if (object.meta_type === 'Deck') {
-      object.meta = deckById[object.meta_id];
-    } else {
-      object.meta = metaById[object.meta_id];
-    }
-
-    if (object.container_type === 'Deck') {
-      const deck = deckById[object.container_id];
-      deck.innerObjects.push(object);
-    }
-
-    return object;
-  });
-  const selectedIds = state.gameObjects.selectedIds;
-  const selectedObjects = selectedIds.map(id => gameObjectById[id]);
-  return {
-    gameObjects,
-    selectedIds,
-    selectedObjects,
-    isDragging: state.gameObjects.isDragging,
-  };
-}
-
 function dispatcher(dispatch) {
   return bindActionCreators({
     selectGameObject,
@@ -339,4 +309,4 @@ function dispatcher(dispatch) {
   }, dispatch);
 }
 
-export default connect(selector, dispatcher)(GameObjectContainer);
+export default connect(gameObjectContainerSelector, dispatcher)(GameObjectContainer);

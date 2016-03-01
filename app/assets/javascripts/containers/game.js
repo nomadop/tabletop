@@ -24,6 +24,7 @@ import {
   perspectiveToScreen,
   screenToPerspective,
 } from '../utils/coordination_transformer';
+import { gameContainerSelector } from '../selectors/game';
 
 class Game extends Component {
   constructor() {
@@ -220,16 +221,6 @@ Game.propTypes = {
   selectedIds: PropTypes.array,
 };
 
-function selector(state) {
-  const metaById = state.meta.byId;
-  const meta = state.meta.ids.map(id => metaById[id]);
-  return {
-    camera: state.camera,
-    meta,
-    selectedIds: state.gameObjects.selectedIds,
-  };
-}
-
 function dispatcher(dispatch) {
   return bindActionCreators({
     moveCameraHorizontal,
@@ -242,4 +233,4 @@ function dispatcher(dispatch) {
   }, dispatch);
 }
 
-export default connect(selector, dispatcher)(Game);
+export default connect(gameContainerSelector, dispatcher)(Game);

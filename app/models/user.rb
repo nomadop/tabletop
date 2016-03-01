@@ -11,6 +11,10 @@ class User < ApplicationRecord
     room.nil? ? 'lobby' : "room#{room.id}"
   end
 
+  def player_id
+    player.id if player
+  end
+
   def player_num
     player.number if player
   end
