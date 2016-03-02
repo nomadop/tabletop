@@ -210,7 +210,7 @@ class GameChannel < ApplicationCable::Channel
   end
 
   def destroy_player_area()
-    area = current_user.player.area
+    area = PlayerArea.where(player: current_user.player).take
     if area.nil?
       return ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'No area exist'})
     end

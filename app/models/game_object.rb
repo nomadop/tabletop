@@ -1,5 +1,5 @@
 class GameObject < ApplicationRecord
-  SERIALIZE_KEYS = %w(id meta_id meta_type container_id container_type center_x center_y related_x related_y rotate is_fliped is_locked
+  SERIALIZE_KEYS = %w(id meta_id meta_type container_id container_type center_x center_y related_x related_y related_rotate rotate is_fliped is_locked
                       lock_version player_num)
 
   before_save :round_position
@@ -24,12 +24,24 @@ class GameObject < ApplicationRecord
     meta.sub_type
   end
 
+  def inner_object?
+    container_id && container_type != 'Deck'
+  end
+
+  def related_postion
+    @inner_position ||= container.rotate_by_center([center_x, center_y]) if inner_object?
+  end
+
   def related_x
-    center_x - container.left_x if container_id && container_type != 'Deck'
+    related_postion[0] - container.left_x if inner_object?
   end
 
   def related_y
-    center_y - container.top_y if container_id && container_type != 'Deck'
+    related_postion[1] - container.top_y if inner_object?
+  end
+
+  def related_rotate
+    rotate - container.rotate if inner_object?
   end
 
   def left_x
@@ -84,8 +96,8 @@ class GameObject < ApplicationRecord
   end
 
   def check_container
-    return true if container_id.nil? || container_type == 'Deck'
+    return true unless inner_object?
 
-    self.container = nil unless container.range_x.include?(center_x) && container.range_y.include?(center_y)
+    self.container = nil unless container.point_inside?(related_postion)
   end
 end

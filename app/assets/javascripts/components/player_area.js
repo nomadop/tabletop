@@ -13,15 +13,17 @@ export default class PlayerArea extends Component {
 
   get style() {
     const { playerArea } = this.props;
-    const { center_x, center_y, width, height } = playerArea;
+    const { center_x, center_y, width, height, rotate } = playerArea;
     const left = center_x - width / 2;
     const top = center_y - height / 2;
+    const transform = `rotate(${rotate}deg)`;
 
     return {
       top,
       left,
       width,
       height,
+      transform,
     };
   }
 

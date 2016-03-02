@@ -16,16 +16,19 @@ export default class GameObject extends Component {
 
   get style() {
     const { gameObject } = this.props;
-    const { meta, center_x, center_y, related_x, related_y, rotate, is_fliped, isDragging } = gameObject;
+    const { meta, center_x, center_y, related_x, related_y, is_fliped, isDragging } = gameObject;
     const { height, width, front_img, back_img } = meta;
     let centerX;
     let centerY;
+    let rotate;
     if (gameObject.container_id && gameObject.container_type !== 'Deck') {
       centerX = related_x;
       centerY = related_y;
+      rotate = gameObject.related_rotate;
     } else {
       centerX = isDragging && this.state.centerX ? this.state.centerX : center_x;
       centerY = isDragging && this.state.centerY ? this.state.centerY : center_y;
+      rotate = gameObject.rotate;
     }
     const left = centerX - width / 2;
     const top = centerY - height / 2;

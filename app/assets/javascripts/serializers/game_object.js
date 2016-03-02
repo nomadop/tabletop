@@ -1,4 +1,4 @@
-const SERIALIZE_KEYS = ['id', 'meta_id', 'meta_type', 'container_id', 'container_type', 'center_x', 'center_y', 'related_x', 'related_y', 'rotate', 'is_fliped', 'is_locked', 'lock_version', 'player_num'];
+const SERIALIZE_KEYS = ['id', 'meta_id', 'meta_type', 'container_id', 'container_type', 'center_x', 'center_y', 'related_x', 'related_y', 'related_rotate', 'rotate', 'is_fliped', 'is_locked', 'lock_version', 'player_num'];
 
 export function serializeGameObject(gameObject) {
   const attrs = SERIALIZE_KEYS.map(key => {

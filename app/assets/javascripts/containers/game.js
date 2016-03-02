@@ -24,6 +24,7 @@ import {
   perspectiveToOriginal,
   perspectiveToScreen,
   screenToPerspective,
+  rotateByPoint,
 } from '../utils/coordination_transformer';
 import { gameContainerSelector } from '../selectors/game';
 
@@ -101,7 +102,7 @@ class Game extends Component {
       return this.props.rotateCameraVertical(-1);
     case '72':
       this.drawStartMouseInfo = null;
-      return this.setState({drawMode: !this.state.drawMode});
+      return this.setState({ drawMode: !this.state.drawMode });
     default:
       return null;
     }
@@ -139,19 +140,41 @@ class Game extends Component {
     }
   }
 
+  extractDrawBoxProperties(event) {
+    const camera = this.props.camera;
+    const mouseInfo = this.extractMouseEvent(event);
+    const topY = this.drawStartMouseInfo.y.original;
+    const leftX = this.drawStartMouseInfo.x.original;
+    const rightX = mouseInfo.x.original;
+    const bottomY = mouseInfo.y.original;
+    const centerX = (leftX + rightX) / 2;
+    const centerY = (topY + bottomY) / 2;
+    const rotatedTopLeft = rotateByPoint([leftX, topY], [centerX, centerY], camera.rotate);
+    const rotatedBottomRight = rotateByPoint([rightX, bottomY], [centerX, centerY], camera.rotate);
+    const width = rotatedBottomRight[0] - rotatedTopLeft[0];
+    const height = rotatedBottomRight[1] - rotatedTopLeft[1];
+    const rotate = -camera.rotate;
+    return {
+      centerX,
+      centerY,
+      rotatedTopLeft,
+      rotatedBottomRight,
+      width,
+      height,
+      rotate,
+    };
+  }
+
   handleMouseMove(event) {
     if (this.state.drawMode && this.drawStartMouseInfo) {
-      const mouseInfo = this.extractMouseEvent(event);
       const drawBox = this.refs.drawBox;
-      const top = this.drawStartMouseInfo.y.original;
-      const left = this.drawStartMouseInfo.x.original;
-      const width = mouseInfo.x.original - left;
-      const height = mouseInfo.y.original - top;
+      const { rotatedTopLeft, width, height, rotate } = this.extractDrawBoxProperties(event);
       drawBox.setState({
-        top,
-        left,
+        top: rotatedTopLeft[1],
+        left: rotatedTopLeft[0],
         width: width < 0 ? 0 : width,
         height: height < 0 ? 0 : height,
+        rotate: rotate,
       });
     }
   }
@@ -159,18 +182,13 @@ class Game extends Component {
   handleMouseUp(event) {
     if (this.state.drawMode) {
       if (confirm('Create player area?')) {
-        const mouseInfo = this.extractMouseEvent(event);
-        const top = this.drawStartMouseInfo.y.original;
-        const left = this.drawStartMouseInfo.x.original;
-        const width = mouseInfo.x.original - left;
-        const height = mouseInfo.y.original - top;
-        const center_x = left + width / 2;
-        const center_y = top + height / 2;
+        const { centerX, centerY, width, height, rotate } = this.extractDrawBoxProperties(event);
         App.game.create_player_area({
-          center_x,
-          center_y,
+          center_x: centerX,
+          center_y: centerY,
           width,
           height,
+          rotate,
         });
       }
 
@@ -245,7 +263,7 @@ class Game extends Component {
 
   renderDrawBox() {
     if (this.state.drawMode) {
-      return <DrawBox ref="drawBox" />;
+      return <DrawBox ref="drawBox"/>;
     }
   }
 
