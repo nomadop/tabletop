@@ -3,7 +3,7 @@ class Player < ApplicationRecord
 
   belongs_to :user
   belongs_to :room
-  has_many :player_areas
+  has_one :area, class_name: 'PlayerArea'
 
   scope :available, ->{ where(user: nil) }
 

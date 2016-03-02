@@ -192,6 +192,10 @@ class GameChannel < ApplicationCable::Channel
   end
 
   def create_player_area(data)
+    if PlayerArea.where(player: current_user.player).any?
+      return ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'Player area exist'})
+    end
+
     area = PlayerArea.new(data['area'].merge(room: current_user.room, player: current_user.player))
 
     if area.save

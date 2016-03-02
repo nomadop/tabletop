@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160301085506) do
+ActiveRecord::Schema.define(version: 20160302021506) do
 
   create_table "decks", force: :cascade do |t|
     t.string   "sub_type",                    null: false
@@ -74,6 +74,7 @@ ActiveRecord::Schema.define(version: 20160301085506) do
     t.float    "rotate"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["player_id"], name: "index_player_areas_on_player_id", unique: true
   end
 
   create_table "players", force: :cascade do |t|
