@@ -1,8 +1,9 @@
 class GameObject < ApplicationRecord
-  SERIALIZE_KEYS = %w(id meta_id meta_type container_id container_type center_x center_y rotate is_fliped is_locked
+  SERIALIZE_KEYS = %w(id meta_id meta_type container_id container_type center_x center_y related_x related_y rotate is_fliped is_locked
                       lock_version player_num)
 
   before_save :round_position
+  before_save :check_container
 
   belongs_to :room
   belongs_to :player, optional: true
@@ -21,6 +22,14 @@ class GameObject < ApplicationRecord
 
   def sub_type
     meta.sub_type
+  end
+
+  def related_x
+    center_x - container.left_x if container_id && container_type != 'Deck'
+  end
+
+  def related_y
+    center_y - container.top_y if container_id && container_type != 'Deck'
   end
 
   def left_x
@@ -55,10 +64,14 @@ class GameObject < ApplicationRecord
 
   def self.unserialize_game_object(serial)
     result = {}
+    excludes = %w(related_x related_y player_num)
     serial.split(',').each_with_index do |attr, index|
       next if attr.blank?
 
-      result[SERIALIZE_KEYS[index]] = attr == 'null' ? nil : attr
+      attr_name = SERIALIZE_KEYS[index]
+      next if excludes.include?(attr_name)
+
+      result[attr_name] = attr == 'null' ? nil : attr
     end
     result
   end
@@ -68,5 +81,11 @@ class GameObject < ApplicationRecord
   def round_position
     self.center_x = center_x.round(3)
     self.center_y = center_y.round(3)
+  end
+
+  def check_container
+    return true if container_id.nil? || container_type == 'Deck'
+
+    self.container = nil unless container.range_x.include?(center_x) && container.range_y.include?(center_y)
   end
 end

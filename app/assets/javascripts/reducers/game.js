@@ -127,7 +127,11 @@ function gameObjectById(state = {}, action) {
     });
     return update(state, updater);
   case DRAG_GAME_OBJECTS:
-    action.gameObjectIds.forEach(id => updater[id] = { isDragging: { $set: true } });
+    action.gameObjectIds.forEach(id => updater[id] = {
+      isDragging: { $set: true },
+      container_id: { $set: null },
+      container_type: { $set: null },
+    });
     return update(state, updater);
   case DROP_GAME_OBJECTS:
     action.gameObjects.forEach(object => {

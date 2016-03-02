@@ -72,7 +72,7 @@ function rotate(state = 0, action) {
   }
 }
 
-function scale(state = 1, action) {
+function scale(state = 0.5, action) {
   switch (action.type) {
   case ZOOM_CAMERA:
     const newScale = state + action.offset;

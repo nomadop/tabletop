@@ -200,6 +200,7 @@ class GameChannel < ApplicationCable::Channel
 
     if area.save
       ActionCable.server.broadcast(game_stream, action: :create_player_area, area: area)
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: area.inner_objects.map(&serializer))
     else
       ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'Create area failed'})
     end
@@ -214,7 +215,9 @@ class GameChannel < ApplicationCable::Channel
       return ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'No area exist'})
     end
 
+    inner_object_ids = area.inner_object_ids
     if area.destroy
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: GameObject.where(id: inner_object_ids).map(&serializer))
       ActionCable.server.broadcast(game_stream, action: :destroy_player_area, area_id: area.id)
     else
       ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'Destroy area failed'})

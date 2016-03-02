@@ -16,10 +16,17 @@ export default class GameObject extends Component {
 
   get style() {
     const { gameObject } = this.props;
-    const { meta, center_x, center_y, rotate, is_fliped, isDragging } = gameObject;
+    const { meta, center_x, center_y, related_x, related_y, rotate, is_fliped, isDragging } = gameObject;
     const { height, width, front_img, back_img } = meta;
-    const centerX = isDragging && this.state.centerX ? this.state.centerX : center_x;
-    const centerY = isDragging && this.state.centerY ? this.state.centerY : center_y;
+    let centerX;
+    let centerY;
+    if (gameObject.container_id && gameObject.container_type !== 'Deck') {
+      centerX = related_x;
+      centerY = related_y;
+    } else {
+      centerX = isDragging && this.state.centerX ? this.state.centerX : center_x;
+      centerY = isDragging && this.state.centerY ? this.state.centerY : center_y;
+    }
     const left = centerX - width / 2;
     const top = centerY - height / 2;
 
@@ -61,15 +68,15 @@ export default class GameObject extends Component {
 
   handleMouseDown(event) {
     const funcKey = event.ctrlKey || event.metaKey;
-    const { isSelected, onSelect, onRelease, releaseAll, isLocked } = this.props;
+    const { isSelected, onSelect, onRelease, isLocked, gameObject } = this.props;
 
     if (isSelected) {
       if (funcKey) {
-        onRelease();
+        onRelease([gameObject.id]);
       }
     } else if (!isLocked) {
       if (!funcKey) {
-        releaseAll()
+        onRelease()
       }
 
       onSelect();
@@ -190,7 +197,6 @@ GameObject.propTypes = {
   onSelect: PropTypes.func,
   onRelease: PropTypes.func,
   onDragStart: PropTypes.func,
-  releaseAll: PropTypes.func,
   joinDeck: PropTypes.func,
   draw: PropTypes.func,
 };

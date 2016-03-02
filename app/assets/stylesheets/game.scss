@@ -22,21 +22,25 @@
 .player1 {
   color: darkred;
   outline-color: darkred !important;
+  border-color: darkred !important;
 }
 
 .player2 {
   color: darkblue;
   outline-color: darkblue !important;
+  border-color: darkblue !important;
 }
 
 .player3 {
   color: darkgreen;
   outline-color: darkgreen !important;
+  border-color: darkgreen !important;
 }
 
 .player4 {
   color: darkgoldenrod;
   outline-color: darkgoldenrod !important;
+  border-color: darkgoldenrod !important;
 }
 
 .game-window {
@@ -164,13 +168,25 @@
       .game-object-container {
         .player-area {
           position: absolute;
-          outline: -webkit-focus-ring-color auto 5px;
+          outline: 5px double;
           display: block;
 
           .area-header {
+            position: absolute;
+            top: -2em;
+            left: 0;
+            width: 100%;
             padding: 4px;
             display: flex;
             justify-content: space-between;
+
+            .title {
+              cursor: default;
+            }
+
+            .control {
+              display: flex;
+            }
 
             i {
               margin: 4px;

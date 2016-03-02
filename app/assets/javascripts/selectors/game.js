@@ -28,10 +28,13 @@ const gameObjectsSelector = createSelector(
   metaByIdSelector,
   deckByIdSelector,
   deckIdsSelector,
+  playerAreaByIdSelector,
+  playerAreaIdsSelector,
   gameObjectByIdSelector,
   gameObjectIdsSelector,
-  (metaById, deckById, deckIds, gameObjectById, gameObjectIds) => {
+  (metaById, deckById, deckIds, areaById, areaIds, gameObjectById, gameObjectIds) => {
     deckIds.forEach(id => deckById[id].innerObjects = []);
+    areaIds.forEach(id => areaById[id].innerObjects = []);
     return gameObjectIds.map(id => {
       const object = gameObjectById[id];
       if (object.meta_type === 'Deck') {
@@ -43,6 +46,9 @@ const gameObjectsSelector = createSelector(
       if (object.container_type === 'Deck') {
         const deck = deckById[object.container_id];
         deck.innerObjects.push(object);
+      } else if (object.container_type === 'PlayerArea') {
+        const area = areaById[object.container_id];
+        area.innerObjects.push(object);
       }
 
       return object;

@@ -163,11 +163,21 @@ class GameObjectContainer extends Component {
     });
   }
 
-  handleDropGameObjects() {
+  handleDropGameObjects(event) {
     if (!this.draggingComponents.length) {
       return;
     }
 
+    let container = event.target;
+    while (container) {
+      if (container.getAttribute && container.getAttribute('dropable')) {
+        break;
+      }
+
+      container = container.parentNode;
+    }
+    const containerId = container && container.getAttribute('container-id');
+    const containerType = container && container.getAttribute('container-type');
     const objects = this.draggingComponents.map(component => {
       const gameObject = component.props.gameObject;
       if (gameObject.id === 'fakeDragging') {
@@ -175,7 +185,8 @@ class GameObjectContainer extends Component {
       }
       return {
         id: gameObject.id,
-        container_id: null,
+        container_id: containerId ? Number(containerId) : null,
+        container_type: containerType,
         lock_version: gameObject.lock_version,
         center_x: component.state.centerX,
         center_y: component.state.centerY,
@@ -281,9 +292,8 @@ class GameObjectContainer extends Component {
       isSelected={isSelected}
       isLocked={isLocked}
       onSelect={this.handleSelectGameObject.bind(this, id)}
-      onRelease={this.handleUnselectGameObjects.bind(this, [id])}
+      onRelease={this.handleUnselectGameObjects.bind(this)}
       onDragStart={this.handleDragStart.bind(this)}
-      releaseAll={this.handleUnselectGameObjects.bind(this)}
       joinDeck={this.handleJoinDeck.bind(this)}
       draw={this.handleDrawGameObject.bind(this, object)}
     />
@@ -296,6 +306,11 @@ class GameObjectContainer extends Component {
       ref={`playerArea${id}`}
       playerArea={area}
       isOwner={area.player_num === playerNum}
+      onSelect={this.handleSelectGameObject.bind(this)}
+      onRelease={this.handleUnselectGameObjects.bind(this)}
+      onDragStart={this.handleDragStart.bind(this)}
+      onJoinDeck={this.handleJoinDeck.bind(this)}
+      onDraw={this.handleDrawGameObject.bind(this)}
     />
   }
 
