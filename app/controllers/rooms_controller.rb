@@ -12,7 +12,7 @@ class RoomsController < ApplicationController
       game_object_meta: room.game.game_object_meta,
       game_objects: room.game_objects.as_json(methods: [:player_num]),
       decks: room.decks,
-      player_areas: room.player_areas.as_json(methods: [:player_num]),
+      player_areas: room.player_areas,
     }
   end
 

@@ -199,9 +199,25 @@ class GameChannel < ApplicationCable::Channel
     area = PlayerArea.new(data['area'].merge(room: current_user.room, player: current_user.player))
 
     if area.save
-      ActionCable.server.broadcast(game_stream, action: :create_player_area, area: area.as_json(methods: :player_num))
+      ActionCable.server.broadcast(game_stream, action: :create_player_area, area: area)
     else
       ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'Create area failed'})
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+  end
+
+  def destroy_player_area()
+    area = current_user.player.area
+    if area.nil?
+      return ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'No area exist'})
+    end
+
+    if area.destroy
+      ActionCable.server.broadcast(game_stream, action: :destroy_player_area, area_id: area.id)
+    else
+      ActionCable.server.broadcast(game_stream, action: :error, error: {message: 'Destroy area failed'})
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace

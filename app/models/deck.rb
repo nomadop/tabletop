@@ -50,8 +50,10 @@ class Deck < ApplicationRecord
       Deck.transaction do
         GameObject.transaction do
           object.update(attrs)
+          if is_expanded
+            game_object.update(is_fliped: true)
+          end
           self.update(is_expanded: false)
-          game_object.update(is_fliped: true)
         end
       end
     end

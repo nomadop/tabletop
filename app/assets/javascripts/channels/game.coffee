@@ -51,6 +51,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
   create_player_area: (area) ->
     @perform 'create_player_area', area: area
 
+  destroy_player_area: ->
+    @perform 'destroy_player_area'
+
 window.addEventListener 'beforeunload', ->
   App.game.unsubscribe()
   return

@@ -14,6 +14,7 @@ import {
   REMOVE_GAME_OBJECTS,
   START_DRAWING_GAME_OBJECT,
   END_DRAWING_GAME_OBJECT,
+  REMOVE_PLAYER_AREA,
 } from '../actions/action_types';
 import camera from './camera';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
@@ -74,6 +75,9 @@ function playerAreaById(state = {}, action) {
   case RECEIVE_PLAYER_AREAS:
     action.playerAreas.forEach(playerArea => updater[playerArea.id] = { $set: playerArea });
     return update(state, updater);
+  case REMOVE_PLAYER_AREA:
+    updater[action.areaId] = { $set: null };
+    return update(state, updater);
   default:
     return state;
   }
@@ -84,6 +88,8 @@ function playerAreaIds(state = [], action) {
   case RECEIVE_PLAYER_AREAS:
     const newIds = action.playerAreas.map(playerArea => playerArea.id);
     return arrayPlus(state, newIds);
+  case REMOVE_PLAYER_AREA:
+    return arrayMinus(state, [action.areaId]);
   default:
     return state;
   }

@@ -27,10 +27,11 @@ const playerAreasSelector = createSelector(
 const gameObjectsSelector = createSelector(
   metaByIdSelector,
   deckByIdSelector,
+  deckIdsSelector,
   gameObjectByIdSelector,
   gameObjectIdsSelector,
-  (metaById, deckById, gameObjectById, gameObjectIds) => {
-    Object.values(deckById).forEach(deck => deck.innerObjects = []);
+  (metaById, deckById, deckIds, gameObjectById, gameObjectIds) => {
+    deckIds.forEach(id => deckById[id].innerObjects = []);
     return gameObjectIds.map(id => {
       const object = gameObjectById[id];
       if (object.meta_type === 'Deck') {

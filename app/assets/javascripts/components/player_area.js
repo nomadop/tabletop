@@ -22,9 +22,32 @@ export default class PlayerArea extends Component {
     return classNames.join(' ');
   }
 
+  handleDestroy() {
+    if (confirm('Destroy player area')) {
+      App.game.destroy_player_area();
+    }
+  }
+
+  renderHeader() {
+    const { playerArea } = this.props;
+    const username = playerArea.username;
+    const title = `player${playerArea.player_num}${username ? `(${username})` : null}`;
+    return (
+      <div className="area-header">
+        <span className="title">{title}</span>
+        <span className="control">
+          <i className="fa fa-retweet"/>
+          <i className="fa fa-cog"/>
+          <i className="fa fa-times" onClick={this.handleDestroy}/>
+        </span>
+      </div>
+    )
+  }
+
   render() {
     return (
       <div className={this.className} style={this.style}>
+        {this.renderHeader()}
       </div>
     );
   }

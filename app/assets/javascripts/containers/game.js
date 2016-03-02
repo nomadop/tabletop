@@ -127,7 +127,6 @@ class Game extends Component {
     if (this.state.drawMode) {
       if (!this.drawStartMouseInfo) {
         this.drawStartMouseInfo = this.extractMouseEvent(event);
-        console.log('draw start');
       }
       return;
     }

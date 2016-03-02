@@ -13,6 +13,7 @@ import {
   REMOVE_GAME_OBJECTS,
   START_DRAWING_GAME_OBJECT,
   END_DRAWING_GAME_OBJECT,
+  REMOVE_PLAYER_AREA,
 } from './action_types';
 
 export function receiveGameObjects(gameObjects) {
@@ -119,5 +120,12 @@ export function endDrawingGameObject(gameObject) {
   return {
     type: END_DRAWING_GAME_OBJECT,
     gameObject,
+  };
+}
+
+export function removePlayerArea(areaId) {
+  return {
+    type: REMOVE_PLAYER_AREA,
+    areaId,
   };
 }

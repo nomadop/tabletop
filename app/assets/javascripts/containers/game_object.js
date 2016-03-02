@@ -16,6 +16,7 @@ import {
   removeGameObjects,
   startDrawingGameObject,
   endDrawingGameObject,
+  removePlayerArea,
 } from '../actions/game';
 import { rotateByPoint } from '../utils/coordination_transformer';
 import { serializeGameObject, unserializeGameObject } from '../serializers/game_object';
@@ -56,6 +57,8 @@ class GameObjectContainer extends Component {
         return this.props.selectGameObject(data.player_num, data.object_id);
       case 'release_game_objects':
         return this.props.unselectGameObjects(data.object_ids);
+      case 'destroy_player_area':
+        return this.props.removePlayerArea(data.area_id);
       case 'error':
         alert(JSON.stringify(data.error));
         return;
@@ -327,6 +330,7 @@ GameObjectContainer.propTypes = {
   removeGameObjects: PropTypes.func,
   startDrawingGameObject: PropTypes.func,
   endDrawingGameObject: PropTypes.func,
+  removePlayerArea: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -343,6 +347,7 @@ function dispatcher(dispatch) {
     removeGameObjects,
     startDrawingGameObject,
     endDrawingGameObject,
+    removePlayerArea,
   }, dispatch);
 }
 

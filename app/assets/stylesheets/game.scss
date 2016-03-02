@@ -20,18 +20,22 @@
 }
 
 .player1 {
+  color: darkred;
   outline-color: darkred !important;
 }
 
 .player2 {
+  color: darkblue;
   outline-color: darkblue !important;
 }
 
 .player3 {
+  color: darkgreen;
   outline-color: darkgreen !important;
 }
 
 .player4 {
+  color: darkgoldenrod;
   outline-color: darkgoldenrod !important;
 }
 
@@ -162,6 +166,21 @@
           position: absolute;
           outline: -webkit-focus-ring-color auto 5px;
           display: block;
+
+          .area-header {
+            padding: 4px;
+            display: flex;
+            justify-content: space-between;
+
+            i {
+              margin: 4px;
+
+              &:hover {
+                cursor: pointer;
+                color: #6699cc;
+              }
+            }
+          }
         }
 
         .game-object {
@@ -201,6 +220,7 @@
             pointer-events: none;
             font-size: 4em;
             font-weight: bolder;
+            color: black;
             text-shadow: -3px -3px 3px #fff, 3px -3px 3px #fff, -3px 3px 3px #fff, 3px 3px 3px #fff;
           }
 
