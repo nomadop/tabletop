@@ -30,6 +30,7 @@ class GameObjectContainer extends Component {
       case 'update_game_object':
       case 'lock_failed':
         return this.props.receiveGameObjects([unserializeGameObject(data.object)]);
+      case 'create_game_objects':
       case 'update_game_objects':
         const objects = data.objects.map(unserializeGameObject);
         return this.props.receiveGameObjects(objects);

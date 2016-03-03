@@ -109,6 +109,21 @@ class Game extends Component {
   }
 
   handleMouseWheel(event) {
+    let target = event.target;
+    let available = true;
+    while (target) {
+      if (target.getAttribute && target.getAttribute('class') === 'pop-up-layer') {
+        available = false;
+        break;
+      }
+
+      target = target.parentNode;
+    }
+
+    if (!available) {
+      return;
+    }
+
     event.preventDefault();
     const deltaY = event.deltaY;
     const deltaX = event.deltaX;
@@ -196,10 +211,6 @@ class Game extends Component {
     }
   }
 
-  handleCreateGameObject(meta_id) {
-    App.game.create_game_object(meta_id);
-  }
-
   resizeGameWindow() {
     this.setState({
       width: window.innerWidth,
@@ -231,9 +242,9 @@ class Game extends Component {
     )
   }
 
-  renderDrawBlocker(style) {
+  renderActionBlocker(style) {
     if (this.state.drawMode) {
-      return <div className="draw-blocker" style={style}></div>;
+      return <div className="action-blocker" style={style}></div>;
     }
   }
 
@@ -245,11 +256,11 @@ class Game extends Component {
     };
 
     return (
-      <div className="pop-up-layer" style={style}>
-        {this.renderDrawBlocker(style)}
+      <div className="pop-up-layer">
+        {this.renderActionBlocker(style)}
         <div className="pane-container">
           {this.renderGameMenu()}
-          <CreateObjectPane meta={meta} module={game.module} createGameObject={this.handleCreateGameObject}/>
+          <CreateObjectPane meta={meta} module={game.module}/>
         </div>
       </div>
     )

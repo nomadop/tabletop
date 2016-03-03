@@ -21,6 +21,12 @@ App.game = App.cable.subscriptions.create "GameChannel",
   create_game_object: (meta_id) ->
     @perform 'create_game_object', meta_id: meta_id
 
+  create_game_objects: (ids) ->
+    @perform 'create_game_objects', ids: ids
+
+  create_and_pack_game_objects: (ids) ->
+    @perform 'create_and_pack_game_objects', ids: ids
+
   update_game_object: (id, attrs) ->
     @perform 'update_game_object', id: id, attrs: attrs
 
