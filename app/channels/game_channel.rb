@@ -259,4 +259,11 @@ class GameChannel < ApplicationCable::Channel
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
+
+  def send_message(data)
+    current_user.room.messages.create(from: current_user, level: :normal, content: data['content'])
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+  end
 end

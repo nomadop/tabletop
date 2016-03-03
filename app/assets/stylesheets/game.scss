@@ -77,18 +77,51 @@
 
       .message-container {
         box-sizing: border-box;
-        padding: 0.5rem;
+        padding: 0 0.5rem;
         width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
+        height: calc(100% - 26px);
+        overflow-x: hidden;
+        overflow-y: auto;
 
         .message {
           width: 100%;
           display: flex;
 
+          .from {
+            width: 50px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
           .content {
-            margin-left: 0.5rem;
+            width: calc(100% - 70px);
+            margin-left: 4px;
+            word-wrap: break-word;
+          }
+        }
+      }
+
+      .message-control {
+        display: flex;
+        padding: 4px 10px;
+
+        .message-input {
+          flex-grow: 1;
+          background: transparent;
+          border: none;
+        }
+
+        .send {
+          margin-left: 4px;
+          border: 1px solid black;
+          border-radius: 4px;
+          padding: 0 4px;
+
+          &:hover {
+            cursor: pointer;
+            color: #6699cc;
+            border-color: #6699cc;
           }
         }
       }

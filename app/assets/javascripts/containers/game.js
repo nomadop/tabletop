@@ -74,10 +74,18 @@ class Game extends Component {
     }
   }
 
+  handleDisableKeyEvent(isDisabled) {
+    this.isKeyEventDisabled = isDisabled;
+  }
+
   handleKeyDown(e) {
     const { keyCode, metaKey, altKey } = e;
     if (metaKey && altKey && keyCode === 73) {
-      return true;
+      return;
+    }
+
+    if (this.isKeyEventDisabled) {
+      return;
     }
 
     if (altKey) {
@@ -277,7 +285,7 @@ class Game extends Component {
     return (
       <div className="pop-up-layer">
         {this.renderActionBlocker(style)}
-        <MessagePane bottom={10 - height} messages={messages}/>
+        <MessagePane bottom={10 - height} messages={messages} disableKeyEvent={this.handleDisableKeyEvent.bind(this)}/>
         <div className="pane-container">
           {this.renderGameMenu()}
           <CreateObjectPane meta={meta} module={game.module}/>
