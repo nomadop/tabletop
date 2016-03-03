@@ -60,6 +60,10 @@ export default class GameObject extends Component {
 
     if (gameObject.meta_type === 'Deck') {
       classNames.push('deck-object');
+
+      if (!gameObject.meta.innerObjects.length) {
+        classNames.push('empty');
+      }
     }
 
     if (gameObject.player_num) {

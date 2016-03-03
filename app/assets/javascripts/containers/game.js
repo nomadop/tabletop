@@ -181,7 +181,11 @@ class Game extends Component {
   }
 
   handleMouseMove(event) {
-    if (this.state.drawMode && this.drawStartMouseInfo) {
+    if (!event.buttons) {
+      return;
+    }
+
+    if (this.state.drawMode) {
       const drawBox = this.refs.drawBox;
       const { rotatedTopLeft, width, height, rotate } = this.extractDrawBoxProperties(event);
       drawBox.setState({
@@ -191,6 +195,17 @@ class Game extends Component {
         height: height < 0 ? 0 : height,
         rotate: rotate,
       });
+    } else if (!this.props.isDragging) {
+      const { movementX, movementY } = event.nativeEvent;
+
+      if (event.shiftKey) {
+        this.props.rotateCameraHorizontal(movementX);
+        this.props.rotateCameraVertical(movementY);
+      } else {
+        const scale = this.props.camera.scale;
+        this.props.moveCameraHorizontal(movementX / scale);
+        this.props.moveCameraVertical(movementY / scale);
+      }
     }
   }
 
@@ -269,6 +284,8 @@ class Game extends Component {
   renderCoordination() {
     if (this.props.debug) {
       return <CoordinationLayer rows={10} cols={10} size={100}/>;
+    } else {
+      return <span className="origin-point"/>
     }
   }
 
@@ -325,6 +342,7 @@ Game.propTypes = {
   fetchGameData: PropTypes.func,
   unselectGameObjects: PropTypes.func,
   selectedIds: PropTypes.array,
+  isDragging: PropTypes.bool,
 };
 
 function dispatcher(dispatch) {

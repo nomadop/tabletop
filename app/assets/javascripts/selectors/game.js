@@ -80,8 +80,9 @@ export const gameContainerSelector = createSelector(
   cameraSelector,
   metaSelector,
   selectedIdsSelector,
-  (camera, meta, selectedIds) => {
-    return { camera, meta, selectedIds };
+  isDraggingSelector,
+  (camera, meta, selectedIds, isDragging) => {
+    return { camera, meta, selectedIds, isDragging };
   }
 );
 

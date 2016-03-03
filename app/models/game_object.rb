@@ -98,6 +98,11 @@ class GameObject < ApplicationRecord
   def check_container
     return true unless inner_object?
 
-    self.container = nil unless container.point_inside?(related_postion)
+    if container.point_inside?(related_postion)
+      self.rotate = container.rotate
+    else
+      self.container = nil
+    end
+    true
   end
 end
