@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  room_id: 1
+  from_id: 1
+  to_id: 1
+  level: MyString
+  content: MyText
+
+two:
+  room_id: 1
+  from_id: 1
+  to_id: 1
+  level: MyString
+  content: MyText

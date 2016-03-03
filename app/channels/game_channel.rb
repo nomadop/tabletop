@@ -46,10 +46,12 @@ class GameChannel < ApplicationCable::Channel
 
   def create_game_objects(data)
     meta = GameObjectMetum.where(id: data['ids'])
-    create_script = meta.map { |metum| { room: current_user.room, meta: metum } }
+    room = current_user.room
+    create_script = meta.map { |metum| { room: room, meta: metum } }
     GameObject.transaction do
       objects = GameObject.create(create_script)
 
+      room.messages.create(level: :info, content: "player#{current_user.player_num}(#{current_user.email}) created #{meta.map(&:name)}.")
       ActionCable.server.broadcast(game_stream, action: :create_game_objects, objects: objects.map(&serializer))
     end
   rescue StandardError => e

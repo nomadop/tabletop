@@ -15,6 +15,7 @@ import {
   END_DRAWING_GAME_OBJECT,
   REMOVE_PLAYER_AREA,
 } from './action_types';
+import { receiveMessages } from './message';
 
 export function receiveGameObjects(gameObjects) {
   return {
@@ -53,6 +54,7 @@ export function fetchGameData(roomId) {
         dispatch(receiveDecks(json.decks));
         dispatch(receivePlayerAreas(json.player_areas));
         dispatch(receiveGameObjects(json.game_objects));
+        dispatch(receiveMessages(json.messages));
       });
   };
 }

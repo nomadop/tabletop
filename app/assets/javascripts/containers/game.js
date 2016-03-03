@@ -4,8 +4,9 @@ import { bindActionCreators } from 'redux';
 import PerspectiveLayer from '../components/perspective_layer';
 import DirectorLayer from '../components/director_layer';
 import CoordinationLayer from '../components/coordination_layer';
-import CreateObjectPane from 'components/create_object_pane';
-import GamePane from 'components/game_pane';
+import CreateObjectPane from '../components/create_object_pane';
+import GamePane from '../components/game_pane';
+import MessagePane from '../components/message-pane';
 import DrawBox from '../components/draw_box';
 import GameObjectContainer from './game_object';
 import {
@@ -19,6 +20,7 @@ import {
   fetchGameData,
   unselectGameObjects,
 } from '../actions/game';
+import { receiveMessages } from '../actions/message';
 import {
   originalToPerspective,
   perspectiveToOriginal,
@@ -46,6 +48,8 @@ class Game extends Component {
         alert('Room is closed by host');
         window.location.href = '/';
         return;
+      case 'new_message':
+        return this.props.receiveMessages([data.message]);
       default:
         return;
       }
@@ -264,7 +268,7 @@ class Game extends Component {
   }
 
   renderPopUpLayer(width, height) {
-    const { meta, game } = this.props;
+    const { meta, game, messages } = this.props;
     const style = {
       width,
       height,
@@ -273,6 +277,7 @@ class Game extends Component {
     return (
       <div className="pop-up-layer">
         {this.renderActionBlocker(style)}
+        <MessagePane bottom={10 - height} messages={messages}/>
         <div className="pane-container">
           {this.renderGameMenu()}
           <CreateObjectPane meta={meta} module={game.module}/>
@@ -343,6 +348,8 @@ Game.propTypes = {
   unselectGameObjects: PropTypes.func,
   selectedIds: PropTypes.array,
   isDragging: PropTypes.bool,
+  messages: PropTypes.array,
+  receiveMessages: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -354,6 +361,7 @@ function dispatcher(dispatch) {
     rotateCameraVertical,
     fetchGameData,
     unselectGameObjects,
+    receiveMessages,
   }, dispatch);
 }
 

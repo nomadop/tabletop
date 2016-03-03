@@ -13,6 +13,7 @@ class RoomsController < ApplicationController
       game_objects: room.game_objects.as_json(methods: [:player_num, :related_x, :related_y, :related_rotate]),
       decks: room.decks,
       player_areas: room.player_areas,
+      messages: room.messages,
     }
   end
 

@@ -10,6 +10,7 @@ class Room < ApplicationRecord
   has_many :players, dependent: :destroy
   has_many :users, through: :players
   has_many :player_areas, dependent: :destroy
+  has_many :messages, dependent: :destroy
 
   def join(user)
     if players.available.any?

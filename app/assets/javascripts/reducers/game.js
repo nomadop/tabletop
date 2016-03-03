@@ -17,6 +17,7 @@ import {
   REMOVE_PLAYER_AREA,
 } from '../actions/action_types';
 import camera from './camera';
+import messages from './message';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
 
 function metaById(state = {}, action) {
@@ -233,4 +234,5 @@ export default combineReducers({
   camera,
   gameObjects,
   playerAreas,
+  messages,
 });

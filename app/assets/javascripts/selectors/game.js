@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import messagesSelector from './message';
 
 const authenticationSelector = (state, props) => props.authentication;
 const cameraSelector = state => state.camera;
@@ -81,8 +82,9 @@ export const gameContainerSelector = createSelector(
   metaSelector,
   selectedIdsSelector,
   isDraggingSelector,
-  (camera, meta, selectedIds, isDragging) => {
-    return { camera, meta, selectedIds, isDragging };
+  messagesSelector,
+  (camera, meta, selectedIds, isDragging, messages) => {
+    return { camera, meta, selectedIds, isDragging, messages };
   }
 );
 

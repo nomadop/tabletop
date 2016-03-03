@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160302021506) do
+ActiveRecord::Schema.define(version: 20160303070545) do
 
   create_table "decks", force: :cascade do |t|
     t.string   "sub_type",                    null: false
@@ -62,6 +62,16 @@ ActiveRecord::Schema.define(version: 20160302021506) do
     t.text     "description"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer  "room_id"
+    t.integer  "from_id"
+    t.integer  "to_id"
+    t.string   "level"
+    t.string   "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "player_areas", force: :cascade do |t|
