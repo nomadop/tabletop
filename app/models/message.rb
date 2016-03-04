@@ -9,7 +9,7 @@ class Message < ApplicationRecord
     opts[:methods] ||= []
     opts[:methods] |= [:from_name]
     opts[:except] ||= []
-    opts[:except] |= [:created_at, :updated_at]
+    opts[:except] |= [:room_id, :from_id, :to_id, :created_at, :updated_at]
     super(opts)
   end
 

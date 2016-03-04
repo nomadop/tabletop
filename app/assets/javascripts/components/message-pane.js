@@ -20,7 +20,7 @@ export default class MessagePane extends Component {
     const input = this.refs.input;
     const message = input.value;
     input.value = '';
-    App.game.send_message(message);
+    this.props.sendMessage(message);
   }
 
   renderMessages() {
@@ -48,6 +48,7 @@ export default class MessagePane extends Component {
                  ref="input"
                  onFocus={disableKeyEvent.bind(undefined, true)}
                  onBlur={disableKeyEvent.bind(undefined, false)}
+                 onKeyDown={e => e.keyCode === 13 ? this.handleSendMessage() : null}
           />
           <span className="send unselectable" onClick={this.handleSendMessage.bind(this)}>Send</span>
         </div>
@@ -60,4 +61,5 @@ MessagePane.propTypes = {
   messages: PropTypes.array,
   bottom: PropTypes.number,
   disableKeyEvent: PropTypes.func,
+  sendMessage: PropTypes.func,
 };

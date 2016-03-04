@@ -34,6 +34,7 @@ class Game extends Component {
   constructor() {
     super(...arguments);
 
+    this.localMsgSendCount = 0;
     this.state = {
       width: undefined,
       height: undefined,
@@ -49,7 +50,11 @@ class Game extends Component {
         window.location.href = '/';
         return;
       case 'new_message':
-        return this.props.receiveMessages([data.message]);
+        const message = data.message;
+        if (message.from_name !== this.props.authentication.username) {
+          this.props.receiveMessages([message]);
+        }
+        return;
       default:
         return;
       }
@@ -238,6 +243,18 @@ class Game extends Component {
     }
   }
 
+  handleSendMessage(content) {
+    this.localMsgSendCount++;
+    const message = {
+      id: 'localSendMsg' + this.localMsgSendCount,
+      level: 'normal',
+      from_name: this.props.authentication.username,
+      content: content,
+    };
+    this.props.receiveMessages([message]);
+    App.game.send_message(content);
+  }
+
   resizeGameWindow() {
     this.setState({
       width: window.innerWidth,
@@ -285,7 +302,11 @@ class Game extends Component {
     return (
       <div className="pop-up-layer">
         {this.renderActionBlocker(style)}
-        <MessagePane bottom={10 - height} messages={messages} disableKeyEvent={this.handleDisableKeyEvent.bind(this)}/>
+        <MessagePane bottom={10 - height}
+                     messages={messages}
+                     disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
+                     sendMessage={this.handleSendMessage.bind(this)}
+        />
         <div className="pane-container">
           {this.renderGameMenu()}
           <CreateObjectPane meta={meta} module={game.module}/>
