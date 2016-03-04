@@ -7,7 +7,7 @@ export default class CreateObjectPane extends Component {
     super(...arguments);
 
     this.state = {
-      filter: 'All',
+      filter: '所有',
     };
   }
 
@@ -24,28 +24,29 @@ export default class CreateObjectPane extends Component {
     this.metaComponents.forEach(component => component.setState({ isSelected }));
   }
 
-  handleCreateSelected() {
+  handleCreateSelected(pack) {
     const selectedComponents = this.metaComponents.filter(component => component.state.isSelected);
     const metaIds = selectedComponents.map(component => component.props.meta.id);
-    App.game.create_game_objects(metaIds);
-  }
 
-  handleCreateDeck() {
-    const selectedComponents = this.metaComponents.filter(component => component.state.isSelected);
-    const metaIds = selectedComponents.map(component => component.props.meta.id);
-    App.game.create_and_pack_game_objects(metaIds);
+    if (metaIds.length) {
+      if (confirm('确定创建?')) {
+        pack ? App.game.create_and_pack_game_objects(metaIds) : App.game.create_game_objects(metaIds);
+      }
+    } else {
+      this.props.systemWarning('没有选择物件.');
+    }
   }
 
   renderMeta() {
     const { meta, module } = this.props;
     const filter = this.state.filter;
-    const filteredMeta = meta.filter(metum => filter === 'All' ? true : metum.sub_type === filter);
+    const filteredMeta = meta.filter(metum => filter === '所有' ? true : metum.sub_type === filter);
     return filteredMeta.map(metum => <GameObjectMeta key={metum.id} ref={`meta${metum.id}`} meta={metum} module={module}/>);
   }
 
   renderFilterTabs() {
     const filter = this.state.filter;
-    const tabs = ['All'];
+    const tabs = ['所有'];
     this.props.meta.forEach(metum => {
       const subType = metum.sub_type;
       if (tabs.indexOf(subType) < 0) {
@@ -60,17 +61,17 @@ export default class CreateObjectPane extends Component {
   renderFooterControl() {
     return (
       <div className="footer-control">
-        <button onClick={this.handleSelectAll.bind(this, true)}>Select All</button>
-        <button onClick={this.handleSelectAll.bind(this, false)}>Unselect All</button>
-        <button onClick={this.handleCreateSelected.bind(this)}>Create</button>
-        <button onClick={this.handleCreateDeck.bind(this)}>Create Deck</button>
+        <button onClick={this.handleSelectAll.bind(this, true)}>全选</button>
+        <button onClick={this.handleSelectAll.bind(this, false)}>取消全选</button>
+        <button onClick={this.handleCreateSelected.bind(this, false)}>创建</button>
+        <button onClick={this.handleCreateSelected.bind(this, true)}>创建并打包</button>
       </div>
     )
   }
 
   render() {
     return (
-      <GamePane className="create-object-pane" title="Create Game Object" width={360} height={480} resizeable={true}>
+      <GamePane className="create-object-pane" title="创建新物件" width={360} height={480} resizeable={true}>
         <div className="filter-bar">
           {this.renderFilterTabs()}
           <span className="filter-fill"/>
@@ -87,4 +88,5 @@ export default class CreateObjectPane extends Component {
 CreateObjectPane.propTypes = {
   meta: PropTypes.array,
   module: PropTypes.string,
+  systemWarning: PropTypes.func,
 };

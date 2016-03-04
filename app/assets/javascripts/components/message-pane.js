@@ -19,19 +19,36 @@ export default class MessagePane extends Component {
   handleSendMessage() {
     const input = this.refs.input;
     const message = input.value;
-    input.value = '';
-    this.props.sendMessage(message);
+    if (message.length) {
+      input.value = '';
+      this.props.sendMessage(message);
+    }
   }
 
   renderMessages() {
     const { messages } = this.props;
-    return messages.map(msg => (
-      <div key={msg.id} className={`message ${msg.level}`}>
-        <span className="from">{msg.from_name}</span>
-        <span className="speak-spliter">:</span>
-        <span className="content">{msg.content}</span>
-      </div>
-    ));
+
+    return messages.map(msg => {
+      const iconClassNames = ['fa'];
+      switch (msg.level) {
+      case 'normal':
+        iconClassNames.push('fa-comments');
+        break;
+      default:
+        iconClassNames.push('fa-cogs');
+        break;
+      }
+      const iconClassName = iconClassNames.join(' ');
+
+      return (
+        <div key={msg.id} className={`message ${msg.level}`}>
+          <span className="icon"><i className={iconClassName}/></span>
+          <span className="from">{msg.from_name}</span>
+          <span className="speak-spliter">:</span>
+          <span className="content">{msg.content}</span>
+        </div>
+      );
+    });
   }
 
   render() {
@@ -50,7 +67,7 @@ export default class MessagePane extends Component {
                  onBlur={disableKeyEvent.bind(undefined, false)}
                  onKeyDown={e => e.keyCode === 13 ? this.handleSendMessage() : null}
           />
-          <span className="send unselectable" onClick={this.handleSendMessage.bind(this)}>Send</span>
+          <span className="send unselectable" onClick={this.handleSendMessage.bind(this)}>发送</span>
         </div>
       </div>
     );

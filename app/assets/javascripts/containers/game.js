@@ -241,7 +241,7 @@ class Game extends Component {
 
   handleMouseUp(event) {
     if (this.state.drawMode) {
-      if (confirm('Create player area?')) {
+      if (confirm('确定创建区域?')) {
         const { centerX, centerY, width, height, rotate } = this.extractDrawBoxProperties(event);
         App.game.create_player_area({
           center_x: centerX,
@@ -256,16 +256,36 @@ class Game extends Component {
     }
   }
 
-  handleSendMessage(content) {
+  handleSendLocalMessage(from_name, level, content) {
     this.localMsgSendCount++;
     const message = {
       id: 'localSendMsg' + this.localMsgSendCount,
-      level: 'normal',
-      from_name: this.props.authentication.username,
-      content: content,
+      level,
+      from_name,
+      content,
     };
     this.props.receiveMessages([message]);
+  }
+
+  handleSendMessage(content) {
+    if (content.length > 255) {
+      return this.handleSystemWarning('输入过长.');
+    }
+
+    this.handleSendLocalMessage(
+      this.props.authentication.username,
+      'normal',
+      content
+    );
     App.game.send_message(content);
+  }
+
+  handleSystemWarning(content) {
+    this.handleSendLocalMessage(
+      '系统',
+      'warning',
+      content
+    );
   }
 
   resizeGameWindow() {
@@ -292,9 +312,9 @@ class Game extends Component {
     const { room } = this.props;
 
     return (
-      <GamePane className="game-menu" title="Game Menu" width={240} height={480}>
-        <a href={`/rooms/${room.id}/leave`} data-method="post">Leave</a>
-        <a href={`/rooms/${room.id}`} data-method="delete">Close</a>
+      <GamePane className="game-menu" title="菜单" width={240} height={480}>
+        <a href={`/rooms/${room.id}/leave`} data-method="post">离开房间</a>
+        <a href={`/rooms/${room.id}`} data-method="delete">关闭房间</a>
       </GamePane>
     )
   }
@@ -322,7 +342,7 @@ class Game extends Component {
         />
         <div className="pane-container">
           {this.renderGameMenu()}
-          <CreateObjectPane meta={meta} module={game.module}/>
+          <CreateObjectPane meta={meta} module={game.module} systemWarning={this.handleSystemWarning.bind(this)}/>
         </div>
       </div>
     )

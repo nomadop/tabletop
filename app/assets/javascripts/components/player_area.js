@@ -35,7 +35,7 @@ export default class PlayerArea extends Component {
   }
 
   handleDestroy() {
-    if (confirm('Destroy player area')) {
+    if (confirm('确定删除区域?')) {
       App.game.destroy_player_area();
     }
   }
@@ -43,7 +43,7 @@ export default class PlayerArea extends Component {
   renderHeader() {
     const { playerArea } = this.props;
     const username = playerArea.username;
-    const title = `player${playerArea.player_num}${username ? `(${username})` : null}`;
+    const title = `玩家${playerArea.player_num}${username ? `(${username})` : null}`;
     return (
       <div className="area-header">
         <span className="title">{title}</span>

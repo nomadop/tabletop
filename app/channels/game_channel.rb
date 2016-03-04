@@ -51,7 +51,7 @@ class GameChannel < ApplicationCable::Channel
     GameObject.transaction do
       objects = GameObject.create(create_script)
 
-      room.messages.create(level: :info, content: "player#{current_user.player_num}(#{current_user.username}) created #{meta.map(&:name)}.")
+      room.messages.create(level: :info, content: "玩家#{current_user.player_num}(#{current_user.username})创建了#{meta.first(3).map(&:name)}等#{meta.count}个物件.")
       ActionCable.server.broadcast(game_stream, action: :create_game_objects, objects: objects.map(&serializer))
     end
   rescue StandardError => e

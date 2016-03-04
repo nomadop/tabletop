@@ -205,7 +205,7 @@ class GameObjectContainer extends Component {
   handleDestroyGameObjects() {
     const { selectedIds } = this.props;
 
-    if (confirm('Sure to destroy selected objects?')) {
+    if (confirm('确定删除物件?')) {
       App.game.destroy_game_objects(selectedIds);
     }
   }

@@ -30,7 +30,7 @@ class Lobby extends Component {
     return (
       <li key={room.join_path}>
         <span className="name">{room.name}</span>
-        <span className="join-path"><a href={room.join_path} data-method="post">join</a></span>
+        <span className="join-path"><a href={room.join_path} data-method="post">加入</a></span>
       </li>
     )
   }
@@ -40,23 +40,23 @@ class Lobby extends Component {
 
     const navNode = (
       <Navigator>
-        <span>Welcome! {authentication.username}</span>
-        <a rel="nofollow" data-method="delete" href="/users/sign_out">Log out</a>
+        <span>欢迎! {authentication.username}</span>
+        <a rel="nofollow" data-method="delete" href="/users/sign_out">登出</a>
       </Navigator>
     );
 
     return (
       <div className="lobby-app">
         {navNode}
-        <h1>Lobby</h1>
+        <h1>大厅</h1>
         <ul>{messages.map(msg => <li>{msg}</li>)}</ul>
         <ul>{rooms.map(room => this.renderRoom(room))}</ul>
         <form action="/rooms" method="post">
           <select name="game_id" id="create_room_game_id">
             {games.map(game => <option key={game.id} value={game.id}>{game.name}</option>)}
           </select>
-          <input type="text" name="name" id="create_room_name" />
-          <input type="submit" value="create" />
+          <input type="text" name="name" id="create_room_name" placeholder="房间名" />
+          <input type="submit" value="创建房间" />
         </form>
       </div>
     );

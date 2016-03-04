@@ -14,7 +14,7 @@ class Message < ApplicationRecord
   end
 
   def from_name
-    from.nil? ? 'System' : from.username;
+    from.nil? ? '系统' : from.username;
   end
 
   def room_stream
