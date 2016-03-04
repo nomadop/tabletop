@@ -2,12 +2,24 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 
 export default class MessagePane extends Component {
+  constructor() {
+    super(...arguments);
+
+    this.state = {
+      width: 320,
+      height: 240,
+    };
+  }
+
   get style() {
     const bottom = this.props.bottom;
+    const { width, height } = this.state;
 
     return {
       left: 10,
       bottom: bottom || 10,
+      width,
+      height,
     };
   }
 
@@ -23,6 +35,38 @@ export default class MessagePane extends Component {
       input.value = '';
       this.props.sendMessage(message);
     }
+  }
+
+  handleNSResize(direction, event) {
+    const { clientX, clientY } = event;
+    if (!clientY && !clientX) {
+      return;
+    }
+
+    let width = clientX - 10;
+    let height = window.innerHeight - clientY + 10;
+    if (width > 640) {
+      width = 640;
+    } else if (width < 320) {
+      width = 320;
+    }
+
+    if (height > 480) {
+      height = 480;
+    } else if (height < 240) {
+      height = 240;
+    }
+
+    const newState = {};
+    if (direction & 1) {
+      newState.height = height;
+    }
+
+    if (direction & 2) {
+      newState.width = width;
+    }
+
+    this.setState(newState);
   }
 
   renderMessages() {
@@ -69,6 +113,9 @@ export default class MessagePane extends Component {
           />
           <span className="send unselectable" onClick={this.handleSendMessage.bind(this)}>发送</span>
         </div>
+        <span className="resizer top-resizer unselectable" onDrag={this.handleNSResize.bind(this, 1)} draggable="true"/>
+        <span className="resizer right-resizer unselectable" onDrag={this.handleNSResize.bind(this, 2)} draggable="true"/>
+        <span className="resizer top-right-resizer unselectable" onDrag={this.handleNSResize.bind(this, 3)} draggable="true"/>
       </div>
     );
   }
