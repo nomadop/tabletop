@@ -213,8 +213,21 @@ class Game extends Component {
         rotate: rotate,
       });
     } else if (!this.props.isDragging) {
-      const { movementX, movementY } = event.nativeEvent;
+      let target = event.target;
+      let blockAction = false;
+      while (target) {
+        if (target.getAttribute && target.getAttribute('class') === 'pop-up-layer') {
+          blockAction = true;
+          break;
+        }
 
+        target = target.parentNode;
+      }
+      if (blockAction) {
+        return;
+      }
+
+      const { movementX, movementY } = event.nativeEvent;
       if (event.shiftKey) {
         this.props.rotateCameraHorizontal(movementX);
         this.props.rotateCameraVertical(movementY);

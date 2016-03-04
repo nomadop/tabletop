@@ -16,6 +16,7 @@ export default class CreateObjectPane extends Component {
   }
 
   handleSetFilter(filter) {
+    this.handleSelectAll(false);
     this.setState({ filter });
   }
 
@@ -60,6 +61,7 @@ export default class CreateObjectPane extends Component {
     return (
       <div className="footer-control">
         <button onClick={this.handleSelectAll.bind(this, true)}>Select All</button>
+        <button onClick={this.handleSelectAll.bind(this, false)}>Unselect All</button>
         <button onClick={this.handleCreateSelected.bind(this)}>Create</button>
         <button onClick={this.handleCreateDeck.bind(this)}>Create Deck</button>
       </div>
