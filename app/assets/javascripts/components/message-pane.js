@@ -49,7 +49,7 @@ export default class MessagePane extends Component {
                  onFocus={disableKeyEvent.bind(undefined, true)}
                  onBlur={disableKeyEvent.bind(undefined, false)}
           />
-          <span className="send" onClick={this.handleSendMessage.bind(this)}>Send</span>
+          <span className="send unselectable" onClick={this.handleSendMessage.bind(this)}>Send</span>
         </div>
       </div>
     );

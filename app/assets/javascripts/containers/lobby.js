@@ -40,7 +40,7 @@ class Lobby extends Component {
 
     const navNode = (
       <Navigator>
-        <span>Welcome! {authentication.email}</span>
+        <span>Welcome! {authentication.username}</span>
         <a rel="nofollow" data-method="delete" href="/users/sign_out">Log out</a>
       </Navigator>
     );

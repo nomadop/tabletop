@@ -7,6 +7,13 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+  validates_presence_of :nickname
+  validates_uniqueness_of :nickname
+
+  def username
+    nickname.blank? ? email : nickname
+  end
+
   def room_id
     room.nil? ? 'lobby' : "room#{room.id}"
   end
@@ -20,6 +27,6 @@ class User < ApplicationRecord
   end
 
   def auth_info
-    as_json(only: :email, methods: :player_num)
+    as_json(only: [], methods: [:username, :player_num])
   end
 end

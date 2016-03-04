@@ -75,7 +75,7 @@ class PlayerArea < ApplicationRecord
   end
 
   def username
-    player.user.email if player.user
+    player.user.username if player.user
   end
 
   def player_num
