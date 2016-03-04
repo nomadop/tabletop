@@ -29,7 +29,7 @@ export default class PlayerArea extends Component {
 
   get className() {
     const playerNum = this.props.playerArea.player_num;
-    const classNames = ['player-area', `player${playerNum}`, 'unselectable', 'undraggable'];
+    const classNames = ['player-area', `player${playerNum}`, 'undraggable'];
 
     return classNames.join(' ');
   }

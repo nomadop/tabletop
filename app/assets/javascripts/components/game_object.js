@@ -49,7 +49,7 @@ export default class GameObject extends Component {
 
   get className() {
     const { isSelected, gameObject } = this.props;
-    const classNames = ['game-object', 'unselectable', 'undraggable'];
+    const classNames = ['game-object', 'undraggable'];
     if (isSelected) {
       classNames.push('selected');
     }
@@ -181,7 +181,7 @@ export default class GameObject extends Component {
         onMouseMove={this.handleDeckObjectMouseMove.bind(this)}
         onMouseUp={joinDeck.bind(null, deck)}
       >
-        <span className="count unselectable">{deck.innerObjects.length}</span>
+        <span className="count">{deck.innerObjects.length}</span>
         {this.renderInnerObjects(deck)}
       </div>
     );

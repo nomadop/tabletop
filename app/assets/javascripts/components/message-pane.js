@@ -100,7 +100,7 @@ export default class MessagePane extends Component {
 
     return (
       <div className="message-pane" style={this.style}>
-        <div className="message-container unselectable" ref="messageContainer">
+        <div className="message-container" ref="messageContainer">
           {this.renderMessages()}
         </div>
         <div className="message-control">
@@ -111,11 +111,11 @@ export default class MessagePane extends Component {
                  onBlur={disableKeyEvent.bind(undefined, false)}
                  onKeyDown={e => e.keyCode === 13 ? this.handleSendMessage() : null}
           />
-          <span className="send unselectable" onClick={this.handleSendMessage.bind(this)}>发送</span>
+          <span className="send" onClick={this.handleSendMessage.bind(this)}>发送</span>
         </div>
-        <span className="resizer top-resizer unselectable" onDrag={this.handleNSResize.bind(this, 1)} draggable="true"/>
-        <span className="resizer right-resizer unselectable" onDrag={this.handleNSResize.bind(this, 2)} draggable="true"/>
-        <span className="resizer top-right-resizer unselectable" onDrag={this.handleNSResize.bind(this, 3)} draggable="true"/>
+        <span className="resizer top-resizer" onDrag={this.handleNSResize.bind(this, 1)} draggable="true"/>
+        <span className="resizer right-resizer" onDrag={this.handleNSResize.bind(this, 2)} draggable="true"/>
+        <span className="resizer top-right-resizer" onDrag={this.handleNSResize.bind(this, 3)} draggable="true"/>
       </div>
     );
   }
