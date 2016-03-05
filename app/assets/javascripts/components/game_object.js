@@ -34,7 +34,7 @@ export default class GameObject extends Component {
     const top = centerY - height / 2;
 
     const img = is_fliped ? back_img : front_img;
-    const backgroundImage = img ? `url(/res/poker/${img})` : null;
+    const backgroundImage = img ? `url(${img.url})` : null;
     const transform = `rotate(${rotate}deg)`;
 
     return {
@@ -153,7 +153,7 @@ export default class GameObject extends Component {
         top: isTop ? height * -0.1 : 0,
         left: isTop ? left - width * 0.1 : left,
         zIndex: expandIndex - Math.abs(i - expandIndex),
-        background: `url(/res/poker/${front_img}) round`,
+        background: `url(${front_img.url}) round`,
       };
       const onClick = isTop ? () => {} : this.handleExpandIndexMove.bind(this, i < expandIndex);
       nodes.push(

@@ -342,7 +342,7 @@ class Game extends Component {
         />
         <div className="pane-container">
           {this.renderGameMenu()}
-          <CreateObjectPane meta={meta} module={game.module} systemWarning={this.handleSystemWarning.bind(this)}/>
+          <CreateObjectPane meta={meta} systemWarning={this.handleSystemWarning.bind(this)}/>
         </div>
       </div>
     )

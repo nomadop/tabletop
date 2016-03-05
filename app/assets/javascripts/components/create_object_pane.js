@@ -38,10 +38,10 @@ export default class CreateObjectPane extends Component {
   }
 
   renderMeta() {
-    const { meta, module } = this.props;
+    const { meta } = this.props;
     const filter = this.state.filter;
     const filteredMeta = meta.filter(metum => filter === '所有' ? true : metum.sub_type === filter);
-    return filteredMeta.map(metum => <GameObjectMeta key={metum.id} ref={`meta${metum.id}`} meta={metum} module={module}/>);
+    return filteredMeta.map(metum => <GameObjectMeta key={metum.id} ref={`meta${metum.id}`} meta={metum}/>);
   }
 
   renderFilterTabs() {
@@ -87,6 +87,5 @@ export default class CreateObjectPane extends Component {
 
 CreateObjectPane.propTypes = {
   meta: PropTypes.array,
-  module: PropTypes.string,
   systemWarning: PropTypes.func,
 };

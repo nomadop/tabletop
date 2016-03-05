@@ -23,11 +23,11 @@ export default class GameObjectMeta extends Component {
   }
 
   render() {
-    const { meta, module } = this.props;
+    const { meta } = this.props;
 
     return (
       <div className={this.className} onClick={this.handleClick.bind(this)}>
-        <span><img className="thumb" src={`/res/${module}/${meta.front_img}`} alt={meta.front_img}/></span>
+        <span><img className="thumb" src={`${meta.front_img.url}`}/></span>
         <span className="name">{meta.name}</span>
         <span className="desc">{meta.description}</span>
       </div>
@@ -37,5 +37,4 @@ export default class GameObjectMeta extends Component {
 
 GameObjectMeta.propTypes = {
   meta: PropTypes.object,
-  module: PropTypes.string,
 };
