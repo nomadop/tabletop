@@ -219,6 +219,12 @@
         width: 100%;
         height: calc(100% - 37px);
         overflow: auto;
+
+        iframe {
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+        }
       }
     }
 
@@ -260,6 +266,7 @@
       }
 
       .game-object-meta {
+        position: relative;
         margin: 0.5em;
         padding: 0.5em;
         border: 1px solid transparent;
@@ -271,6 +278,16 @@
         .thumb {
           max-width: 50px;
           max-height: 50px;
+        }
+
+        .desc {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: none;
+          background: lightgray;
+          border: 1px solid gray;
+          border-radius: 4px;
         }
 
         &:hover {

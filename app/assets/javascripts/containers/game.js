@@ -19,6 +19,7 @@ import {
 import {
   fetchGameData,
   unselectGameObjects,
+  receiveGameObjectMeta,
 } from '../actions/game';
 import { receiveMessages } from '../actions/message';
 import {
@@ -55,6 +56,8 @@ class Game extends Component {
           this.props.receiveMessages([message]);
         }
         return;
+      case 'new_meta':
+        return this.props.receiveGameObjectMeta([data.meta]);
       default:
         return;
       }
@@ -325,8 +328,18 @@ class Game extends Component {
     }
   }
 
+  renderCreateMetaPane() {
+    if (this.props.dev_mode) {
+      return (
+        <GamePane className="create-meta-pane" title="创建元物件" width={385} height={550}>
+          <iframe src="/game_object_meta/new" frameBorder="0"></iframe>
+        </GamePane>
+      );
+    }
+  }
+
   renderPopUpLayer(width, height) {
-    const { meta, game, messages } = this.props;
+    const { meta, messages } = this.props;
     const style = {
       width,
       height,
@@ -343,6 +356,7 @@ class Game extends Component {
         <div className="pane-container">
           {this.renderGameMenu()}
           <CreateObjectPane meta={meta} systemWarning={this.handleSystemWarning.bind(this)}/>
+          {this.renderCreateMetaPane()}
         </div>
       </div>
     )
@@ -397,6 +411,7 @@ class Game extends Component {
 
 Game.propTypes = {
   debug: PropTypes.bool,
+  dev_mode: PropTypes.bool,
   camera: PropTypes.object,
   moveCameraHorizontal: PropTypes.func,
   moveCameraVertical: PropTypes.func,
@@ -412,6 +427,7 @@ Game.propTypes = {
   isDragging: PropTypes.bool,
   messages: PropTypes.array,
   receiveMessages: PropTypes.func,
+  receiveGameObjectMeta: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -424,6 +440,7 @@ function dispatcher(dispatch) {
     fetchGameData,
     unselectGameObjects,
     receiveMessages,
+    receiveGameObjectMeta,
   }, dispatch);
 }
 

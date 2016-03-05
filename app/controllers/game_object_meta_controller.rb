@@ -1,6 +1,14 @@
 class GameObjectMetaController < ApplicationController
-  before_action :set_game
+  before_action :authenticate_user!
+  before_action :require_in_room, only: [:in_game_new]
+  before_action :set_game, except: [:in_game_new]
   before_action :set_game_object_metum, only: [:show, :edit, :update, :destroy]
+
+  def in_game_new
+    @game = current_user.room.game
+    @game_object_metum = @game.game_object_meta.new
+    render :new
+  end
 
   # GET /game_object_meta
   # GET /game_object_meta.json
@@ -33,7 +41,9 @@ class GameObjectMetaController < ApplicationController
 
     respond_to do |format|
       if @game_object_metum.save
-        format.html { redirect_to game_game_object_metum_path(@game, @game_object_metum), notice: 'Game object metum was successfully created.' }
+        @game_object_metum.dev_room.messages.create(level: :info, content: "#{current_user.username}创建了元物件`#{@game_object_metum.name}'.")
+        ActionCable.server.broadcast(@game_object_metum.stream, action: :new_meta, meta: @game_object_metum)
+        format.html { redirect_to game_object_meta_new_path, notice: 'Game object metum was successfully created.' }
         format.json { render :show, status: :created, location: game_game_object_metum_path(@game, @game_object_metum) }
       else
         format.html { render :new }

@@ -21,22 +21,24 @@ import messages from './message';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
 
 function metaById(state = {}, action) {
-  if (action.type === RECEIVE_GAME_OBJECT_META) {
-    return action.meta.reduce((result, meta) => {
-      result[meta.id] = meta;
-      return result;
-    }, {});
+  const updater = {};
+  switch (action.type) {
+  case RECEIVE_GAME_OBJECT_META:
+    action.meta.forEach(metum => updater[metum.id] = { $set: metum });
+    return update(state, updater);
+  default:
+    return state;
   }
-
-  return state;
 }
 
 function metaIds(state = [], action) {
-  if (action.type === RECEIVE_GAME_OBJECT_META) {
-    return action.meta.map(meta => meta.id);
+  switch (action.type) {
+  case RECEIVE_GAME_OBJECT_META:
+    const newIds = action.meta.map(metum => metum.id);
+    return arrayPlus(state, newIds);
+  default:
+    return state;
   }
-
-  return state;
 }
 
 const meta = combineReducers({
