@@ -20,6 +20,7 @@ import {
   fetchGameData,
   unselectGameObjects,
   receiveGameObjectMeta,
+  removeGameObjectMeta,
 } from '../actions/game';
 import { receiveMessages } from '../actions/message';
 import {
@@ -58,6 +59,8 @@ class Game extends Component {
         return;
       case 'new_meta':
         return this.props.receiveGameObjectMeta([data.meta]);
+      case 'destroy_meta':
+        return this.props.removeGameObjectMeta(data.meta_ids);
       default:
         return;
       }
@@ -339,7 +342,7 @@ class Game extends Component {
   }
 
   renderPopUpLayer(width, height) {
-    const { meta, messages } = this.props;
+    const { meta, messages, dev_mode } = this.props;
     const style = {
       width,
       height,
@@ -355,7 +358,7 @@ class Game extends Component {
         />
         <div className="pane-container">
           {this.renderGameMenu()}
-          <CreateObjectPane meta={meta} systemWarning={this.handleSystemWarning.bind(this)}/>
+          <CreateObjectPane meta={meta} devMode={dev_mode} systemWarning={this.handleSystemWarning.bind(this)}/>
           {this.renderCreateMetaPane()}
         </div>
       </div>
@@ -428,6 +431,7 @@ Game.propTypes = {
   messages: PropTypes.array,
   receiveMessages: PropTypes.func,
   receiveGameObjectMeta: PropTypes.func,
+  removeGameObjectMeta: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -441,6 +445,7 @@ function dispatcher(dispatch) {
     unselectGameObjects,
     receiveMessages,
     receiveGameObjectMeta,
+    removeGameObjectMeta,
   }, dispatch);
 }
 

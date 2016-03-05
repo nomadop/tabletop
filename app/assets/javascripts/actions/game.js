@@ -14,6 +14,7 @@ import {
   START_DRAWING_GAME_OBJECT,
   END_DRAWING_GAME_OBJECT,
   REMOVE_PLAYER_AREA,
+  REMOVE_GAME_OBJECT_META
 } from './action_types';
 import { receiveMessages } from './message';
 
@@ -28,6 +29,13 @@ export function receiveGameObjectMeta(meta) {
   return {
     type: RECEIVE_GAME_OBJECT_META,
     meta,
+  };
+}
+
+export function removeGameObjectMeta(metaIds) {
+  return {
+    type: REMOVE_GAME_OBJECT_META,
+    metaIds,
   };
 }
 

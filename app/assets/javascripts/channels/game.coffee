@@ -63,6 +63,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
   send_message: (content) ->
     @perform 'send_message', content: content
 
+  destroy_meta: (ids) ->
+    @perform 'destroy_meta', ids: ids
+
 window.addEventListener 'beforeunload', ->
   App.game.unsubscribe()
   return

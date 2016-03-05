@@ -37,10 +37,10 @@ export default class GameObjectMeta extends Component {
   }
 
   handleMoveDesc(event) {
-    const { offsetX, offsetY } = event.nativeEvent;
+    const { clientX, clientY } = event.nativeEvent;
     this.setState({
-      descTop: offsetY,
-      descLeft: offsetX,
+      descTop: clientY,
+      descLeft: clientX + 10,
     });
   }
 
@@ -52,6 +52,8 @@ export default class GameObjectMeta extends Component {
 
   render() {
     const { meta } = this.props;
+    const desc = meta.description;
+    const descNode = desc && desc.length ? <span className="desc" style={this.descStyle}>{meta.description}</span> : null;
 
     return (
       <div className={this.className}
@@ -62,7 +64,7 @@ export default class GameObjectMeta extends Component {
       >
         <span><img className="thumb" src={`${meta.front_img.url}`}/></span>
         <span className="name">{meta.name}</span>
-        <span className="desc" style={this.descStyle}>{meta.description}</span>
+        {descNode}
       </div>
     );
   }

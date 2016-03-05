@@ -266,4 +266,19 @@ class GameChannel < ApplicationCable::Channel
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
+
+  def destroy_meta(data)
+    meta = GameObjectMetum.includes(:game).where(id: data['ids'])
+    if meta.all? { |metum| metum.game.dev_room == current_user.room }
+      a_meta = meta.to_a
+      meta.destroy_all
+      current_user.room.messages.create(level: :info, content: "#{current_user.username}移除了#{a_meta.first(3).map(&:name)}等#{a_meta.size}个元物件.")
+      ActionCable.server.broadcast(game_stream, action: :destroy_meta, meta_ids: data['ids'])
+    else
+      ActionCable.server.broadcast(user_stream, action: :error, error: {message: 'no access'})
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+  end
 end

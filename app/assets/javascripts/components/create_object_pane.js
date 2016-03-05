@@ -29,8 +29,21 @@ export default class CreateObjectPane extends Component {
     const metaIds = selectedComponents.map(component => component.props.meta.id);
 
     if (metaIds.length) {
-      if (confirm('确定创建?')) {
+      if (confirm('确定创建选定的物件?')) {
         pack ? App.game.create_and_pack_game_objects(metaIds) : App.game.create_game_objects(metaIds);
+      }
+    } else {
+      this.props.systemWarning('没有选择物件.');
+    }
+  }
+
+  handleDestroySelectedMeta() {
+    const selectedComponents = this.metaComponents.filter(component => component.state.isSelected);
+    const metaIds = selectedComponents.map(component => component.props.meta.id);
+
+    if (metaIds.length) {
+      if (confirm('确定移除选定的元物件?')) {
+        App.game.destroy_meta(metaIds);
       }
     } else {
       this.props.systemWarning('没有选择物件.');
@@ -59,10 +72,12 @@ export default class CreateObjectPane extends Component {
   }
 
   renderFooterControl() {
+    const devMode = this.props.devMode;
     return (
       <div className="footer-control">
         <button onClick={this.handleSelectAll.bind(this, true)}>全选</button>
         <button onClick={this.handleSelectAll.bind(this, false)}>取消全选</button>
+        { devMode ? <button onClick={this.handleDestroySelectedMeta.bind(this)}>移除</button> : null }
         <button onClick={this.handleCreateSelected.bind(this, false)}>创建</button>
         <button onClick={this.handleCreateSelected.bind(this, true)}>创建并打包</button>
       </div>
@@ -87,5 +102,6 @@ export default class CreateObjectPane extends Component {
 
 CreateObjectPane.propTypes = {
   meta: PropTypes.array,
+  devMode: PropTypes.bool,
   systemWarning: PropTypes.func,
 };

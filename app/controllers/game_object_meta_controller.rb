@@ -41,7 +41,7 @@ class GameObjectMetaController < ApplicationController
 
     respond_to do |format|
       if @game_object_metum.save
-        @game_object_metum.dev_room.messages.create(level: :info, content: "#{current_user.username}创建了元物件`#{@game_object_metum.name}'.")
+        @game_object_metum.dev_room.messages.create(level: :info, content: "#{current_user.username}创建了元物件\"#{@game_object_metum.name}\".")
         ActionCable.server.broadcast(@game_object_metum.stream, action: :new_meta, meta: @game_object_metum)
         format.html { redirect_to game_object_meta_new_path, notice: 'Game object metum was successfully created.' }
         format.json { render :show, status: :created, location: game_game_object_metum_path(@game, @game_object_metum) }

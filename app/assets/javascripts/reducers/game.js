@@ -2,6 +2,7 @@ import update from 'react-addons-update';
 import { combineReducers } from 'redux';
 import {
   RECEIVE_GAME_OBJECT_META,
+  REMOVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
   RECEIVE_DECKS,
   RECEIVE_PLAYER_AREAS,
@@ -26,6 +27,9 @@ function metaById(state = {}, action) {
   case RECEIVE_GAME_OBJECT_META:
     action.meta.forEach(metum => updater[metum.id] = { $set: metum });
     return update(state, updater);
+  case REMOVE_GAME_OBJECT_META:
+    action.metaIds.forEach(id => updater[id] = { $set: null });
+    return update(state, updater);
   default:
     return state;
   }
@@ -36,6 +40,8 @@ function metaIds(state = [], action) {
   case RECEIVE_GAME_OBJECT_META:
     const newIds = action.meta.map(metum => metum.id);
     return arrayPlus(state, newIds);
+  case REMOVE_GAME_OBJECT_META:
+    return arrayMinus(state, action.metaIds);
   default:
     return state;
   }

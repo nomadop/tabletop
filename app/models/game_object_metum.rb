@@ -8,6 +8,8 @@ class GameObjectMetum < ApplicationRecord
 
   mount_uploader :front_img, GameResUploader
   mount_uploader :back_img, GameResUploader
+  skip_callback :commit, :after, :remove_front_img!
+  skip_callback :commit, :after, :remove_previously_stored_front_img
   skip_callback :commit, :after, :remove_back_img!
   skip_callback :commit, :after, :remove_previously_stored_back_img
 
