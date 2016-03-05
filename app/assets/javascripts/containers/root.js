@@ -9,15 +9,16 @@ import appContainers from '../containers/index';
 
 const logger = createLogger({ collapsed: true });
 
-const createStoreWithMiddleware = applyMiddleware(
-  thunk,
-  logger
-)(createStore);
-
+const middlewares = [thunk];
 
 export default class Root extends Component {
   componentWillMount() {
     const appReducer = appReducers[this.props.app];
+    if (this.props.debug) {
+      middlewares.push(logger);
+    }
+
+    const createStoreWithMiddleware = applyMiddleware(...middlewares)(createStore);
     this.store = createStoreWithMiddleware(appReducer);
   }
 

@@ -17,7 +17,7 @@ class HomeController < ApplicationController
     props = {
       app: 'game',
       authentication: current_user && current_user.auth_info,
-      debug: false,
+      debug: params[:debug],
       room: @room.as_json(only: [:id]),
       game: @room.game.as_json(only: [:id, :name, :module]),
     }
