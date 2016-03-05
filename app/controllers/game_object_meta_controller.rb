@@ -27,6 +27,9 @@ class GameObjectMetaController < ApplicationController
   def create
     @game_object_metum = GameObjectMetum.new(game_object_metum_params)
     @game_object_metum.game = @game
+    front_img = MiniMagick::Image.new(game_object_metum_params[:front_img].path)
+    @game_object_metum.width = front_img.width
+    @game_object_metum.height = front_img.height
 
     respond_to do |format|
       if @game_object_metum.save

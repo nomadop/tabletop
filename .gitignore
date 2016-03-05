@@ -25,3 +25,4 @@ npm-debug.log
 config/secrets.yml
 config/meta
 public/res
+public/uploads
