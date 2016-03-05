@@ -4,6 +4,10 @@ class Game < ApplicationRecord
   has_many :game_object_meta, dependent: :destroy
   has_many :rooms, dependent: :destroy
 
+  def dev_room
+    rooms.dev.take
+  end
+
   private
 
   def setup

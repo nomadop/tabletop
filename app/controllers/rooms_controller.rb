@@ -13,7 +13,7 @@ class RoomsController < ApplicationController
       game_objects: room.game_objects.as_json(methods: [:player_num, :related_x, :related_y, :related_rotate]),
       decks: room.decks,
       player_areas: room.player_areas,
-      messages: room.messages,
+      messages: room.messages.last(100),
     }
   end
 
@@ -29,6 +29,7 @@ class RoomsController < ApplicationController
 
   def destroy
     return redirect_to '/game', notice: 'You are not host' if current_user != @room.host
+    return redirect_to '/game', notice: 'Can not destroy dev room' if @room.dev
 
     if @room.destroy
       ActionCable.server.broadcast("game@room#{@room.id}", action: :close_room)

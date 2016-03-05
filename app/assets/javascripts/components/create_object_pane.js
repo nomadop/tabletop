@@ -71,7 +71,7 @@ export default class CreateObjectPane extends Component {
 
   render() {
     return (
-      <GamePane className="create-object-pane" title="创建新物件" width={360} height={480} resizeable={true}>
+      <GamePane className="create-object-pane" title="创建新物件" width={385} height={550} resizeable={true}>
         <div className="filter-bar">
           {this.renderFilterTabs()}
           <span className="filter-fill"/>

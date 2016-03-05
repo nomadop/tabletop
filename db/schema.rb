@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160303100142) do
+ActiveRecord::Schema.define(version: 20160304164158) do
 
   create_table "decks", force: :cascade do |t|
     t.string   "sub_type",                    null: false
@@ -105,6 +105,8 @@ ActiveRecord::Schema.define(version: 20160303100142) do
     t.integer  "max_player", default: 8
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.boolean  "dev"
+    t.index ["game_id", "dev"], name: "index_rooms_on_game_id_and_dev", unique: true
   end
 
   create_table "users", force: :cascade do |t|

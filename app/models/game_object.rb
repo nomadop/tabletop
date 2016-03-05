@@ -5,6 +5,8 @@ class GameObject < ApplicationRecord
   before_save :round_position
   before_save :check_container
 
+  alias_method :old_as_json, :as_json
+
   belongs_to :room
   belongs_to :player, optional: true
   belongs_to :meta, polymorphic: true

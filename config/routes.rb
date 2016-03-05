@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   root 'home#lobby'
 
   get '/game' => 'home#game'
+  get '/dev' => 'home#dev'
 
   # Serve websocket cable requests in-process
   mount ActionCable.server => '/cable'

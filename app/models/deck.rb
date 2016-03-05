@@ -5,6 +5,8 @@ class Deck < ApplicationRecord
   has_one :game_object, as: :meta, dependent: :destroy
   has_many :inner_objects, class_name: 'GameObject', as: :container
 
+  alias_method :old_as_json, :as_json
+
   def top
     @top ||= inner_objects.order(deck_index: :desc).first
   end
@@ -65,11 +67,11 @@ class Deck < ApplicationRecord
     return false if game_objects.empty?
     return false if game_objects.any? { |obj| obj.sub_type != sub_type }
 
-    deck_count = inner_objects.count
+    deck_index = inner_objects.maximum(:deck_index)
     sync_attrs = [:center_x, :center_y, :rotate, :is_fliped]
     GameObject.transaction do
       game_objects.each.with_index(1) do |deck_object, index|
-        attrs = game_object.as_json(only: sync_attrs).merge(container: self, deck_index: deck_count + index, is_locked: false)
+        attrs = game_object.as_json(only: sync_attrs).merge(container: self, deck_index: deck_index + index, is_locked: false)
         deck_object.update(attrs)
       end
     end

@@ -228,7 +228,8 @@
         display: flex;
 
         .filter-tab {
-          padding: 4px 8px;
+          padding: 4px 8px 0 8px;
+          margin-left: -1px;
           border: 1px solid black;
           border-radius: 10px 10px 0 0;
           background-color: gray;
@@ -259,8 +260,8 @@
       }
 
       .game-object-meta {
-        margin: 0.5rem;
-        padding: 0.5rem;
+        margin: 0.5em;
+        padding: 0.5em;
         border: 1px solid transparent;
         border-radius: 5px;
         display: flex;
@@ -317,6 +318,7 @@
       }
 
       .game-object-container {
+        font-size: 2rem;
         .player-area {
           position: absolute;
           outline: 5px double;
@@ -385,7 +387,7 @@
 
           .count {
             pointer-events: none;
-            font-size: 4em;
+            font-size: 2em;
             font-weight: bolder;
             color: black;
             text-shadow: -3px -3px 3px #fff, 3px -3px 3px #fff, -3px 3px 3px #fff, 3px 3px 3px #fff;
