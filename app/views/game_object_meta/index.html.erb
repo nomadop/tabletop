@@ -26,9 +26,9 @@
         <td><%= game_object_metum.width %></td>
         <td><%= game_object_metum.height %></td>
         <td><%= game_object_metum.description %></td>
-        <td><%= link_to 'Show', game_object_metum %></td>
-        <td><%= link_to 'Edit', edit_game_object_metum_path(game_object_metum) %></td>
-        <td><%= link_to 'Destroy', game_object_metum, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Show', [@game, game_object_metum] %></td>
+        <td><%= link_to 'Edit', edit_game_game_object_metum_path(@game, game_object_metum) %></td>
+        <td><%= link_to 'Destroy', [@game, game_object_metum], method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
@@ -36,4 +36,4 @@
 
 <br>
 
-<%= link_to 'New Game Object Metum', new_game_object_metum_path %>
+<%= link_to 'New Game Object Metum', new_game_game_object_metum_path(@game) %>

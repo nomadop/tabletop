@@ -1,6 +1,6 @@
 <h1>Editing Game Object Metum</h1>
 
-<%= render 'form', game_object_metum: @game_object_metum %>
+<%= render 'form', game: @game, game_object_metum: @game_object_metum %>
 
-<%= link_to 'Show', @game_object_metum %> |
-<%= link_to 'Back', game_object_meta_path %>
+<%= link_to 'Show', [@game, @game_object_metum] %> |
+<%= link_to 'Back', game_game_object_meta_path(@game) %>

@@ -1,10 +1,11 @@
 class GameObjectMetaController < ApplicationController
+  before_action :set_game
   before_action :set_game_object_metum, only: [:show, :edit, :update, :destroy]
 
   # GET /game_object_meta
   # GET /game_object_meta.json
   def index
-    @game_object_meta = GameObjectMetum.all
+    @game_object_meta = @game.game_object_meta
   end
 
   # GET /game_object_meta/1
@@ -14,7 +15,7 @@ class GameObjectMetaController < ApplicationController
 
   # GET /game_object_meta/new
   def new
-    @game_object_metum = GameObjectMetum.new
+    @game_object_metum = @game.game_object_meta.new
   end
 
   # GET /game_object_meta/1/edit
@@ -25,11 +26,12 @@ class GameObjectMetaController < ApplicationController
   # POST /game_object_meta.json
   def create
     @game_object_metum = GameObjectMetum.new(game_object_metum_params)
+    @game_object_metum.game = @game
 
     respond_to do |format|
       if @game_object_metum.save
-        format.html { redirect_to @game_object_metum, notice: 'Game object metum was successfully created.' }
-        format.json { render :show, status: :created, location: @game_object_metum }
+        format.html { redirect_to game_game_object_metum_path(@game, @game_object_metum), notice: 'Game object metum was successfully created.' }
+        format.json { render :show, status: :created, location: game_game_object_metum_path(@game, @game_object_metum) }
       else
         format.html { render :new }
         format.json { render json: @game_object_metum.errors, status: :unprocessable_entity }
@@ -42,8 +44,8 @@ class GameObjectMetaController < ApplicationController
   def update
     respond_to do |format|
       if @game_object_metum.update(game_object_metum_params)
-        format.html { redirect_to @game_object_metum, notice: 'Game object metum was successfully updated.' }
-        format.json { render :show, status: :ok, location: @game_object_metum }
+        format.html { redirect_to game_game_object_metum_path(@game, @game_object_metum), notice: 'Game object metum was successfully updated.' }
+        format.json { render :show, status: :ok, location: game_game_object_metum_path(@game, @game_object_metum) }
       else
         format.html { render :edit }
         format.json { render json: @game_object_metum.errors, status: :unprocessable_entity }
@@ -56,13 +58,17 @@ class GameObjectMetaController < ApplicationController
   def destroy
     @game_object_metum.destroy
     respond_to do |format|
-      format.html { redirect_to game_object_meta_url, notice: 'Game object metum was successfully destroyed.' }
+      format.html { redirect_to game_game_object_meta_url(@game), notice: 'Game object metum was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
+    def set_game
+      @game = Game.find(params[:game_id])
+    end
+
     def set_game_object_metum
       @game_object_metum = GameObjectMetum.find(params[:id])
     end

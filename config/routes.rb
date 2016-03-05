@@ -6,8 +6,9 @@ Rails.application.routes.draw do
       post 'leave'
     end
   end
-  resources :games
-  resources :game_object_meta
+  resources :games do
+    resources :game_object_meta
+  end
   devise_for :users, controllers: { sessions: :user_sessions }
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'home#lobby'

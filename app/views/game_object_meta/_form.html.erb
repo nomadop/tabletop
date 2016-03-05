@@ -1,4 +1,4 @@
-<%= form_for(game_object_metum) do |f| %>
+<%= form_for([game, game_object_metum]) do |f| %>
   <% if game_object_metum.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(game_object_metum.errors.count, "error") %> prohibited this game_object_metum from being saved:</h2>
