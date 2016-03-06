@@ -19,7 +19,12 @@ export default class Root extends Component {
     }
 
     const createStoreWithMiddleware = applyMiddleware(...middlewares)(createStore);
-    this.store = createStoreWithMiddleware(appReducer);
+    const initState = {};
+    if (this.props.app === 'game') {
+      initState.camera = {};
+      initState.camera.scale = this.props.game.start_scale;
+    }
+    this.store = createStoreWithMiddleware(appReducer, initState);
   }
 
   renderAppComponent() {

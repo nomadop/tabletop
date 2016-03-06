@@ -5,7 +5,7 @@ class Room < ApplicationRecord
   after_create :copy_objects_from_dev
 
   belongs_to :game
-  belongs_to :host, class_name: 'User'
+  belongs_to :host, class_name: 'User', optional: true
   has_many :game_objects, dependent: :destroy
   has_many :decks, dependent: :destroy
   has_many :players, dependent: :destroy
@@ -47,6 +47,8 @@ class Room < ApplicationRecord
   end
 
   def copy_objects_from_dev
+    return true if dev
+
     dev_room = game.dev_room
     deck_map = {}
     dev_room.decks.find_each do |deck|

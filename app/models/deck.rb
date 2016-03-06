@@ -67,7 +67,7 @@ class Deck < ApplicationRecord
     return false if game_objects.empty?
     return false if game_objects.any? { |obj| obj.sub_type != sub_type }
 
-    deck_index = inner_objects.maximum(:deck_index)
+    deck_index = inner_objects.maximum(:deck_index) || 0
     sync_attrs = [:center_x, :center_y, :rotate, :is_fliped]
     GameObject.transaction do
       game_objects.each.with_index(1) do |deck_object, index|

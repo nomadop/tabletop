@@ -19,7 +19,7 @@ class HomeController < ApplicationController
       authentication: current_user && current_user.auth_info,
       debug: params[:debug],
       room: @room.as_json(only: [:id]),
-      game: @room.game.as_json(only: [:id, :name, :module]),
+      game: @room.game.as_json(only: [:id, :name, :module, :start_scale]),
     }
     render component: 'Root', props: props
   end
@@ -35,7 +35,7 @@ class HomeController < ApplicationController
       authentication: current_user && current_user.auth_info,
       debug: false,
       room: dev_room.as_json(only: [:id]),
-      game: game.as_json(only: [:id, :name, :module]),
+      game: game.as_json(only: [:id, :name, :module, :start_scale]),
       dev_mode: true,
     }
     render component: 'Root', props: props

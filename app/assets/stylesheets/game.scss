@@ -253,11 +253,13 @@
       }
 
       .meta-container {
-        overflow-y: auto;
-        display: flex;
-        flex-wrap: wrap;
         height: calc(100% - 28px - 19px);
-        align-items: flex-start;
+        overflow-y: auto;
+
+        .content {
+          display: flex;
+          flex-wrap: wrap;
+        }
       }
 
       .footer-control {
@@ -287,6 +289,7 @@
           border: 1px solid gray;
           border-radius: 4px;
           max-width: 100px;
+          z-index: 1;
         }
 
         &:hover {

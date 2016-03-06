@@ -92,7 +92,7 @@ export default class CreateObjectPane extends Component {
           <span className="filter-fill"/>
         </div>
         <div className="meta-container">
-          {this.renderMeta()}
+          <div className="content">{this.renderMeta()}</div>
         </div>
         {this.renderFooterControl()}
       </GamePane>
