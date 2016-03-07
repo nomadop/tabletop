@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: :recorder
   before_action :require_in_room, only: [:game]
   before_action :require_out_room, only: [:lobby]
 
@@ -38,6 +38,11 @@ class HomeController < ApplicationController
       game: game.as_json(only: [:id, :name, :module, :start_scale]),
       dev_mode: true,
     }
+    render component: 'Root', props: props
+  end
+
+  def recorder
+    props = { app: 'recorder' }
     render component: 'Root', props: props
   end
 end

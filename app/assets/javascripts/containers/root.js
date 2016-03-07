@@ -13,7 +13,7 @@ const middlewares = [thunk];
 
 export default class Root extends Component {
   componentWillMount() {
-    const appReducer = appReducers[this.props.app];
+    const appReducer = appReducers[this.props.app] || (state => state);
     if (this.props.debug) {
       middlewares.push(logger);
     }
