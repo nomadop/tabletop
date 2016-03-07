@@ -62,7 +62,10 @@ export function fetchGameData(roomId) {
         dispatch(receiveDecks(json.decks));
         dispatch(receivePlayerAreas(json.player_areas));
         dispatch(receiveGameObjects(json.game_objects));
-        dispatch(receiveMessages(json.messages));
+        dispatch(receiveMessages(json.messages.map(msg => {
+          msg.oldMessage = true;
+          return msg;
+        })));
       });
   };
 }

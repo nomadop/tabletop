@@ -1,6 +1,9 @@
 class Message < ApplicationRecord
   after_create :publish
 
+  enum msg_type: [ :text, :audio ]
+  mount_uploader :mp3, AudioUploader
+
   belongs_to :room
   belongs_to :from, class_name: 'User', optional: true
   belongs_to :to, class_name: 'User', optional: true
@@ -32,6 +35,6 @@ class Message < ApplicationRecord
   private
 
   def publish
-    ActionCable.server.broadcast(stream, action: :new_message, message: self)
+    ActionCable.server.broadcast(stream, action: :new_message, message: self) if text?
   end
 end

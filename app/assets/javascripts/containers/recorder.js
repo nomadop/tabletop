@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import { initRecording, startRecording, stopRecording, playRecording, downloadRecording } from '../utils/recorder';
+import { initRecording, startRecording, stopRecording, playRecording, downloadRecording, uploadRecording } from '../utils/recorder';
 
 class Lobby extends Component {
   componentDidMount() {
@@ -26,6 +26,7 @@ class Lobby extends Component {
         <button onClick={stopRecording.bind(this, null)}>Stop</button>
         <button onClick={playRecording}>Play</button>
         <button onClick={downloadRecording}>Download</button>
+        <button onClick={uploadRecording}>Upload</button>
         <ul ref="recordingList" className="recordingList"/>
         <div ref="logger" className="logger"></div>
       </div>

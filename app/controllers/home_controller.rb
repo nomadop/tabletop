@@ -1,6 +1,7 @@
 class HomeController < ApplicationController
-  before_action :authenticate_user!, except: :recorder
-  before_action :require_in_room, only: [:game]
+  protect_from_forgery except: :upload_audio
+  before_action :authenticate_user!
+  before_action :require_in_room, only: [:game, :upload_audio]
   before_action :require_out_room, only: [:lobby]
 
   def lobby
@@ -17,7 +18,7 @@ class HomeController < ApplicationController
     props = {
       app: 'game',
       authentication: current_user && current_user.auth_info,
-      debug: params[:debug],
+      debug: params[:debug] == 'true' ? true : false,
       room: @room.as_json(only: [:id]),
       game: @room.game.as_json(only: [:id, :name, :module, :start_scale]),
     }
@@ -44,5 +45,16 @@ class HomeController < ApplicationController
   def recorder
     props = { app: 'recorder' }
     render component: 'Root', props: props
+  end
+
+  def upload_audio
+    body = request.body.read
+    base64 = body[22..-1]
+    blob = Base64.decode64(base64)
+    t = Tempfile.new(%w(voice .mp3))
+    t.binmode
+    t.write(blob)
+    msg = current_user.room.messages.audio.create(from: current_user, level: :normal, mp3: t)
+    ActionCable.server.broadcast(msg.stream, action: :new_message, message: msg)
   end
 end

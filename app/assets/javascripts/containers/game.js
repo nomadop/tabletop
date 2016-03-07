@@ -31,6 +31,7 @@ import {
   rotateByPoint,
 } from '../utils/coordination_transformer';
 import { gameContainerSelector } from '../selectors/game';
+import { initRecording, startRecording, stopRecording, uploadRecording } from '../utils/recorder';
 
 class Game extends Component {
   constructor() {
@@ -53,7 +54,7 @@ class Game extends Component {
         return;
       case 'new_message':
         const message = data.message;
-        if (message.from_name !== this.props.authentication.username) {
+        if (message.msg_type === 'audio' || message.from_name !== this.props.authentication.username) {
           this.props.receiveMessages([message]);
         }
         return;
@@ -73,6 +74,7 @@ class Game extends Component {
 
     window.addEventListener('resize', this.resizeGameWindow.bind(this));
     window.addEventListener('mousewheel', this.handleMouseWheel.bind(this));
+    initRecording(this.handleSystemWarning.bind(this));
   }
 
   componentWillUnmount() {
@@ -126,8 +128,22 @@ class Game extends Component {
     case '72':
       this.drawStartMouseInfo = null;
       return this.setState({ drawMode: !this.state.drawMode });
+    case '75':
+      if (this.recording) {
+        return;
+      }
+
+      this.recording = true;
+      return startRecording();
     default:
       return null;
+    }
+  }
+
+  handleKeyUp(e) {
+    if (e.keyCode === 75) {
+      this.recording = false;
+      stopRecording(uploadRecording);
     }
   }
 
@@ -395,6 +411,7 @@ class Game extends Component {
         ref="gameWindow"
         style={style}
         onKeyDown={this.handleKeyDown.bind(this)}
+        onKeyUp={this.handleKeyUp.bind(this)}
         onMouseDown={this.handleMouseDown.bind(this)}
         onMouseMove={this.handleMouseMove.bind(this)}
         onMouseUp={this.handleMouseUp.bind(this)}

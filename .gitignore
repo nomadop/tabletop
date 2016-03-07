@@ -26,3 +26,4 @@ config/secrets.yml
 config/meta
 public/res
 public/uploads
+public/audios

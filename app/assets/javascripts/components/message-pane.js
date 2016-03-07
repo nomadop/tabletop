@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
+import AudioContent from './audio_content';
 
 export default class MessagePane extends Component {
   constructor() {
@@ -69,6 +70,16 @@ export default class MessagePane extends Component {
     this.setState(newState);
   }
 
+  renderContent(msg) {
+    switch (msg.msg_type) {
+    case 'audio':
+      return <AudioContent src={msg.mp3.url} newReceived={!msg.oldMessage}/>;
+    case 'text':
+    default:
+      return <span className="content">{msg.content}</span>
+    }
+  }
+
   renderMessages() {
     const { messages } = this.props;
 
@@ -89,7 +100,7 @@ export default class MessagePane extends Component {
           <span className="icon"><i className={iconClassName}/></span>
           <span className="from">{msg.from_name}</span>
           <span className="speak-spliter">:</span>
-          <span className="content">{msg.content}</span>
+          {this.renderContent(msg)}
         </div>
       );
     });

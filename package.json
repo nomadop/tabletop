@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.1.19",
+    "fetch": "^1.0.1",
     "isomorphic-fetch": "^2.2.0",
     "microm": "^0.2.4",
     "react": "^0.14.2",

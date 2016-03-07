@@ -84,6 +84,7 @@
         .message {
           width: 100%;
           cursor: default;
+          margin-top: 4px;
 
           &.info {
             color: cornflowerblue;
@@ -111,8 +112,41 @@
           }
 
           .content {
+            position: relative;
             margin-left: 4px;
             word-wrap: break-word;
+          }
+
+          .audio-control {
+            background: white;
+            display: inline-block;
+            padding: 0 8px;
+            border: 1px black solid;
+            border-radius: 10px;
+            transform: translateY(2px);
+
+            &:hover {
+              cursor: pointer;
+            }
+
+            .new-audio {
+              color: red;
+              font-size: 0.5em;
+            }
+
+            .playing {
+              position: absolute;
+              top: 2px;
+              right: 8px;
+
+              &.fa-volume-off {
+                right: 14.5px;
+              }
+
+              &.fa-volume-up {
+                color: #6699cc;
+              }
+            }
           }
         }
       }

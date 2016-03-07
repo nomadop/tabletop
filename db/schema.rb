@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160304164158) do
+ActiveRecord::Schema.define(version: 20160307051213) do
 
   create_table "decks", force: :cascade do |t|
     t.string   "sub_type",                    null: false
@@ -70,8 +70,10 @@ ActiveRecord::Schema.define(version: 20160304164158) do
     t.integer  "to_id"
     t.string   "level"
     t.string   "content"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "msg_type",   default: 0
+    t.string   "mp3"
   end
 
   create_table "player_areas", force: :cascade do |t|
