@@ -9,7 +9,7 @@ export default class AudioContent extends Component {
       played: false,
     };
     const audio = new Audio(this.props.src);
-    audio.preload = this.props.newReceived ? 'auto' : 'metadata';
+    audio.autoplay = this.props.newReceived;
     audio.addEventListener('loadedmetadata', this.initState.bind(this));
     audio.addEventListener('play', this.handlePlay.bind(this));
     audio.addEventListener('ended', this.handleEnd.bind(this));
@@ -37,6 +37,7 @@ export default class AudioContent extends Component {
   }
 
   handlePlay() {
+    this.audio.currentTime = 0;
     this.setState({
       playing: true,
       played: true,
@@ -44,7 +45,6 @@ export default class AudioContent extends Component {
   }
 
   handleEnd() {
-    this.audio.currentTime = 0;
     this.setState({
       playing: false,
     });

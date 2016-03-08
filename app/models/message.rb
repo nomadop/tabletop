@@ -1,5 +1,6 @@
 class Message < ApplicationRecord
   after_create :publish
+  after_create :encode_voice
 
   enum msg_type: [ :text, :audio ]
   mount_uploader :mp3, AudioUploader
@@ -36,5 +37,9 @@ class Message < ApplicationRecord
 
   def publish
     ActionCable.server.broadcast(stream, action: :new_message, message: self) if text?
+  end
+
+  def encode_voice
+    EncodeVoiceJob.perform_later(id) if audio?
   end
 end

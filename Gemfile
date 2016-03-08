@@ -34,7 +34,7 @@ end
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 3.0'
+  # gem 'web-console', '~> 3.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 end
@@ -51,3 +51,4 @@ gem 'rubocop'
 gem 'font-awesome-rails'
 gem 'carrierwave', :github => 'carrierwaveuploader/carrierwave', :branch => 'master'
 gem 'mini_magick'
+gem 'sidekiq'
