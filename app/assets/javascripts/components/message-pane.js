@@ -73,7 +73,7 @@ export default class MessagePane extends Component {
   renderContent(msg) {
     switch (msg.msg_type) {
     case 'audio':
-      return <AudioContent src={msg.mp3.url} newReceived={!msg.oldMessage}/>;
+      return <AudioContent src={msg.mp3.url} newReceived={msg.newReceived}/>;
     case 'text':
     default:
       return <span className="content">{msg.content}</span>

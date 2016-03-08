@@ -261,7 +261,17 @@ class GameChannel < ApplicationCable::Channel
   end
 
   def send_message(data)
-    current_user.room.messages.create(from: current_user, level: :normal, content: data['content'])
+    if (body = data['mp3'])
+      base64 = body[22..-1]
+      blob = Base64.decode64(base64)
+      t = Tempfile.new(%w(voice .mp3))
+      t.binmode
+      t.write(blob)
+      msg = current_user.room.messages.audio.create(from: current_user, level: :normal, mp3: t)
+      ActionCable.server.broadcast(game_stream, action: :new_message, message: msg)
+    else
+      current_user.room.messages.create(from: current_user, level: :normal, content: data['content'])
+    end
   rescue StandardError => e
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, error: e)

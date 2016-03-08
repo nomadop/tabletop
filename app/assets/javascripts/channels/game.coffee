@@ -60,8 +60,8 @@ App.game = App.cable.subscriptions.create "GameChannel",
   destroy_player_area: ->
     @perform 'destroy_player_area'
 
-  send_message: (content) ->
-    @perform 'send_message', content: content
+  send_message: (content, mp3) ->
+    @perform 'send_message', content: content, mp3: mp3
 
   destroy_meta: (ids) ->
     @perform 'destroy_meta', ids: ids

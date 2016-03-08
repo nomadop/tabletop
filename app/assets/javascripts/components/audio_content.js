@@ -9,6 +9,7 @@ export default class AudioContent extends Component {
       played: false,
     };
     const audio = new Audio(this.props.src);
+    audio.preload = this.props.newReceived ? 'auto' : 'metadata';
     audio.addEventListener('loadedmetadata', this.initState.bind(this));
     audio.addEventListener('play', this.handlePlay.bind(this));
     audio.addEventListener('ended', this.handleEnd.bind(this));
@@ -19,7 +20,7 @@ export default class AudioContent extends Component {
 
   get style() {
     const duration = this.state.duration;
-    let width = duration ? duration * 10 : 20;
+    let width = duration ? duration * 10 : 38;
     if (width < 38) {
       width = 38;
     } else if (width > 100) {
@@ -66,7 +67,11 @@ export default class AudioContent extends Component {
         </span>
       );
     } else {
-      return (<span className="content"/>);
+      return (
+        <span className="content audio-control" style={this.style}>
+          <i className="fa fa-spinner fa-spin"/>
+        </span>
+      );
     }
   }
 }

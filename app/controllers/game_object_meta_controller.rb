@@ -1,5 +1,4 @@
 class GameObjectMetaController < ApplicationController
-  protect_from_forgery except: :create
   before_action :authenticate_user!
   before_action :require_in_room, only: [:in_game_new]
   before_action :set_game, except: [:in_game_new]
@@ -34,7 +33,6 @@ class GameObjectMetaController < ApplicationController
   # POST /game_object_meta
   # POST /game_object_meta.json
   def create
-    byebug
     @game_object_metum = GameObjectMetum.new(game_object_metum_params)
     @game_object_metum.game = @game
     front_img = MiniMagick::Image.new(game_object_metum_params[:front_img].path)

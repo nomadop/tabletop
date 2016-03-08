@@ -31,7 +31,7 @@ import {
   rotateByPoint,
 } from '../utils/coordination_transformer';
 import { gameContainerSelector } from '../selectors/game';
-import { initRecording, startRecording, stopRecording, uploadRecording } from '../utils/recorder';
+import { initRecording, startRecording, stopRecording, getBase64 } from '../utils/recorder';
 
 class Game extends Component {
   constructor() {
@@ -54,7 +54,8 @@ class Game extends Component {
         return;
       case 'new_message':
         const message = data.message;
-        if (message.msg_type === 'audio' || message.from_name !== this.props.authentication.username) {
+        message.newReceived = true;
+        if (message.from_name !== this.props.authentication.username) {
           this.props.receiveMessages([message]);
         }
         return;
@@ -143,7 +144,7 @@ class Game extends Component {
   handleKeyUp(e) {
     if (e.keyCode === 75) {
       this.recording = false;
-      stopRecording(uploadRecording);
+      stopRecording(() => getBase64(this.handleSendMessage.bind(this, '')));
     }
   }
 
@@ -278,36 +279,33 @@ class Game extends Component {
     }
   }
 
-  handleSendLocalMessage(from_name, level, content) {
+  handleSendLocalMessage(message) {
     this.localMsgSendCount++;
-    const message = {
-      id: 'localSendMsg' + this.localMsgSendCount,
-      level,
-      from_name,
-      content,
-    };
+    message.id = 'localSendMsg' + this.localMsgSendCount;
     this.props.receiveMessages([message]);
   }
 
-  handleSendMessage(content) {
+  handleSendMessage(content, mp3) {
     if (content.length > 255) {
       return this.handleSystemWarning('输入过长.');
     }
 
-    this.handleSendLocalMessage(
-      this.props.authentication.username,
-      'normal',
-      content
-    );
-    App.game.send_message(content);
+    this.handleSendLocalMessage({
+      from_name: this.props.authentication.username,
+      level: 'normal',
+      content,
+      msg_type: mp3 ? 'audio' : 'text',
+      mp3: {url: mp3},
+    });
+    App.game.send_message(content, mp3);
   }
 
   handleSystemWarning(content) {
-    this.handleSendLocalMessage(
-      '系统',
-      'warning',
+    this.handleSendLocalMessage({
+      from_name: '系统',
+      level: 'warning',
       content
-    );
+    });
   }
 
   resizeGameWindow() {
