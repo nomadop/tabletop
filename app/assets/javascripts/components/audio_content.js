@@ -20,11 +20,11 @@ export default class AudioContent extends Component {
 
   get style() {
     const duration = this.state.duration;
-    let width = duration ? duration * 10 : 38;
-    if (width < 38) {
-      width = 38;
-    } else if (width > 100) {
-      width = 120;
+    let width = duration ? duration * 10 : 50;
+    if (width < 50) {
+      width = 50;
+    } else if (width > 200) {
+      width = 200;
     }
 
     return { width };
@@ -62,14 +62,20 @@ export default class AudioContent extends Component {
       return (
         <span className="content audio-control" style={this.style} onClick={this.handleClick.bind(this)}>
           {Math.round(duration) + '"'}
-          {newAudio ? <i className="new-audio fa fa-circle"/> : null}
-          <i className={`playing fa fa-volume-${playing ? 'up' : 'off'}`}/>
+          <span className="new-audio">
+            {newAudio ? <i className="fa fa-circle"/> : null}
+          </span>
+          <span className="playing">
+            <i className={`fa fa-volume-${playing ? 'up' : 'off'}`}/>
+          </span>
+          <span className="content-arrow"/>
         </span>
       );
     } else {
       return (
         <span className="content audio-control" style={this.style}>
           <i className="fa fa-spinner fa-spin"/>
+          <span className="content-arrow"/>
         </span>
       );
     }

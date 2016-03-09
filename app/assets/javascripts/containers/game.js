@@ -290,8 +290,11 @@ class Game extends Component {
       return this.handleSystemWarning('输入过长.');
     }
 
+    const authentication = this.props.authentication;
     this.handleSendLocalMessage({
-      from_name: this.props.authentication.username,
+      from_name: authentication.username,
+      from_avatar: authentication.avatar_info.thumb.url,
+      from_player: authentication.player_num,
       level: 'normal',
       content,
       msg_type: mp3 ? 'audio' : 'text',
@@ -302,7 +305,8 @@ class Game extends Component {
 
   handleSystemWarning(content) {
     this.handleSendLocalMessage({
-      from_name: '系统',
+      from_name: '系统警告',
+      from_avatar: '/uploads/avatar/anonymous/thumb_anonymous.png',
       level: 'warning',
       content
     });
@@ -369,6 +373,7 @@ class Game extends Component {
                      messages={messages}
                      disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
                      sendMessage={this.handleSendMessage.bind(this)}
+                     authentication={this.props.authentication}
         />
         <div className="pane-container">
           {this.renderGameMenu()}

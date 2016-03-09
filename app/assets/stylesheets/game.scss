@@ -85,6 +85,7 @@
           width: 100%;
           cursor: default;
           margin-top: 4px;
+          display: flex;
 
           &.info {
             color: cornflowerblue;
@@ -94,36 +95,51 @@
             color: orange;
           }
 
-          .icon {
-            margin-right: 2px;
+          .avatar {
+            margin-top: 4px;
+            max-width: 2.4em;
+            max-height: 2.4em;
           }
+          
+          .msg-body {
+            display: flex;
+            flex-direction: column;
 
-          .from {
-            max-width: 100px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: inline-block;
-            vertical-align: bottom;
-          }
+            .from {
+              display: flex;
+              align-items: baseline;
 
-          .speak-spliter {
-            display: inline-block;
-          }
+              i {
+                margin: 0 2px;
+              }
+            }
 
-          .content {
-            position: relative;
-            margin-left: 4px;
-            word-wrap: break-word;
+            .content {
+              max-width: 100%;
+              position: relative;
+              margin: 0 12px;
+              word-wrap: break-word;
+              padding: 0 4px;
+              background: white;
+              //border: 1px solid black;
+              border-radius: 0 4px 4px 4px;
+
+              .content-arrow {
+                position: absolute;
+                width: 0;
+                height: 0;
+                border: solid transparent;
+                top: 0;
+                left: -16px;
+                border-width: 0 8px 8px;
+                border-right-color: white;
+              }
+            }
           }
 
           .audio-control {
             background: white;
-            display: inline-block;
-            padding: 0 8px;
-            border: 1px black solid;
-            border-radius: 10px;
-            transform: translateY(2px);
+            display: flex;
 
             &:hover {
               cursor: pointer;
@@ -135,16 +151,50 @@
             }
 
             .playing {
-              position: absolute;
-              top: 2px;
-              right: 8px;
+              flex-grow: 1;
+              display: flex;
+              flex-direction: row-reverse;
+              align-items: center;
 
-              &.fa-volume-off {
-                right: 14.5px;
+              .fa-volume-off {
+                margin: 0 6px;
               }
 
-              &.fa-volume-up {
+              .fa-volume-up {
                 color: #6699cc;
+              }
+            }
+          }
+
+          &.self {
+            flex-direction: row-reverse;
+
+            .from {
+              flex-direction: row-reverse;
+            }
+
+            .content {
+              text-align: right;
+              border-radius: 4px 0 4px 4px;
+
+              .content-arrow {
+                left: auto;
+                right: -16px;
+                border-width: 0 8px 8px;
+                border-right-color: transparent;
+                border-left-color: white;
+              }
+            }
+
+            .audio-control {
+              flex-direction: row-reverse;
+
+              .playing {
+                flex-direction: row;
+
+                .fa {
+                  transform: scaleX(-1);
+                }
               }
             }
           }
@@ -156,6 +206,7 @@
         padding: 4px 10px;
 
         .message-input {
+          padding: 0 8px;
           flex-grow: 1;
           background: transparent;
           border: none;

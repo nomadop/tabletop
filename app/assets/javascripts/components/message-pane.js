@@ -24,6 +24,11 @@ export default class MessagePane extends Component {
     };
   }
 
+  componentDidMount() {
+    const messageContainer = ReactDOM.findDOMNode(this.refs.messageContainer);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+  }
+
   componentDidUpdate() {
     const messageContainer = ReactDOM.findDOMNode(this.refs.messageContainer);
     messageContainer.scrollTop = messageContainer.scrollHeight;
@@ -70,49 +75,63 @@ export default class MessagePane extends Component {
     this.setState(newState);
   }
 
-  renderContent(msg) {
-    switch (msg.msg_type) {
-    case 'audio':
-      return <AudioContent src={msg.mp3.url} newReceived={msg.newReceived}/>;
-    case 'text':
+  getMessageClassName(msg) {
+    const classNames = ['message', msg.level];
+    if (msg.from_name === this.props.authentication.username) {
+      classNames.push('self');
+    }
+
+    if (msg.from_player) {
+      classNames.push('player' + msg.from_player);
+    }
+
+    return classNames.join(' ');
+  }
+
+  getIconClassName(msg) {
+    const iconClassNames = ['fa'];
+    switch (msg.level) {
+    case 'normal':
+      iconClassNames.push('fa-comments');
+      break;
     default:
-      return <span className="content">{msg.content}</span>
+      iconClassNames.push('fa-cogs');
+      break;
+    }
+
+    return iconClassNames.join(' ');
+  }
+
+  renderContent(msg) {
+    if (msg.msg_type === 'audio') {
+      return <AudioContent src={msg.mp3.url} newReceived={msg.newReceived}/>;
+    } else {
+      return <span className="content">{msg.content}<span className="content-arrow"/></span>
     }
   }
 
-  renderMessages() {
-    const { messages } = this.props;
+  renderMessage(msg) {
+    const msgClassName = this.getMessageClassName(msg);
+    const iconClassName = this.getIconClassName(msg);
 
-    return messages.map(msg => {
-      const iconClassNames = ['fa'];
-      switch (msg.level) {
-      case 'normal':
-        iconClassNames.push('fa-comments');
-        break;
-      default:
-        iconClassNames.push('fa-cogs');
-        break;
-      }
-      const iconClassName = iconClassNames.join(' ');
-
-      return (
-        <div key={msg.id} className={`message ${msg.level}`}>
-          <span className="icon"><i className={iconClassName}/></span>
-          <span className="from">{msg.from_name}</span>
-          <span className="speak-spliter">:</span>
+    return (
+      <div key={msg.id} className={msgClassName}>
+        <span className="msg-header"><img className="avatar" src={msg.from_avatar} alt="from-avatar"/></span>
+        <span className="msg-body">
+          <span className="from"><i className={iconClassName}/>{msg.from_name}</span>
           {this.renderContent(msg)}
-        </div>
-      );
-    });
+        </span>
+      </div>
+    );
   }
 
   render() {
-    const { disableKeyEvent } = this.props;
+    const { disableKeyEvent, messages } = this.props;
 
     return (
       <div className="message-pane" style={this.style}>
         <div className="message-container" ref="messageContainer">
-          {this.renderMessages()}
+          {messages.map(msg => this.renderMessage(msg))}
         </div>
         <div className="message-control">
           <input type="text"
@@ -137,4 +156,5 @@ MessagePane.propTypes = {
   bottom: PropTypes.number,
   disableKeyEvent: PropTypes.func,
   sendMessage: PropTypes.func,
+  authentication: PropTypes.object,
 };
