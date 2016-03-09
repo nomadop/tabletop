@@ -7,6 +7,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+  mount_uploader :avatar, AvatarUploader
+
   validates_presence_of :nickname
   validates_uniqueness_of :nickname
 
@@ -27,6 +29,17 @@ class User < ApplicationRecord
   end
 
   def auth_info
-    as_json(only: [], methods: [:username, :player_num])
+    as_json(only: [], methods: [:username, :player_num, :avatar_info])
+  end
+
+  def avatar_info
+    file = avatar.file
+    !file.nil? && file.exists? ? avatar : AvatarUploader.anonymous
+  end
+
+  private
+
+  def set_anonymous_avatar
+    self.avatar = ''
   end
 end

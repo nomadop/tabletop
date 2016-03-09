@@ -40,7 +40,11 @@ class Lobby extends Component {
 
     const navNode = (
       <Navigator>
-        <span>欢迎! {authentication.username}</span>
+        <span>
+          欢迎!
+          <img src={authentication.avatar_info.thumb.url} alt="thumb_avatar"/>
+          {authentication.username}
+        </span>
         <a rel="nofollow" data-method="delete" href="/users/sign_out">登出</a>
       </Navigator>
     );

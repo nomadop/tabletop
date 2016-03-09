@@ -6,6 +6,7 @@ class HomeController < ApplicationController
   def lobby
     props = {
       app: 'lobby',
+      debug: params[:debug] == 'true' ? true : false,
       authentication: current_user && current_user.auth_info,
       games: Game.all.as_json(only: [:id, :name]),
       rooms: Room.play.as_json(only: [:name], methods: [:join_path]),
