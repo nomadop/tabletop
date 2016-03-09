@@ -1,0 +1,15 @@
+<h2>Edit Avatar</h2>
+
+<%= form_for(@user, url: users_update_avatar_path, html: { method: :put }) do |f| %>
+  <div class="field">
+    <%= f.label :avatar %><br/>
+    <%= image_tag @user.avatar %><br/>
+    <%= f.file_field :avatar %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "上传" %>
+  </div>
+<% end %>
+
+<%= link_to '返回', root_path %>

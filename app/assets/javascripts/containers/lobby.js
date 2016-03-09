@@ -45,6 +45,7 @@ class Lobby extends Component {
           <img src={authentication.avatar_info.thumb.url} alt="thumb_avatar"/>
           {authentication.username}
         </span>
+        <a href="/users/edit_avatar">更换头像</a>
         <a rel="nofollow" data-method="delete" href="/users/sign_out">登出</a>
       </Navigator>
     );

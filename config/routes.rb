@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   get '/dev' => 'home#dev'
   get '/game_object_meta/new' => 'game_object_meta#in_game_new'
   get '/recorder' => 'home#recorder'
+  get '/users/edit_avatar' => 'users#edit_avatar'
+  put '/users/update_avatar' => 'users#update_avatar'
 
   # Serve websocket cable requests in-process
   mount ActionCable.server => '/cable'
