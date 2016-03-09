@@ -142,6 +142,10 @@ class Game extends Component {
   }
 
   handleKeyUp(e) {
+    if (this.isKeyEventDisabled) {
+      return;
+    }
+
     if (e.keyCode === 75) {
       this.recording = false;
       stopRecording(() => getBase64(this.handleSendMessage.bind(this, '')));

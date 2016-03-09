@@ -16,3 +16,13 @@
 //= require react_ujs
 //= require components
 //= require cable
+
+function refreshPreview(input) {
+  var file = input.files[0];
+  var reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = function () {
+    var preview = document.querySelector('#preview');
+    preview.src = reader.result;
+  }
+}
