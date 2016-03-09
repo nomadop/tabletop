@@ -143,6 +143,10 @@ class GameObjectContainer extends Component {
   }
 
   handleDragStart(event) {
+    if (window.selectMode) {
+      return;
+    }
+
     const { selectedIds } = this.props;
 
     this.dragStartMouseInfo = this.props.extractMouseEvent(event);
@@ -229,6 +233,10 @@ class GameObjectContainer extends Component {
   }
 
   handleDrawGameObject(deckObject, targetObject, event) {
+    if (window.selectMode) {
+      return;
+    }
+
     const { selectedIds } = this.props;
     if (selectedIds.length > 1 || selectedIds[0] !== deckObject.id) {
       return this.handleDragStart(event);

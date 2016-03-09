@@ -43,6 +43,12 @@
   border-color: darkgoldenrod !important;
 }
 
+.drag-box {
+  position: absolute;
+  border: 1px solid black;
+  display: block;
+}
+
 .game-window {
   position: fixed;
   left: 0;
@@ -404,12 +410,6 @@
     .director-layer {
       position: absolute;
       pointer-events: all;
-
-      .draw-box {
-        position: absolute;
-        border: 1px solid black;
-        display: block;
-      }
 
       .origin-point {
         position: absolute;

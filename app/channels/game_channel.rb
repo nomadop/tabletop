@@ -210,6 +210,23 @@ class GameChannel < ApplicationCable::Channel
     ActionCable.server.broadcast(user_stream, action: :error, error: e)
   end
 
+  def lock_game_objects(data)
+    objects = GameObject.includes(:player).where(id: data['ids'])
+    success = false
+    GameObject.transaction do
+      success = true if objects.all? { |obj| obj.require_lock(current_user.player_id) }
+    end
+    if success
+      ActionCable.server.broadcast(game_stream, action: :lock_success, object_ids: data['ids'])
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: objects.map(&serializer))
+    else
+      ActionCable.server.broadcast(user_stream, action: :lock_failed, objects: objects.reload.map(&serializer))
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :lock_error, error: e)
+  end
+
   def release_game_objects(data)
     objects = GameObject.includes(:player).where(id: data['ids'])
 

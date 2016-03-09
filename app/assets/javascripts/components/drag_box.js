@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-export default class DrawBox extends Component {
+export default class DragBox extends Component {
   constructor() {
     super(...arguments);
     this.state = {
@@ -28,7 +28,7 @@ export default class DrawBox extends Component {
 
   render() {
     return (
-      <div className="draw-box" style={this.style}></div>
+      <div className="drag-box" style={this.style}></div>
     );
   }
 }

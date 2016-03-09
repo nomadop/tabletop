@@ -7,7 +7,7 @@ import CoordinationLayer from '../components/coordination_layer';
 import CreateObjectPane from '../components/create_object_pane';
 import GamePane from '../components/game_pane';
 import MessagePane from '../components/message-pane';
-import DrawBox from '../components/draw_box';
+import DragBox from 'components/drag_box';
 import GameObjectContainer from './game_object';
 import {
   moveCameraHorizontal,
@@ -32,6 +32,7 @@ import {
 } from '../utils/coordination_transformer';
 import { gameContainerSelector } from '../selectors/game';
 import { initRecording, startRecording, stopRecording, getBase64 } from '../utils/recorder';
+import { arrayMinus } from '../utils/array_enhancement';
 
 class Game extends Component {
   constructor() {
@@ -42,6 +43,7 @@ class Game extends Component {
       width: undefined,
       height: undefined,
       drawMode: false,
+      selectMode: false,
     };
   }
 
@@ -63,6 +65,10 @@ class Game extends Component {
         return this.props.receiveGameObjectMeta([data.meta]);
       case 'destroy_meta':
         return this.props.removeGameObjectMeta(data.meta_ids);
+      case 'lock_success':
+      case 'lock_failed':
+      case 'lock_error':
+        return setTimeout(() => window.requiringLock = false, 100);
       default:
         return;
       }
@@ -75,6 +81,7 @@ class Game extends Component {
 
     window.addEventListener('resize', this.resizeGameWindow.bind(this));
     window.addEventListener('mousewheel', this.handleMouseWheel.bind(this));
+    window.addEventListener('contextmenu', e => e.preventDefault());
     initRecording(this.handleSystemWarning.bind(this));
   }
 
@@ -127,7 +134,7 @@ class Game extends Component {
     case '40':
       return this.props.rotateCameraVertical(-1);
     case '72':
-      this.drawStartMouseInfo = null;
+      this.mouseDownInfo = null;
       return this.setState({ drawMode: !this.state.drawMode });
     case '75':
       if (this.recording) {
@@ -152,19 +159,23 @@ class Game extends Component {
     }
   }
 
-  handleMouseWheel(event) {
+  searchEventPath(event, checker) {
     let target = event.target;
-    let available = true;
+    let result = null;
     while (target) {
-      if (target.getAttribute && target.getAttribute('class') === 'pop-up-layer') {
-        available = false;
+      if (checker(target)) {
+        result = target;
         break;
       }
 
       target = target.parentNode;
     }
 
-    if (!available) {
+    return result;
+  }
+
+  handleMouseWheel(event) {
+    if (this.searchEventPath(event, t => t.getAttribute && t.getAttribute('class') === 'pop-up-layer')) {
       return;
     }
 
@@ -184,12 +195,7 @@ class Game extends Component {
   }
 
   handleMouseDown(event) {
-    if (this.state.drawMode) {
-      if (!this.drawStartMouseInfo) {
-        this.drawStartMouseInfo = this.extractMouseEvent(event);
-      }
-      return;
-    }
+    this.mouseDownInfo = this.extractMouseEvent(event);
 
     const selectedIds = this.props.selectedIds;
     const onGameObject = event.target.className.search('game-object') >= 0;
@@ -202,8 +208,8 @@ class Game extends Component {
   extractDrawBoxProperties(event) {
     const camera = this.props.camera;
     const mouseInfo = this.extractMouseEvent(event);
-    const topY = this.drawStartMouseInfo.y.original;
-    const leftX = this.drawStartMouseInfo.x.original;
+    const topY = this.mouseDownInfo.y.original;
+    const leftX = this.mouseDownInfo.x.original;
     const rightX = mouseInfo.x.original;
     const bottomY = mouseInfo.y.original;
     const centerX = (leftX + rightX) / 2;
@@ -239,18 +245,58 @@ class Game extends Component {
         height: height < 0 ? 0 : height,
         rotate: rotate,
       });
-    } else if (!this.props.isDragging) {
-      let target = event.target;
-      let blockAction = false;
-      while (target) {
-        if (target.getAttribute && target.getAttribute('class') === 'pop-up-layer') {
-          blockAction = true;
-          break;
+    } else if (this.state.selectMode) {
+      const selectBox = this.refs.selectBox;
+      const startX = this.mouseDownInfo.x.screen;
+      const startY = this.mouseDownInfo.y.screen;
+      const { clientX, clientY } = event;
+      const top = Math.min(startY, clientY);
+      const left = Math.min(startX, clientX);
+      const width2 = Math.abs(startX - clientX);
+      const height2 = Math.abs(startY - clientY);
+      selectBox.setState({
+        top: top,
+        left: left,
+        width: width2,
+        height: height2,
+      });
+      const { gameObjects, selectedObjects, authentication } = this.props;
+      const boxingObjects = gameObjects.filter(object => {
+        const {center_x, center_y, is_locked, player_num, container_id, container_type} = object;
+        const checkDeck = !container_id || container_type !== 'Deck';
+        if (!checkDeck) {
+          return false;
         }
 
-        target = target.parentNode;
+        const checkAccess = !is_locked || player_num === authentication.player_num;
+        if (!checkAccess) {
+          return false;
+        }
+
+        const {x, y} = this.transformOriginalPoint([center_x, center_y]);
+        const checkX = x > left && x < left + width2;
+        if (!checkX) {
+          return false;
+        }
+
+        const checkY = y > top && y < top + height2;
+        if (!checkY) {
+          return false;
+        }
+
+        return true;
+      });
+      const selectingObjects = arrayMinus(boxingObjects, selectedObjects);
+      if (selectingObjects.length) {
+        App.game.lock_game_object(selectingObjects.map(obj => obj.id));
       }
-      if (blockAction) {
+
+      const unselectingObjects = arrayMinus(selectedObjects, boxingObjects);
+      if (unselectingObjects.length) {
+        App.game.release_game_objects(unselectingObjects.map(obj => obj.id));
+      }
+    } else if (event.nativeEvent.which === 3) {
+      if (this.searchEventPath(event, t => t.getAttribute && t.getAttribute('class') === 'pop-up-layer')) {
         return;
       }
 
@@ -263,6 +309,14 @@ class Game extends Component {
         this.props.moveCameraHorizontal(movementX / scale);
         this.props.moveCameraVertical(movementY / scale);
       }
+    } else if (!this.props.isDragging) {
+      const checker = t => t.getAttribute && t.getAttribute('class') && t.getAttribute('class').search('game-object') >= 0;
+      if (this.searchEventPath(event, checker)) {
+        return;
+      }
+
+      window.selectMode = true;
+      this.setState({ selectMode: true });
     }
   }
 
@@ -280,6 +334,9 @@ class Game extends Component {
       }
 
       this.setState({ drawMode: false });
+    } else if (this.state.selectMode) {
+      window.selectMode = false;
+      this.setState({ selectMode: false });
     }
   }
 
@@ -336,6 +393,17 @@ class Game extends Component {
     };
   }
 
+  transformOriginalPoint(originalPoint) {
+    const { width, height } = this.state;
+    const { centerX, centerY, rotate, angle, perspective, scale } = this.props.camera;
+    const perspectivePoint = originalToPerspective(originalPoint, centerX, centerY, rotate, scale);
+    const screenPoint = perspectiveToScreen(perspectivePoint, perspective, angle);
+    return {
+      x: screenPoint[0] + width / 2,
+      y: screenPoint[1] + height / 2,
+    };
+  }
+
   renderGameMenu() {
     const { room } = this.props;
 
@@ -373,6 +441,7 @@ class Game extends Component {
     return (
       <div className="pop-up-layer">
         {this.renderActionBlocker(style)}
+        {this.renderSelectBox()}
         <MessagePane bottom={10 - height}
                      messages={messages}
                      disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
@@ -398,7 +467,13 @@ class Game extends Component {
 
   renderDrawBox() {
     if (this.state.drawMode) {
-      return <DrawBox ref="drawBox"/>;
+      return <DragBox ref="drawBox"/>;
+    }
+  }
+
+  renderSelectBox() {
+    if (this.state.selectMode) {
+      return <DragBox ref="selectBox"/>;
     }
   }
 
@@ -456,6 +531,8 @@ Game.propTypes = {
   receiveMessages: PropTypes.func,
   receiveGameObjectMeta: PropTypes.func,
   removeGameObjectMeta: PropTypes.func,
+  gameObjects: PropTypes.array,
+  selectedObjects: PropTypes.array,
 };
 
 function dispatcher(dispatch) {

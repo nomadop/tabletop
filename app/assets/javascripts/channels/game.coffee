@@ -49,7 +49,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
     @perform 'destroy_game_objects', ids: ids if ids.length > 0
 
   lock_game_object: (id) ->
-    @perform 'lock_game_object', id: id
+    return if window.requiringLock
+    window.requiringLock = true;
+    @perform 'lock_game_objects', ids: if Array.isArray(id) then id else [id]
 
   release_game_objects: (ids) ->
     @perform 'release_game_objects', ids: ids if ids.length > 0
