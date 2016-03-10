@@ -187,7 +187,9 @@ function gameObjectById(state = {}, action) {
     return update(state, updater);
   case END_DRAWING_GAME_OBJECT:
     const object = action.gameObject;
-    updater[object.id] = { $set: object };
+    if (object) {
+      updater[object.id] = { $set: object };
+    }
     updater['fakeDragging'] = { $set: null };
     return update(state, updater);
   default:
@@ -205,7 +207,8 @@ function gameObjectIds(state = [], action) {
   case START_DRAWING_GAME_OBJECT:
     return arrayPlus(state, ['fakeDragging']);
   case END_DRAWING_GAME_OBJECT:
-    const newState = arrayPlus(state, [action.gameObject.id]);
+    const object = action.gameObject;
+    const newState = object ? arrayPlus(state, [object.id]) : state;
     return arrayMinus(newState, ['fakeDragging']);
   default:
     return state;
@@ -222,7 +225,9 @@ function selectedIds(state = [], action) {
   case START_DRAWING_GAME_OBJECT:
     return arrayPlus(arrayMinus(state, [action.deckObjectId]), ['fakeDragging']);
   case END_DRAWING_GAME_OBJECT:
-    return arrayMinus(arrayPlus(state, [action.gameObject.id]), ['fakeDragging']);
+    const object = action.gameObject;
+    const newState = object ? arrayPlus(state, [object.id]) : state;
+    return arrayMinus(newState, ['fakeDragging']);
   default:
     return state;
   }

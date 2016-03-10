@@ -45,16 +45,24 @@ class GameObjectContainer extends Component {
       case 'remove_game_objects':
         return this.props.removeGameObjects(data.object_ids);
       case 'draw_success':
+        const attrs = { isDragging: true };
         const fakeDraggingComponent = this.refs.gameObjectfakeDragging;
-        const object = Object.assign(unserializeGameObject(data.keys, data.object), {
-          isDragging: true,
-          center_x: fakeDraggingComponent.state.centerX || fakeDraggingComponent.props.gameObject.center_x,
-          center_y: fakeDraggingComponent.state.centerY || fakeDraggingComponent.props.gameObject.center_y,
-          multipleDragOffsetX: fakeDraggingComponent.multipleDragOffsetX,
-          multipleDragOffsetY: fakeDraggingComponent.multipleDragOffsetY,
-        });
+        if (fakeDraggingComponent) {
+          attrs.center_x = fakeDraggingComponent.state.centerX || fakeDraggingComponent.props.gameObject.center_x;
+          attrs.center_y = fakeDraggingComponent.state.centerY || fakeDraggingComponent.props.gameObject.center_y;
+          attrs.multipleDragOffsetX = fakeDraggingComponent.multipleDragOffsetX;
+          attrs.multipleDragOffsetY = fakeDraggingComponent.multipleDragOffsetY;
+        } else {
+          attrs.center_x = window.lastMouseInfo.x.screen;
+          attrs.center_y = window.lastMouseInfo.y.screen;
+          attrs.multipleDragOffsetX = 0;
+          attrs.multipleDragOffsetY = 0;
+        }
+        const object = Object.assign(unserializeGameObject(data.keys, data.object), attrs);
         this.dragStarting = true;
         return this.props.endDrawingGameObject(object);
+      case 'draw_failed':
+        return this.props.endDrawingGameObject();
       case 'lock_game_object':
         return this.props.selectGameObject(data.player_num, data.object_id);
       case 'release_game_objects':
@@ -107,7 +115,7 @@ class GameObjectContainer extends Component {
     this.props.flipGameObjects(selectedIds, isFlipped);
     const updates = selectedObjects.map(object => {
       const serializeKeys = ['id', 'is_fliped', 'lock_version'];
-      return serializeGameObject(serializeKeys, Object.assign({}, object, {is_fliped: isFlipped}));
+      return serializeGameObject(serializeKeys, Object.assign({}, object, { is_fliped: isFlipped }));
     });
     App.game.update_game_objects(updates);
   }
@@ -153,12 +161,12 @@ class GameObjectContainer extends Component {
     this.props.dragGameObjects(selectedIds);
   }
 
-  handleDragGameObjects(event) {
+  handleDragGameObjects() {
     if (!this.draggingComponents.length) {
       return;
     }
 
-    const mouseInfo = this.props.extractMouseEvent(event);
+    const mouseInfo = window.lastMouseInfo;
     this.draggingComponents.forEach(component => {
       component.setState({
         centerX: mouseInfo.x.original + component.multipleDragOffsetX,
@@ -194,8 +202,8 @@ class GameObjectContainer extends Component {
         container_id: containerId ? Number(containerId) : null,
         container_type: containerType,
         lock_version: gameObject.lock_version,
-        center_x: component.state.centerX,
-        center_y: component.state.centerY,
+        center_x: component.state.centerX || window.lastMouseInfo.x.original,
+        center_y: component.state.centerY || window.lastMouseInfo.y.original,
       };
     });
     this.draggingComponents = [];
@@ -235,7 +243,7 @@ class GameObjectContainer extends Component {
   }
 
   handleDrawGameObject(deckObject, targetObject, event) {
-    if (window.selectMode) {
+    if (window.selectMode || this.props.isDragging) {
       return;
     }
 

@@ -207,9 +207,9 @@ class Game extends Component {
     }
   }
 
-  extractDrawBoxProperties(event) {
+  extractDrawBoxProperties() {
     const camera = this.props.camera;
-    const mouseInfo = this.extractMouseEvent(event);
+    const mouseInfo = window.lastMouseInfo;
     const topY = this.mouseDownInfo.y.original;
     const leftX = this.mouseDownInfo.x.original;
     const rightX = mouseInfo.x.original;
@@ -233,6 +233,7 @@ class Game extends Component {
   }
 
   handleMouseMove(event) {
+    window.lastMouseInfo = this.extractMouseEvent(event);
     if (!event.buttons) {
       return;
     }
@@ -471,7 +472,7 @@ class Game extends Component {
 
   renderCoordination() {
     if (this.props.debug) {
-      return <CoordinationLayer rows={10} cols={10} size={100}/>;
+      //return <CoordinationLayer rows={10} cols={10} size={100}/>;
     } else {
       return <span className="origin-point"/>
     }
