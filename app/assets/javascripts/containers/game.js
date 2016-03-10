@@ -70,7 +70,7 @@ class Game extends Component {
       case 'lock_error':
         return setTimeout(() => window.requiringLock = false, 100);
       case 'error':
-        return this.handleSystemWarning(data.message);
+        return this.handleSystemMessage('error', data.message);
       default:
         return;
       }
@@ -84,7 +84,7 @@ class Game extends Component {
     window.addEventListener('resize', this.resizeGameWindow.bind(this));
     window.addEventListener('mousewheel', this.handleMouseWheel.bind(this));
     window.addEventListener('contextmenu', e => e.preventDefault());
-    initRecording(this.handleSystemWarning.bind(this));
+    initRecording(this.handleSystemMessage.bind(this, 'info'));
   }
 
   componentWillUnmount() {
@@ -358,7 +358,7 @@ class Game extends Component {
 
   handleSendMessage(content, mp3) {
     if (content.length > 255) {
-      return this.handleSystemWarning('输入过长.');
+      return this.handleSystemMessage('warning', '输入过长.');
     }
 
     const authentication = this.props.authentication;
@@ -374,11 +374,24 @@ class Game extends Component {
     App.game.send_message(content, mp3);
   }
 
-  handleSystemWarning(content) {
+  handleSystemMessage(level, content) {
+    let name = '系统';
+    switch (level) {
+    case 'warning':
+      name += '警告';
+      break;
+    case 'error':
+      name += '错误';
+      break;
+    case 'info':
+    default:
+      name += '信息';
+      break;
+    }
     this.handleSendLocalMessage({
-      from_name: '系统警告',
+      from_name: name,
       from_avatar: '/uploads/avatar/anonymous/thumb_anonymous.png',
-      level: 'warning',
+      level,
       content
     });
   }
@@ -461,7 +474,7 @@ class Game extends Component {
           <div className="footer-right">
             <div className="pane-container">
               {this.renderGameMenu()}
-              <CreateObjectPane meta={meta} devMode={dev_mode} systemWarning={this.handleSystemWarning.bind(this)}/>
+              <CreateObjectPane meta={meta} devMode={dev_mode} systemWarning={this.handleSystemMessage.bind(this, 'warning')}/>
               {this.renderCreateMetaPane()}
             </div>
           </div>

@@ -68,6 +68,7 @@ class GameObjectContainer extends Component {
         this.dragStarting = true;
         return this.props.endDrawingGameObject(object);
       case 'draw_failed':
+        this.draggingComponents = [];
         this.dropBeforeDrawSuccessEvent = null;
         return this.props.endDrawingGameObject();
       case 'lock_game_object':

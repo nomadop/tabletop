@@ -240,6 +240,8 @@ function isDragging(state = false, action) {
     return true;
   case DROP_GAME_OBJECTS:
     return false;
+  case END_DRAWING_GAME_OBJECT:
+    return action.gameObject ? true : false;
   default:
     return state;
   }
