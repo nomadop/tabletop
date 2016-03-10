@@ -13,6 +13,7 @@ export default class GamePane extends Component {
       width,
       height,
       display: MINIMUM,
+      focus: false,
     };
     this.dragging = false;
     this.dragHandler = this.handleDrag.bind(this);
@@ -20,18 +21,21 @@ export default class GamePane extends Component {
   }
 
   get style() {
-    switch (this.state.display) {
+    const { display, focus } = this.state;
+
+    switch (display) {
     case MAXIMUM:
       return {
         top: 20,
         left: 20,
         width: window.innerWidth - 40,
         height: window.innerHeight - 40,
+        zIndex: 1,
       };
     case MINIMUM:
       return {
         position: 'relative',
-        marginRight: 10,
+        margin: 4,
       };
     case NORMAL:
     default:
@@ -41,6 +45,7 @@ export default class GamePane extends Component {
         left: left || (window.innerWidth - width) / 2,
         width,
         height,
+        zIndex: focus ? 1 : 0,
       };
     }
   }
@@ -83,24 +88,29 @@ export default class GamePane extends Component {
     this.setState({display: NORMAL});
   }
 
+  handleFocus(focus) {
+    this.setState({ focus });
+  }
+
   renderHeaderControl() {
     const controls = [];
     const display = this.state.display;
     const { resizeable, onClose } = this.props;
     if (display !== MINIMUM) {
       controls.push(<i className="fa fa-minus" key="minimum" onClick={this.handleMinimum.bind(this)}/>);
+    } else {
+      controls.push(<i className="fa fa-plus" key="minimum" onClick={this.handleResume.bind(this)}/>);
     }
 
-    if (display !== NORMAL) {
-      controls.push(<i className="fa fa-reply" key="resume" onClick={this.handleResume.bind(this)}/>);
+    let className = '';
+    if (!resizeable) {
+      className = 'disabled ';
     }
 
     if (display !== MAXIMUM) {
-      let className = "fa fa-plus";
-      if (!resizeable) {
-        className += ' disabled';
-      }
-      controls.push(<i className={className} key="maximum" onClick={this.handleMaximum.bind(this)}/>);
+      controls.push(<i className={className + "fa fa-expand"} key="maximum" onClick={this.handleMaximum.bind(this)}/>);
+    } else {
+      controls.push(<i className={className + "fa fa-compress"} key="maximum" onClick={this.handleResume.bind(this)}/>);
     }
 
     controls.push(<i className="fa fa-times" key="close" onClick={onClose}/>);
@@ -125,7 +135,12 @@ export default class GamePane extends Component {
 
   render() {
     return (
-      <div className={`game-pane ${this.props.className}`} style={this.style}>
+      <div className={`game-pane ${this.props.className}`}
+           tabIndex="1"
+           style={this.style}
+           onFocus={this.handleFocus.bind(this, true)}
+           onBlur={this.handleFocus.bind(this, false)}
+      >
         {this.renderHeader()}
         {this.renderBody()}
       </div>

@@ -65,15 +65,31 @@
       pointer-events: all;
     }
 
-    .pane-container {
-      position: fixed;
+    .footer {
+      position: absolute;
+      width: 100%;
       display: flex;
-      justify-content: flex-end;
-      padding: 5px;
+      justify-content: space-between;
+
+      .footer-right {
+        display: flex;
+        flex-direction: column-reverse;
+      }
+    }
+
+    .pane-container {
+      bottom: 0;
+      display: flex;
+      align-items: flex-start;
+      flex-direction: row-reverse;
+      flex-wrap: wrap-reverse;
+      padding: 10px;
     }
 
     .message-pane {
-      position: fixed;
+      margin: 10px;
+      position: relative;
+      bottom: 0;
       background: rgba(233, 233, 233, 0.7);
       border: 5px double rgba(0, 0, 0, 0.3);
       border-radius: 10px;
@@ -226,6 +242,7 @@
         }
 
         .send {
+          width: 2em;
           margin-left: 4px;
           color: gray;
           border: 1px solid gray;
@@ -277,6 +294,10 @@
       border: 1px solid black;
       border-radius: 5px;
       pointer-events: all;
+
+      &:focus {
+        outline: none;
+      }
 
       .pane-header {
         background: lightgray;

@@ -310,7 +310,14 @@ class Game extends Component {
         this.props.moveCameraVertical(movementY / scale);
       }
     } else if (!this.props.isDragging) {
-      const checker = t => t.getAttribute && t.getAttribute('class') && t.getAttribute('class').search('game-object') >= 0;
+      const checker = t => {
+        return (
+          t.getAttribute &&
+          t.getAttribute('class') && (
+          t.getAttribute('class').search('game-object') >= 0 ||
+          t.getAttribute('class') === 'pop-up-layer'
+        ));
+      };
       if (this.searchEventPath(event, checker)) {
         return;
       }
@@ -442,16 +449,19 @@ class Game extends Component {
       <div className="pop-up-layer">
         {this.renderActionBlocker(style)}
         {this.renderSelectBox()}
-        <MessagePane bottom={10 - height}
-                     messages={messages}
-                     disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
-                     sendMessage={this.handleSendMessage.bind(this)}
-                     authentication={this.props.authentication}
-        />
-        <div className="pane-container">
-          {this.renderGameMenu()}
-          <CreateObjectPane meta={meta} devMode={dev_mode} systemWarning={this.handleSystemWarning.bind(this)}/>
-          {this.renderCreateMetaPane()}
+        <div className="footer" style={{bottom: -height}}>
+          <MessagePane messages={messages}
+                       disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
+                       sendMessage={this.handleSendMessage.bind(this)}
+                       authentication={this.props.authentication}
+          />
+          <div className="footer-right">
+            <div className="pane-container">
+              {this.renderGameMenu()}
+              <CreateObjectPane meta={meta} devMode={dev_mode} systemWarning={this.handleSystemWarning.bind(this)}/>
+              {this.renderCreateMetaPane()}
+            </div>
+          </div>
         </div>
       </div>
     )

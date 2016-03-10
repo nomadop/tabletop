@@ -13,12 +13,9 @@ export default class MessagePane extends Component {
   }
 
   get style() {
-    const bottom = this.props.bottom;
     const { width, height } = this.state;
 
     return {
-      left: 10,
-      bottom: bottom || 10,
       width,
       height,
     };
@@ -153,7 +150,6 @@ export default class MessagePane extends Component {
 
 MessagePane.propTypes = {
   messages: PropTypes.array,
-  bottom: PropTypes.number,
   disableKeyEvent: PropTypes.func,
   sendMessage: PropTypes.func,
   authentication: PropTypes.object,
