@@ -28,15 +28,16 @@ class GameObjectContainer extends Component {
       switch (data.action) {
       case 'create_game_object':
       case 'update_game_object':
-      case 'lock_failed':
-        return this.props.receiveGameObjects([unserializeGameObject(data.object)]);
+        return this.props.receiveGameObjects([unserializeGameObject(data.keys, data.object)]);
       case 'create_game_objects':
       case 'update_game_objects':
-        const objects = data.objects.map(unserializeGameObject);
+      case 'lock_failed':
+      case 'release_failed':
+        const objects = data.objects.map(unserializeGameObject.bind(null, data.keys));
         return this.props.receiveGameObjects(objects);
       case 'create_deck':
         this.props.receiveDecks([data.deck]);
-        return this.props.receiveGameObjects([unserializeGameObject(data.object)]);
+        return this.props.receiveGameObjects([unserializeGameObject(data.keys, data.object)]);
       case 'create_player_area':
         return this.props.receivePlayerAreas([data.area]);
       case 'update_deck':
@@ -45,7 +46,7 @@ class GameObjectContainer extends Component {
         return this.props.removeGameObjects(data.object_ids);
       case 'draw_success':
         const fakeDraggingComponent = this.refs.gameObjectfakeDragging;
-        const object = Object.assign(unserializeGameObject(data.object), {
+        const object = Object.assign(unserializeGameObject(data.keys, data.object), {
           isDragging: true,
           center_x: fakeDraggingComponent.state.centerX || fakeDraggingComponent.props.gameObject.center_x,
           center_y: fakeDraggingComponent.state.centerY || fakeDraggingComponent.props.gameObject.center_y,
@@ -60,9 +61,6 @@ class GameObjectContainer extends Component {
         return this.props.unselectGameObjects(data.object_ids);
       case 'destroy_player_area':
         return this.props.removePlayerArea(data.area_id);
-      case 'error':
-        alert(JSON.stringify(data.error));
-        return;
       default:
         return;
       }
@@ -107,8 +105,9 @@ class GameObjectContainer extends Component {
     const { selectedIds, selectedObjects } = this.props;
     const isFlipped = !selectedObjects.some(object => object.is_fliped);
     this.props.flipGameObjects(selectedIds, isFlipped);
-    const updates = selectedIds.map(id => {
-      return serializeGameObject({id, is_fliped: isFlipped});
+    const updates = selectedObjects.map(object => {
+      const serializeKeys = ['id', 'is_fliped', 'lock_version'];
+      return serializeGameObject(serializeKeys, Object.assign({}, object, {is_fliped: isFlipped}));
     });
     App.game.update_game_objects(updates);
   }
@@ -120,15 +119,15 @@ class GameObjectContainer extends Component {
       const middleY = selectedObjects.reduce((result, object) => result + object.center_y, 0) / selectedObjects.length;
       const updates = selectedObjects.map(object => {
         const rotatedPosition = rotateByPoint([object.center_x, object.center_y], [middleX, middleY], rotate);
-        return {
-          id: object.id,
+        return Object.assign({}, object, {
           rotate: object.rotate + rotate,
           center_x: rotatedPosition[0],
           center_y: rotatedPosition[1],
-        };
+        });
       });
       this.props.rotateGameObjects(updates);
-      App.game.update_game_objects(updates.map(serializeGameObject));
+      const keys = ['id', 'rotate', 'center_x', 'center_y', 'lock_version'];
+      App.game.update_game_objects(updates.map(serializeGameObject.bind(null, keys)));
     }
   }
 
@@ -188,6 +187,8 @@ class GameObjectContainer extends Component {
       if (gameObject.id === 'fakeDragging') {
         return alert('Fetal error: drop before draw success');
       }
+      gameObject.multipleDragOffsetX = null;
+      gameObject.multipleDragOffsetY = null;
       return {
         id: gameObject.id,
         container_id: containerId ? Number(containerId) : null,
@@ -202,7 +203,8 @@ class GameObjectContainer extends Component {
     if (this.joiningDeck) {
       this.joiningDeck = false;
     } else {
-      App.game.update_game_objects(objects.map(serializeGameObject));
+      const keys = ['id', 'container_id', 'container_type', 'lock_version', 'center_x', 'center_y'];
+      App.game.update_game_objects(objects.map(serializeGameObject.bind(null, keys)), keys);
     }
   }
 

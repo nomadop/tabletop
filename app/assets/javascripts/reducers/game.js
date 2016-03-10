@@ -115,11 +115,16 @@ function gameObjectById(state = {}, action) {
   case RECEIVE_GAME_OBJECTS:
     action.gameObjects.forEach(object => {
       const oldObject = state[object.id];
-      if (oldObject && object.lock_version < oldObject.lock_version) {
+      if (!oldObject) {
+        return updater[object.id] = { $set: object };
+      }
+
+      if (object.lock_version < oldObject.lock_version) {
         return;
       }
 
-      updater[object.id] = { $set: object }
+      updater[object.id] = {};
+      Object.keys(object).forEach(key => updater[object.id][key] = { $set: object[key] });
     });
     return update(state, updater);
   case FLIP_GAME_OBJECTS:
@@ -155,10 +160,16 @@ function gameObjectById(state = {}, action) {
     action.gameObjectIds.forEach(id => updater[id] = { $set: undefined });
     return update(state, updater);
   case SELECT_GAME_OBJECT:
-    updater[action.gameObjectId] = { player_num: { $set: action.playerNum } };
+    updater[action.gameObjectId] = {
+      is_locked: { $set: true },
+      player_num: { $set: action.playerNum },
+    };
     return update(state, updater);
   case UNSELECT_GAME_OBJECTS:
-    action.gameObjectIds.forEach(id => updater[id] = { player_num: { $set: null } });
+    action.gameObjectIds.forEach(id => updater[id] = {
+      is_locked: { $set: false },
+      player_num: { $set: null },
+    });
     return update(state, updater);
   case START_DRAWING_GAME_OBJECT:
     const template = Object.assign({}, state[action.templateId], {

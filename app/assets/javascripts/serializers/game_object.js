@@ -1,7 +1,9 @@
 const SERIALIZE_KEYS = ['id', 'meta_id', 'meta_type', 'container_id', 'container_type', 'center_x', 'center_y', 'related_x', 'related_y', 'related_rotate', 'rotate', 'is_fliped', 'is_locked', 'lock_version', 'player_num'];
+const META_TYPES = ['GameObjectMetum', 'Deck'];
 
-export function serializeGameObject(gameObject) {
-  const attrs = SERIALIZE_KEYS.map(key => {
+export function serializeGameObject(serializeKeys, gameObject) {
+  const keys = serializeKeys || SERIALIZE_KEYS;
+  const attrs = keys.map(key => {
     const attr = gameObject[key];
 
     if (attr && (key === 'center_x' || key === 'center_y')) {
@@ -9,7 +11,7 @@ export function serializeGameObject(gameObject) {
     }
 
     if ((key === 'container_id' || key === 'container_type') && attr === null) {
-      return 'null';
+      return 'n';
     }
 
     return attr;
@@ -18,17 +20,20 @@ export function serializeGameObject(gameObject) {
   return attrs.join(',');
 }
 
-export function unserializeGameObject(serial) {
+export function unserializeGameObject(serializeKeys, serial) {
+  const keys = serializeKeys || SERIALIZE_KEYS;
   const attrs = serial.split(',');
   const object = {};
   for (let i = 0; i < attrs.length; i++) {
     const attr = attrs[i];
-    const key = SERIALIZE_KEYS[i];
-    if (/^-?\d+(.\d+)?$/.test(attr)) {
+    const key = keys[i];
+    if (key === 'meta_type') {
+      object[key] = META_TYPES[Number(attr)];
+    } else if (/^-?\d+(.\d+)?$/.test(attr)) {
       object[key] = Number(attr);
-    } else if (attr === 'true') {
+    } else if (attr === 't') {
       object[key] = true;
-    } else if (attr === 'false') {
+    } else if (attr === 'f') {
       object[key] = false;
     } else if (attr.length > 0) {
       object[key] = attr;

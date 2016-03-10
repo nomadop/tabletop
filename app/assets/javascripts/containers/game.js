@@ -69,6 +69,8 @@ class Game extends Component {
       case 'lock_failed':
       case 'lock_error':
         return setTimeout(() => window.requiringLock = false, 100);
+      case 'error':
+        return this.handleSystemWarning(data.message);
       default:
         return;
       }
@@ -449,7 +451,7 @@ class Game extends Component {
       <div className="pop-up-layer">
         {this.renderActionBlocker(style)}
         {this.renderSelectBox()}
-        <div className="footer" style={{bottom: -height}}>
+        <div className="footer" style={{bottom: -height || 0}}>
           <MessagePane messages={messages}
                        disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
                        sendMessage={this.handleSendMessage.bind(this)}

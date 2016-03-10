@@ -30,8 +30,8 @@ App.game = App.cable.subscriptions.create "GameChannel",
   update_game_object: (id, attrs) ->
     @perform 'update_game_object', id: id, attrs: attrs
 
-  update_game_objects: (gameObjects) ->
-    @perform 'update_game_objects', objects: gameObjects
+  update_game_objects: (gameObjects, keys) ->
+    @perform 'update_game_objects', keys: keys, objects: gameObjects
 
   create_deck: (ids) ->
     @perform 'create_deck', ids: ids

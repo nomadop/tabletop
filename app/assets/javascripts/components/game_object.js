@@ -104,8 +104,10 @@ export default class GameObject extends Component {
         onDragStart(event);
       } else {
         const deck = gameObject.meta;
-        const target = deck.is_expanded ? deck.innerObjects[this.state.expandIndex] : null;
-        draw(target, event);
+        if (deck.innerObjects.length) {
+          const target = deck.is_expanded ? deck.innerObjects[this.state.expandIndex] : null;
+          draw(target, event);
+        }
       }
     }
   }

@@ -1,6 +1,6 @@
 class GameObject < ApplicationRecord
-  SERIALIZE_KEYS = %w(id meta_id meta_type container_id container_type center_x center_y related_x related_y related_rotate rotate is_fliped is_locked
-                      lock_version player_num)
+  SERIALIZE_KEYS = %w(id meta_id meta_type container_id container_type center_x center_y related_x related_y related_rotate rotate is_fliped is_locked lock_version player_num)
+  META_TYPES = %w(GameObjectMetum Deck)
 
   before_save :round_position
   before_save :check_container
@@ -62,30 +62,44 @@ class GameObject < ApplicationRecord
     center_y + height / 2
   end
 
-  def require_lock(pid)
-    return player_id == pid if is_locked
+  def require_lock(player)
+    return player_id == player.id if is_locked
 
-    update(is_locked: true, player_id: pid)
+    update(is_locked: true, player: player)
   end
 
   def release_lock
     update(is_locked: false, player_id: nil)
   end
 
-  def self.serialize_game_object(object)
-    SERIALIZE_KEYS.map { |key| object.send(key) }.join(',')
+  def self.serialize_game_object(serialize_keys, object)
+    keys = serialize_keys || SERIALIZE_KEYS
+    attrs = keys.map do |key|
+      attr = object.send(key)
+      if key == 'meta_type'
+        META_TYPES.index(attr)
+      elsif attr.is_a?(TrueClass)
+        't'
+      elsif attr.is_a?(FalseClass)
+        'f'
+      else
+        attr
+      end
+    end
+    attrs.join(',')
   end
 
-  def self.unserialize_game_object(serial)
+  def self.unserialize_game_object(serialize_keys, serial)
+    keys = serialize_keys || SERIALIZE_KEYS
     result = {}
     excludes = %w(related_x related_y player_num)
     serial.split(',').each_with_index do |attr, index|
       next if attr.blank?
 
-      attr_name = SERIALIZE_KEYS[index]
+      attr_name = keys[index]
       next if excludes.include?(attr_name)
 
-      result[attr_name] = attr == 'null' ? nil : attr
+      result[attr_name] = attr == 'n' ? nil : attr
     end
     result
   end

@@ -8,20 +8,20 @@ class GameChannel < ApplicationCable::Channel
     "game##{current_user.id}"
   end
 
-  def serializer
-    GameObject.method(:serialize_game_object)
+  def serializer(keys = nil)
+    GameObject.method(:serialize_game_object).curry[keys]
   end
 
-  def serialize(object)
-    GameObject.serialize_game_object(object)
+  def serialize(object, keys = nil)
+    GameObject.serialize_game_object(keys, object)
   end
 
-  def unserializer
-    GameObject.method(:unserialize_game_object)
+  def unserializer(keys = nil)
+    GameObject.method(:unserialize_game_object).curry[keys]
   end
 
-  def unserialize(serial)
-    GameObject.unserialize_game_object(serial)
+  def unserialize(serial, keys = nil)
+    GameObject.unserialize_game_object(keys, serial)
   end
 
   def subscribed
@@ -41,7 +41,7 @@ class GameChannel < ApplicationCable::Channel
     ActionCable.server.broadcast(game_stream, action: :create_game_object, object: serialize(object))
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def create_game_objects(data)
@@ -56,7 +56,7 @@ class GameChannel < ApplicationCable::Channel
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def create_and_pack_game_objects(data)
@@ -74,66 +74,82 @@ class GameChannel < ApplicationCable::Channel
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def update_game_objects(data)
-    unserialzed_objects = data['objects'].map(&unserializer)
+    keys = data['keys']
+    unserialzed_objects = data['objects'].map(&unserializer(keys))
     object_ids = unserialzed_objects.map { |obj| obj['id'] }
     GameObject.transaction do
-      objects = GameObject.includes(:meta).where(id: object_ids, is_locked: true, player: current_user.player)
+      objects = GameObject.includes(:meta, :room).where(id: object_ids, is_locked: true, player: current_user.player)
       objects.find_each do |object|
         json = unserialzed_objects.find { |obj| obj['id'] == object.id.to_s }
         object.update(json)
       end
 
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: GameObject.where(id: object_ids).map(&serializer))
+      keys |= %w(related_x related_y)
+      ActionCable.server.broadcast(game_stream,
+                                   action: :update_game_objects,
+                                   keys: keys,
+                                   objects: GameObject.includes(:meta, :player).where(id: object_ids).map(&serializer(keys)))
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def create_deck(data)
-    game_objects = GameObject.includes(:meta).where(id: data['ids'])
-    unless game_objects.all? { |o| o.require_lock(current_user.player_id) }
+    game_objects = GameObject.includes(:meta, :room, :player).where(id: data['ids'])
+    unless game_objects.all? { |o| o.require_lock(current_user.player) }
       return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' })
     end
 
     if (deck = Deck.create_deck(current_user.room, game_objects))
       ActionCable.server.broadcast(game_stream, action: :create_deck, deck: deck, object: serialize(deck.game_object))
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects.map(&serializer))
+      keys = %w(id container_id container_type is_locked lock_version)
+      ActionCable.server.broadcast(game_stream,
+                                   action: :update_game_objects,
+                                   keys: keys,
+                                   objects: game_objects.map(&serializer(keys)))
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def join_deck(data)
-    game_objects = GameObject.where(id: data['ids'])
-    unless game_objects.all? { |o| o.require_lock(current_user.player_id) }
+    game_objects = GameObject.includes(:meta, :room, :player).where(id: data['ids'])
+    unless game_objects.all? { |o| o.require_lock(current_user.player) }
       return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' })
     end
 
     deck = Deck.find(data['deck_id'])
 
-    if game_objects.any? && deck.game_object.require_lock(current_user.player_id)
+    keys = %w(id container_id container_type is_locked lock_version)
+    if game_objects.any? && deck.game_object.require_lock(current_user.player)
       deck.join(game_objects)
       deck.game_object.release_lock
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: game_objects.map(&serializer))
+      ActionCable.server.broadcast(game_stream,
+                                   action: :update_game_objects,
+                                   keys: keys,
+                                   objects: game_objects.map(&serializer(keys)))
       ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck.reload)
     else
-      ActionCable.server.broadcast(user_stream, action: :join_failed, objects: game_objects.map(&serializer))
+      ActionCable.server.broadcast(user_stream,
+                                   action: :join_failed,
+                                   keys: keys,
+                                   objects: game_objects.map(&serializer(keys)))
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def draw(data)
     deck = Deck.find(data['deck_id'])
     return ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'invalid deck id') unless deck
-    return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' }) unless deck.game_object.require_lock(current_user.player_id)
+    return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' }) unless deck.game_object.require_lock(current_user.player)
 
     game_object = deck.draw(player_id: current_user.player_id, target_id: data['target_id'])
     deck.game_object.release_lock
@@ -147,7 +163,7 @@ class GameChannel < ApplicationCable::Channel
   rescue StandardError => e
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'system error')
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def toggle_deck(data)
@@ -168,12 +184,12 @@ class GameChannel < ApplicationCable::Channel
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def destroy_game_objects(data)
-    objects = GameObject.where(id: data['ids'])
-    unless objects.all? { |o| o.require_lock(current_user.player_id) }
+    objects = GameObject.includes(:meta, :room, :player).where(id: data['ids'])
+    unless objects.all? { |o| o.require_lock(current_user.player) }
       return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' })
     end
 
@@ -194,7 +210,7 @@ class GameChannel < ApplicationCable::Channel
     ActionCable.server.broadcast(game_stream, action: :remove_game_objects, object_ids: data['ids'])
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def lock_game_object(data)
@@ -207,20 +223,27 @@ class GameChannel < ApplicationCable::Channel
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def lock_game_objects(data)
-    objects = GameObject.includes(:player).where(id: data['ids'])
+    objects = GameObject.includes(:meta, :room).where(id: data['ids'])
     success = false
     GameObject.transaction do
-      success = true if objects.all? { |obj| obj.require_lock(current_user.player_id) }
+      success = true if objects.all? { |obj| obj.require_lock(current_user.player) }
     end
+    keys = %w(id is_locked player_num lock_version)
     if success
       ActionCable.server.broadcast(game_stream, action: :lock_success, object_ids: data['ids'])
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: objects.map(&serializer))
+      ActionCable.server.broadcast(game_stream,
+                                   action: :update_game_objects,
+                                   keys: keys,
+                                   objects: objects.map(&serializer(keys)))
     else
-      ActionCable.server.broadcast(user_stream, action: :lock_failed, objects: objects.reload.map(&serializer))
+      ActionCable.server.broadcast(user_stream,
+                                   action: :lock_failed,
+                                   keys: keys,
+                                   objects: objects.map(&serializer(keys)))
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
@@ -230,15 +253,28 @@ class GameChannel < ApplicationCable::Channel
   def release_game_objects(data)
     objects = GameObject.includes(:player).where(id: data['ids'])
 
+    keys = %w(id is_locked player_num lock_version)
     if objects.all? { |o| o.is_locked && o.player == current_user.player }
       objects.update_all(is_locked: false, player_id: nil)
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: objects.reload.map(&serializer))
+      ActionCable.server.broadcast(game_stream,
+                                   action: :update_game_objects,
+                                   keys: keys,
+                                   objects: objects.reload.map(&serializer(keys)))
     else
-      ActionCable.server.broadcast(user_stream, action: :release_failed, objects: objects.map(&serializer))
+      ActionCable.server.broadcast(user_stream,
+                                   action: :release_failed,
+                                   keys: keys,
+                                   objects: objects.map(&serializer(keys)))
     end
+  rescue ActiveRecord::StatementInvalid
+    keys = %w(id is_locked player_num lock_version)
+    ActionCable.server.broadcast(user_stream,
+                                 action: :release_failed,
+                                 keys: keys,
+                                 objects: objects.map(&serializer(keys)))
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def create_player_area(data)
@@ -256,7 +292,7 @@ class GameChannel < ApplicationCable::Channel
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def destroy_player_area()
@@ -267,14 +303,14 @@ class GameChannel < ApplicationCable::Channel
 
     inner_object_ids = area.inner_object_ids
     if area.destroy
-      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: GameObject.where(id: inner_object_ids).map(&serializer))
+      ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: GameObject.includes(:meta, :room).where(id: inner_object_ids).map(&serializer))
       ActionCable.server.broadcast(game_stream, action: :destroy_player_area, area_id: area.id)
     else
       ActionCable.server.broadcast(game_stream, action: :error, error: { message: 'Destroy area failed' })
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def send_message(data)
@@ -291,7 +327,7 @@ class GameChannel < ApplicationCable::Channel
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
   def destroy_meta(data)
@@ -306,6 +342,6 @@ class GameChannel < ApplicationCable::Channel
     end
   rescue StandardError => e
     puts e.inspect, e.backtrace
-    ActionCable.server.broadcast(user_stream, action: :error, error: e)
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 end

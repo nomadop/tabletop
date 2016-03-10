@@ -64,8 +64,8 @@ class Deck < ApplicationRecord
 
   def join(game_objects)
     game_objects = Array(game_objects)
-    return false if game_objects.empty?
-    return false if game_objects.any? { |obj| obj.sub_type != sub_type }
+    raise 'Empty targets' if game_objects.empty?
+    raise 'Invalid sub type' if game_objects.any? { |obj| obj.sub_type != sub_type }
 
     deck_index = inner_objects.maximum(:deck_index) || 0
     sync_attrs = [:center_x, :center_y, :rotate, :is_fliped]
@@ -77,7 +77,8 @@ class Deck < ApplicationRecord
     end
     return true
   rescue StandardError => e
-    return false
+    puts e.inspect, e.backtrace
+    return true
   end
 
   def resume_inner_objects
@@ -89,8 +90,8 @@ class Deck < ApplicationRecord
 
   def self.create_deck(room, game_objects)
     game_objects = Array(game_objects)
-    return nil if game_objects.map(&:meta_type).uniq != ['GameObjectMetum']
-    return nil if game_objects.map(&:sub_type).uniq.size > 1
+    raise 'Invalid game object meta' if game_objects.map(&:meta_type).uniq != ['GameObjectMetum']
+    raise 'Can not pack multiple sub type' if game_objects.map(&:sub_type).uniq.size > 1
 
     deck = nil
     meta = game_objects.first.meta
