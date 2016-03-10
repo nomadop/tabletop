@@ -317,7 +317,7 @@ class Game extends Component {
         return (
           t.getAttribute &&
           t.getAttribute('class') && (
-          t.getAttribute('class').search('game-object') >= 0 ||
+          t.getAttribute('class').split(' ').indexOf('game-object') >= 0 ||
           t.getAttribute('class') === 'pop-up-layer'
         ));
       };

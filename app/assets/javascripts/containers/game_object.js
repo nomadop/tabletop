@@ -45,6 +45,12 @@ class GameObjectContainer extends Component {
       case 'remove_game_objects':
         return this.props.removeGameObjects(data.object_ids);
       case 'draw_success':
+        if (this.dropBeforeDrawSuccessEvent) {
+          setTimeout(() => {
+            this.handleDropGameObjects(this.dropBeforeDrawSuccessEvent);
+            this.dropBeforeDrawSuccessEvent = null;
+          }, 100);
+        }
         const attrs = { isDragging: true };
         const fakeDraggingComponent = this.refs.gameObjectfakeDragging;
         if (fakeDraggingComponent) {
@@ -62,6 +68,7 @@ class GameObjectContainer extends Component {
         this.dragStarting = true;
         return this.props.endDrawingGameObject(object);
       case 'draw_failed':
+        this.dropBeforeDrawSuccessEvent = null;
         return this.props.endDrawingGameObject();
       case 'lock_game_object':
         return this.props.selectGameObject(data.player_num, data.object_id);
@@ -190,10 +197,13 @@ class GameObjectContainer extends Component {
     }
     const containerId = container && container.getAttribute('container-id');
     const containerType = container && container.getAttribute('container-type');
+    let success = true;
     const objects = this.draggingComponents.map(component => {
       const gameObject = component.props.gameObject;
       if (gameObject.id === 'fakeDragging') {
-        return alert('Fetal error: drop before draw success');
+        console.log('drop before draw success');
+        this.dropBeforeDrawSuccessEvent = event;
+        return success = false;
       }
       gameObject.multipleDragOffsetX = null;
       gameObject.multipleDragOffsetY = null;
@@ -206,6 +216,9 @@ class GameObjectContainer extends Component {
         center_y: component.state.centerY || window.lastMouseInfo.y.original,
       };
     });
+    if (!success) {
+      return;
+    }
     this.draggingComponents = [];
     this.props.dropGameObjects(objects);
     if (this.joiningDeck) {
