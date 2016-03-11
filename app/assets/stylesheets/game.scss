@@ -55,6 +55,10 @@
   top: 0;
   transform-style: preserve-3d;
 
+  &.camera-moving {
+    cursor: move;
+  }
+
   .pop-up-layer {
     transform: perspective(0) translateZ(10000px);
     pointer-events: none;

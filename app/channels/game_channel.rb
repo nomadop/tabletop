@@ -88,7 +88,7 @@ class GameChannel < ApplicationCable::Channel
         object.update(json)
       end
 
-      keys |= %w(related_x related_y)
+      keys |= %w(related_x related_y rotate)
       ActionCable.server.broadcast(game_stream,
                                    action: :update_game_objects,
                                    keys: keys,
@@ -101,7 +101,7 @@ class GameChannel < ApplicationCable::Channel
 
   def create_deck(data)
     game_objects = GameObject.includes(:meta, :room, :player).where(id: data['ids'])
-    unless game_objects.all? { |o| o.require_lock(current_user.player) }
+    unless game_objects.all? { |o| try_require_lock(o) }
       return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' })
     end
 
@@ -120,16 +120,16 @@ class GameChannel < ApplicationCable::Channel
 
   def join_deck(data)
     game_objects = GameObject.includes(:meta, :room, :player).where(id: data['ids'])
-    unless game_objects.all? { |o| o.require_lock(current_user.player) }
+    unless game_objects.all? { |o| try_require_lock(o) }
       return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' })
     end
 
     deck = Deck.find(data['deck_id'])
 
     keys = %w(id container_id container_type is_locked lock_version)
-    if game_objects.any? && deck.game_object.require_lock(current_user.player)
+    if game_objects.any? && try_require_lock(deck.game_object)
       deck.join(game_objects)
-      deck.game_object.release_lock
+      deck.game_object.reload.release_lock
       ActionCable.server.broadcast(game_stream,
                                    action: :update_game_objects,
                                    keys: keys,
@@ -149,10 +149,10 @@ class GameChannel < ApplicationCable::Channel
   def draw(data)
     deck = Deck.find(data['deck_id'])
     return ActionCable.server.broadcast(user_stream, action: :draw_failed, message: 'invalid deck id') unless deck
-    return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' }) unless deck.game_object.require_lock(current_user.player)
+    return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' }) unless try_require_lock(deck.game_object)
 
     game_object = deck.draw(player_id: current_user.player_id, target_id: data['target_id'])
-    deck.game_object.release_lock
+    deck.game_object.reload.release_lock
     if game_object
       ActionCable.server.broadcast(game_stream, action: :update_deck, deck: deck.reload)
       ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: Array(serialize(deck.game_object)))
@@ -169,7 +169,7 @@ class GameChannel < ApplicationCable::Channel
   def toggle_deck(data)
     deck = Deck.find(data['deck_id'])
     is_expanded = data['is_expanded'] == 't' ? true : false
-    if deck.game_object.require_lock(current_user.player_id)
+    if try_require_lock(deck.game_object)
       Deck.transaction do
         GameObject.transaction do
           deck.update(is_expanded: is_expanded)
@@ -189,7 +189,7 @@ class GameChannel < ApplicationCable::Channel
 
   def destroy_game_objects(data)
     objects = GameObject.includes(:meta, :room, :player).where(id: data['ids'])
-    unless objects.all? { |o| o.require_lock(current_user.player) }
+    unless objects.all? { |o| try_require_lock(o) }
       return ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' })
     end
 
@@ -216,7 +216,7 @@ class GameChannel < ApplicationCable::Channel
   def lock_game_object(data)
     object = GameObject.find(data['id'])
 
-    if object.require_lock(current_user.player_id)
+    if try_require_lock(object)
       ActionCable.server.broadcast(game_stream, action: :update_game_objects, objects: [serialize(object)])
     else
       ActionCable.server.broadcast(user_stream, action: :lock_failed, object: serialize(object))
@@ -230,7 +230,7 @@ class GameChannel < ApplicationCable::Channel
     objects = GameObject.includes(:meta, :room).where(id: data['ids'])
     success = false
     GameObject.transaction do
-      success = true if objects.all? { |obj| obj.require_lock(current_user.player) }
+      success = true if objects.all? { |obj| try_require_lock(obj) }
     end
     keys = %w(id is_locked player_num lock_version)
     if success
@@ -343,5 +343,18 @@ class GameChannel < ApplicationCable::Channel
   rescue StandardError => e
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
+  end
+
+  private
+
+  def try_require_lock(game_object, count: 3, time_interval: 0.1)
+    game_object.reload.require_lock(current_user.player)
+  rescue ActiveRecord::StaleObjectError => e
+    if count > 0
+      sleep(time_interval)
+      try_require_lock(game_object, count: count - 1)
+    else
+      raise(e)
+    end
   end
 end

@@ -13,6 +13,9 @@
 
 ActiveRecord::Schema.define(version: 20160309040253) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "decks", force: :cascade do |t|
     t.string   "sub_type",                    null: false
     t.float    "width"
@@ -20,7 +23,7 @@ ActiveRecord::Schema.define(version: 20160309040253) do
     t.boolean  "is_expanded", default: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
-    t.integer  "room_id"
+    t.integer  "room_id",                     null: false
   end
 
   create_table "game_object_meta", force: :cascade do |t|
@@ -50,8 +53,8 @@ ActiveRecord::Schema.define(version: 20160309040253) do
     t.integer  "container_id"
     t.string   "container_type"
     t.integer  "deck_index"
-    t.integer  "room_id"
     t.integer  "player_id"
+    t.integer  "room_id",                        null: false
   end
 
   create_table "games", force: :cascade do |t|
@@ -62,6 +65,7 @@ ActiveRecord::Schema.define(version: 20160309040253) do
     t.text     "description"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["module"], name: "index_games_on_module", unique: true, using: :btree
   end
 
   create_table "messages", force: :cascade do |t|
@@ -86,17 +90,17 @@ ActiveRecord::Schema.define(version: 20160309040253) do
     t.float    "rotate"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["player_id"], name: "index_player_areas_on_player_id", unique: true
+    t.index ["player_id"], name: "index_player_areas_on_player_id", unique: true, using: :btree
   end
 
   create_table "players", force: :cascade do |t|
     t.integer  "user_id"
-    t.integer  "room_id"
-    t.integer  "number"
+    t.integer  "room_id",    null: false
+    t.integer  "number",     null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["room_id", "number"], name: "index_players_on_room_id_and_number", unique: true
-    t.index ["user_id"], name: "index_players_on_user_id", unique: true
+    t.index ["room_id", "number"], name: "index_players_on_room_id_and_number", unique: true, using: :btree
+    t.index ["user_id"], name: "index_players_on_user_id", unique: true, using: :btree
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -108,7 +112,7 @@ ActiveRecord::Schema.define(version: 20160309040253) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
     t.boolean  "dev"
-    t.index ["game_id", "dev"], name: "index_rooms_on_game_id_and_dev", unique: true
+    t.index ["game_id", "dev"], name: "index_rooms_on_game_id_and_dev", unique: true, using: :btree
   end
 
   create_table "users", force: :cascade do |t|
@@ -124,11 +128,11 @@ ActiveRecord::Schema.define(version: 20160309040253) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
-    t.string   "nickname"
+    t.string   "nickname",                            null: false
     t.string   "avatar"
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["nickname"], name: "index_users_on_nickname", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["nickname"], name: "index_users_on_nickname", unique: true, using: :btree
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
 
 end

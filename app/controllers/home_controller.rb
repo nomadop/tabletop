@@ -34,8 +34,8 @@ class HomeController < ApplicationController
     props = {
       app: 'game',
       authentication: current_user && current_user.auth_info,
-      debug: false,
-      room: dev_room.as_json(only: [:id]),
+      debug: params[:debug] == 'true' ? true : false,
+      room: dev_room.as_json(only: [:id, :name, :max_player], methods: [:player_count]),
       game: game.as_json(only: [:id, :name, :module, :start_scale]),
       dev_mode: true,
     }

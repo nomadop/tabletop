@@ -46,6 +46,7 @@ class Game extends Component {
       selectMode: false,
       gameMenu: false,
       createObjectPane: false,
+      cameraMoving: false,
     };
   }
 
@@ -93,9 +94,13 @@ class Game extends Component {
     window.removeEventListener('resize', this.resizeGameWindow.bind(this));
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps) {
     if (this.state.drawMode) {
       return false;
+    }
+
+    if (this.props.camera !== nextProps.camera) {
+      this.setState({ cameraMoving: true });
     }
   }
 
@@ -212,7 +217,7 @@ class Game extends Component {
 
   extractDrawBoxProperties() {
     const camera = this.props.camera;
-    const mouseInfo = this.extractMouseEvent(window.lastMouseInfo);
+    const mouseInfo = this.extractMouseEvent(window.lastMouseMoveEvent);
     const topY = this.mouseDownInfo.y.original;
     const leftX = this.mouseDownInfo.x.original;
     const rightX = mouseInfo.x.original;
@@ -308,12 +313,12 @@ class Game extends Component {
 
       const { movementX, movementY } = event.nativeEvent;
       if (event.shiftKey) {
-        this.props.rotateCameraHorizontal(movementX);
-        this.props.rotateCameraVertical(movementY);
+        this.props.rotateCameraHorizontal(-movementX);
+        this.props.rotateCameraVertical(-movementY);
       } else {
         const scale = this.props.camera.scale;
-        this.props.moveCameraHorizontal(movementX / scale);
-        this.props.moveCameraVertical(movementY / scale);
+        this.props.moveCameraHorizontal(-movementX / scale);
+        this.props.moveCameraVertical(-movementY / scale);
       }
     } else if (!this.props.isDragging) {
       const checker = t => {
@@ -350,6 +355,8 @@ class Game extends Component {
     } else if (this.state.selectMode) {
       window.selectMode = false;
       this.setState({ selectMode: false });
+    } else {
+      this.setState({ cameraMoving: false });
     }
   }
 
@@ -553,7 +560,7 @@ class Game extends Component {
   }
 
   render() {
-    const { width, height } = this.state;
+    const { width, height, cameraMoving } = this.state;
     const { camera, authentication } = this.props;
 
     const style = {
@@ -563,7 +570,7 @@ class Game extends Component {
 
     return (
       <div
-        className="game-window"
+        className={`game-window${cameraMoving ? ' camera-moving' : ''}`}
         tabIndex="1"
         ref="gameWindow"
         style={style}
