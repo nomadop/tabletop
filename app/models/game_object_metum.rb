@@ -13,7 +13,6 @@ class GameObjectMetum < ApplicationRecord
   skip_callback :commit, :after, :remove_back_img!
   skip_callback :commit, :after, :remove_previously_stored_back_img
 
-
   def as_json(opts = {})
     opts[:except] ||= []
     opts[:except] |= [:created_at, :updated_at]

@@ -27,3 +27,4 @@ config/meta
 public/res
 public/uploads
 public/audios
+exports

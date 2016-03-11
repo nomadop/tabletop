@@ -9,8 +9,7 @@ class User < ApplicationRecord
 
   mount_uploader :avatar, AvatarUploader
 
-  validates_presence_of :nickname
-  validates_uniqueness_of :nickname
+  validates :nickname, presence: true, uniqueness: true, length: {maximum: 20}
 
   def username
     nickname.blank? ? email : nickname
