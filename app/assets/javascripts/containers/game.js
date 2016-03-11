@@ -21,6 +21,9 @@ import {
   unselectGameObjects,
   receiveGameObjectMeta,
   removeGameObjectMeta,
+  toggleCreateMetaPane,
+  toggleCreateObjectPane,
+  toggleGameMenu,
 } from '../actions/game';
 import { receiveMessages } from '../actions/message';
 import {
@@ -44,8 +47,6 @@ class Game extends Component {
       height: undefined,
       drawMode: false,
       selectMode: false,
-      gameMenu: false,
-      createObjectPane: false,
       cameraMoving: false,
     };
   }
@@ -412,15 +413,12 @@ class Game extends Component {
   }
 
   handleToggleGameMenu() {
-    const gameMenu = this.state.gameMenu;
-    this.setState({ gameMenu: !gameMenu });
+    const showGameMenu = this.props.gamePanes.showGameMenu;
+    this.props.toggleGameMenu(!showGameMenu);
   }
 
   handleToggleCreateObjectPane(open) {
-    this.setState({
-      gameMenu: false,
-      createObjectPane: open,
-    });
+    this.props.toggleCreateObjectPane(open);
   }
 
   resizeGameWindow() {
@@ -455,12 +453,13 @@ class Game extends Component {
   }
 
   renderGameMenu() {
-    const { room } = this.props;
+    const { room, gamePanes, dev_mode } = this.props;
 
-    if (this.state.gameMenu) {
+    if (gamePanes.showGameMenu) {
       return (
         <GamePane className="game-menu" width={240} height={480} noHeader={true}>
           <a href="javascript:" onClick={this.handleToggleCreateObjectPane.bind(this, true)}>创建新物件</a>
+          {dev_mode ? <a href="javascript:" onClick={this.props.toggleCreateMetaPane.bind(null, true)}>创建元物件</a> : null}
           <a href={`/rooms/${room.id}/leave`} data-method="post">离开房间</a>
           <a href={`/rooms/${room.id}`} data-method="delete">关闭房间</a>
         </GamePane>
@@ -475,9 +474,14 @@ class Game extends Component {
   }
 
   renderCreateMetaPane() {
-    if (this.props.dev_mode) {
+    const { dev_mode, gamePanes } = this.props;
+    if (dev_mode && gamePanes.showCreateMetaPane ) {
       return (
-        <GamePane className="create-meta-pane" title="创建元物件" width={385} height={550}>
+        <GamePane className="create-meta-pane"
+                  title="创建元物件"
+                  width={385} height={550}
+                  onClose={this.props.toggleCreateMetaPane.bind(null, false)}
+        >
           <iframe src="/game_object_meta/new" frameBorder="0"></iframe>
         </GamePane>
       );
@@ -485,8 +489,8 @@ class Game extends Component {
   }
 
   renderCreateObjectPane() {
-    const { meta, dev_mode } = this.props;
-    if (this.state.createObjectPane) {
+    const { meta, dev_mode, gamePanes } = this.props;
+    if (gamePanes.showCreateObjectPane) {
       return (
         <CreateObjectPane meta={meta}
                           devMode={dev_mode}
@@ -498,8 +502,7 @@ class Game extends Component {
   }
 
   renderPopUpLayer(width, height) {
-    const { messages, room, game } = this.props;
-    const { gameMenu } = this.state;
+    const { messages, room, game, gamePanes } = this.props;
     const style = {
       width,
       height,
@@ -516,7 +519,7 @@ class Game extends Component {
               {`${room.player_count} / ${room.max_player} `}
               <i className="fa fa-user"/>
             </span>
-            <span className={`game-menu button${gameMenu ? ' active' : ''}`}
+            <span className={`game-menu button${gamePanes.showGameMenu ? ' active' : ''}`}
                   onClick={this.handleToggleGameMenu.bind(this)}
             >
               <i className="fa fa-cog"/>
@@ -620,6 +623,10 @@ Game.propTypes = {
   removeGameObjectMeta: PropTypes.func,
   gameObjects: PropTypes.array,
   selectedObjects: PropTypes.array,
+  gamePanes: PropTypes.object,
+  toggleCreateMetaPane: PropTypes.func,
+  toggleCreateObjectPane: PropTypes.func,
+  toggleGameMenu: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -634,6 +641,9 @@ function dispatcher(dispatch) {
     receiveMessages,
     receiveGameObjectMeta,
     removeGameObjectMeta,
+    toggleCreateMetaPane,
+    toggleCreateObjectPane,
+    toggleGameMenu,
   }, dispatch);
 }
 

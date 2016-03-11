@@ -14,7 +14,10 @@ import {
   START_DRAWING_GAME_OBJECT,
   END_DRAWING_GAME_OBJECT,
   REMOVE_PLAYER_AREA,
-  REMOVE_GAME_OBJECT_META
+  REMOVE_GAME_OBJECT_META,
+  TOGGLE_CREATE_META_PANE,
+  TOGGLE_CREATE_OBJECT_PANE,
+  TOGGLE_GAME_MENU,
 } from './action_types';
 import { receiveMessages } from './message';
 
@@ -137,5 +140,26 @@ export function removePlayerArea(areaId) {
   return {
     type: REMOVE_PLAYER_AREA,
     areaId,
+  };
+}
+
+export function toggleGameMenu(isShown) {
+  return {
+    type: TOGGLE_GAME_MENU,
+    isShown,
+  };
+}
+
+export function toggleCreateObjectPane(isShown) {
+  return {
+    type: TOGGLE_CREATE_OBJECT_PANE,
+    isShown,
+  };
+}
+
+export function toggleCreateMetaPane(isShown) {
+  return {
+    type: TOGGLE_CREATE_META_PANE,
+    isShown,
   };
 }

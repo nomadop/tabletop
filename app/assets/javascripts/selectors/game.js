@@ -12,6 +12,7 @@ const playerAreaIdsSelector = state => state.playerAreas.ids;
 const gameObjectByIdSelector = state => state.gameObjects.byId;
 const gameObjectIdsSelector = state => state.gameObjects.ids;
 const isDraggingSelector = state => state.gameObjects.isDragging;
+const gamePanesSelector = state => state.gamePanes;
 
 const metaSelector = createSelector(
   metaByIdSelector,
@@ -94,8 +95,9 @@ export const gameContainerSelector = createSelector(
   messagesSelector,
   gameObjectsSelector,
   selectedObjectsSelector,
-  (camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects) => {
-    return { camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects };
+  gamePanesSelector,
+  (camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects, gamePanes) => {
+    return { camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects, gamePanes };
   }
 );
 

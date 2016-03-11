@@ -16,6 +16,9 @@ import {
   START_DRAWING_GAME_OBJECT,
   END_DRAWING_GAME_OBJECT,
   REMOVE_PLAYER_AREA,
+  TOGGLE_CREATE_META_PANE,
+  TOGGLE_CREATE_OBJECT_PANE,
+  TOGGLE_GAME_MENU,
 } from '../actions/action_types';
 import camera from './camera';
 import messages from './message';
@@ -254,6 +257,42 @@ const gameObjects = combineReducers({
   isDragging,
 });
 
+function showGameMenu(state = false, action) {
+  switch (action.type) {
+  case TOGGLE_GAME_MENU:
+    return action.isShown;
+  case TOGGLE_CREATE_META_PANE:
+  case TOGGLE_CREATE_OBJECT_PANE:
+    return false;
+  default:
+    return state;
+  }
+}
+
+function showCreateObjectPane(state = false, action) {
+  switch (action.type) {
+  case TOGGLE_CREATE_OBJECT_PANE:
+    return action.isShown;
+  default:
+    return state;
+  }
+}
+
+function showCreateMetaPane(state = false, action) {
+  switch (action.type) {
+  case TOGGLE_CREATE_META_PANE:
+    return action.isShown;
+  default:
+    return state;
+  }
+}
+
+const gamePanes = combineReducers({
+  showGameMenu,
+  showCreateObjectPane,
+  showCreateMetaPane,
+});
+
 export default combineReducers({
   meta,
   decks,
@@ -261,4 +300,5 @@ export default combineReducers({
   gameObjects,
   playerAreas,
   messages,
+  gamePanes,
 });
