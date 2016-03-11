@@ -40,6 +40,16 @@ export default class PlayerArea extends Component {
     }
   }
 
+  handleSetCamera() {
+    const { playerArea, setCamera } = this.props;
+    const { center_x, center_y, rotate } = playerArea;
+    setCamera({
+      centerX: center_x,
+      centerY: center_y,
+      rotate: -rotate,
+    });
+  }
+
   renderHeader() {
     const { playerArea } = this.props;
     const username = playerArea.username;
@@ -48,7 +58,7 @@ export default class PlayerArea extends Component {
       <div className="area-header">
         <span className="title">{title}</span>
         <span className="control">
-          <i className="fa fa-retweet"/>
+          <i className="fa fa-retweet" onClick={this.handleSetCamera.bind(this)}/>
           <i className="fa fa-cog"/>
           <i className="fa fa-times" onClick={this.handleDestroy}/>
         </span>
@@ -95,4 +105,5 @@ PlayerArea.propTypes = {
   onDragStart: PropTypes.func,
   onJoinDeck: PropTypes.func,
   onDraw: PropTypes.func,
+  setCamera: PropTypes.func,
 };

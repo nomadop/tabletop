@@ -5,6 +5,7 @@ import {
   ZOOM_CAMERA,
   ROTATE_CAMERA_HORIZONTAL,
   ROTATE_CAMERA_VERTICAL,
+  SET_CAMERA,
 } from '../actions/action_types';
 
 let rotateCache;
@@ -42,6 +43,8 @@ function centerX(state = 0, action) {
   case MOVE_CAMERA_VERTICAL:
     offsetX = action.offset * rotateSin;
     return state + offsetX;
+  case SET_CAMERA:
+    return action.camera.centerX || state;
   default:
     return state;
   }
@@ -56,15 +59,22 @@ function centerY(state = 0, action) {
   case MOVE_CAMERA_VERTICAL:
     offsetY = action.offset * rotateCos;
     return state + offsetY;
+  case SET_CAMERA:
+    return action.camera.centerY || state;
   default:
     return state;
   }
 }
 
 function rotate(state = 0, action) {
+  let newRotate;
   switch (action.type) {
   case ROTATE_CAMERA_HORIZONTAL:
-    const newRotate = (state + action.offset) % 360;
+    newRotate = (state + action.offset) % 360;
+    reCalculateRotate(newRotate);
+    return newRotate;
+  case SET_CAMERA:
+    newRotate = action.camera.rotate || state;
     reCalculateRotate(newRotate);
     return newRotate;
   default:
@@ -85,6 +95,8 @@ function scale(state = 0.5, action) {
     }
 
     return newScale;
+  case SET_CAMERA:
+    return action.camera.scale || state;
   default:
     return state;
   }
@@ -103,6 +115,8 @@ function angle(state = 60, action) {
     }
 
     return newAngle;
+  case SET_CAMERA:
+    return action.camera.angle || state;
   default:
     return state;
   }
@@ -110,6 +124,8 @@ function angle(state = 60, action) {
 
 function perspective(state = 1000, action) {
   switch (action.type) {
+  case SET_CAMERA:
+    return action.camera.perspective || state;
   default:
     return state;
   }

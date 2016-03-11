@@ -4,6 +4,7 @@ import {
   ZOOM_CAMERA,
   ROTATE_CAMERA_HORIZONTAL,
   ROTATE_CAMERA_VERTICAL,
+  SET_CAMERA,
 } from './action_types';
 
 export function moveCameraHorizontal(offset) {
@@ -38,5 +39,12 @@ export function rotateCameraVertical(offset) {
   return {
     type: ROTATE_CAMERA_VERTICAL,
     offset,
+  };
+}
+
+export function setCamera(camera) {
+  return {
+    type: SET_CAMERA,
+    camera,
   };
 }

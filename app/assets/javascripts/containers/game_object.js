@@ -18,6 +18,7 @@ import {
   endDrawingGameObject,
   removePlayerArea,
 } from '../actions/game';
+import { setCamera } from '../actions/camera';
 import { rotateByPoint } from '../utils/coordination_transformer';
 import { serializeGameObject, unserializeGameObject } from '../serializers/game_object';
 import { gameObjectContainerSelector} from '../selectors/game';
@@ -346,6 +347,7 @@ class GameObjectContainer extends Component {
       onDragStart={this.handleDragStart.bind(this)}
       onJoinDeck={this.handleJoinDeck.bind(this)}
       onDraw={this.handleDrawGameObject.bind(this)}
+      setCamera={this.props.setCamera}
     />
   }
 
@@ -381,6 +383,7 @@ GameObjectContainer.propTypes = {
   startDrawingGameObject: PropTypes.func,
   endDrawingGameObject: PropTypes.func,
   removePlayerArea: PropTypes.func,
+  setCamera: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -398,6 +401,7 @@ function dispatcher(dispatch) {
     startDrawingGameObject,
     endDrawingGameObject,
     removePlayerArea,
+    setCamera,
   }, dispatch);
 }
 
