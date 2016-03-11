@@ -57,7 +57,7 @@ export default class PlayerArea extends Component {
     return (
       <div className="area-header">
         <span className="title">{title}</span>
-        <span className="control">
+        <span className={`control${playerArea.isOwner ? '' : ' locked'}`}>
           <i className="fa fa-video-camera" onClick={this.handleSetCamera.bind(this)}/>
           <i className="fa fa-cog"/>
           <i className="fa fa-times" onClick={this.handleDestroy}/>

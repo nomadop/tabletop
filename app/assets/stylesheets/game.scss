@@ -526,6 +526,10 @@
 
             .control {
               display: flex;
+
+              &.locked {
+                pointer-events: none;
+              }
             }
 
             i {

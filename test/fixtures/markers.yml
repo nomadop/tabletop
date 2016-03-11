@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  marker_type: 1
+  game_object_id: 1
+  top: 1.5
+  left: 1.5
+  rotate: 1.5
+  scale: 1.5
+  content: MyText
+
+two:
+  marker_type: 1
+  game_object_id: 1
+  top: 1.5
+  left: 1.5
+  rotate: 1.5
+  scale: 1.5
+  content: MyText

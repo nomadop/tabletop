@@ -11,6 +11,7 @@ class GameObject < ApplicationRecord
   belongs_to :player, optional: true
   belongs_to :meta, polymorphic: true
   belongs_to :container, polymorphic: true, optional: true
+  has_many :markers, dependent: :destroy
 
   def as_json(opts = {})
     opts[:except] ||= []

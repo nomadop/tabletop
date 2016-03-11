@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160309040253) do
+ActiveRecord::Schema.define(version: 20160311155418) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,6 +66,18 @@ ActiveRecord::Schema.define(version: 20160309040253) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.index ["module"], name: "index_games_on_module", unique: true, using: :btree
+  end
+
+  create_table "markers", force: :cascade do |t|
+    t.integer  "marker_type",                         null: false
+    t.integer  "game_object_id",                      null: false
+    t.float    "top",            default: 0.0
+    t.float    "left",           default: 0.0
+    t.float    "rotate",         default: 0.0
+    t.float    "scale",          default: 1.0
+    t.text     "content",        default: "--- {}\n"
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   create_table "messages", force: :cascade do |t|

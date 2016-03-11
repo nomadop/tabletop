@@ -1,7 +1,7 @@
 require 'carrierwave/orm/activerecord'
 
 class GameObjectMetum < ApplicationRecord
-  belongs_to :game
+  belongs_to :game, optional: true
   has_many :game_objects, as: :meta, dependent: :destroy
 
   validates_presence_of :front_img, :back_img
