@@ -16,7 +16,7 @@ export default class GameObject extends Component {
 
   get style() {
     const { gameObject } = this.props;
-    const { meta, center_x, center_y, related_x, related_y, is_fliped, isDragging } = gameObject;
+    const { meta, center_x, center_y, related_x, related_y, is_fliped, isDragging, container, container_type } = gameObject;
     const { height, width, front_img, back_img } = meta;
     let centerX;
     let centerY;
@@ -33,7 +33,11 @@ export default class GameObject extends Component {
     const left = centerX - width / 2;
     const top = centerY - height / 2;
 
-    const img = is_fliped ? back_img : front_img;
+    let img = is_fliped ? back_img : front_img;
+    const otherArea = container && container_type === 'PlayerArea' && !container.isOwner;
+    if (otherArea) {
+      img = back_img;
+    }
     const backgroundImage = img ? `url(${img.url})` : null;
     const transform = `rotate(${rotate}deg)`;
 
@@ -48,10 +52,14 @@ export default class GameObject extends Component {
   }
 
   get className() {
-    const { isSelected, gameObject } = this.props;
+    const { isSelected, isLocked, gameObject } = this.props;
     const classNames = ['game-object', 'undraggable'];
     if (isSelected) {
       classNames.push('selected');
+    }
+
+    if (isLocked) {
+      classNames.push('locked');
     }
 
     if (gameObject.isDragging) {

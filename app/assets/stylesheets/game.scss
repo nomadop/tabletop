@@ -543,17 +543,18 @@
           pointer-events: all;
           background-size: 100%;
           position: absolute;
+          outline: transparent ridge 0.1em;
           &:hover {
             cursor: pointer;
           }
-          &:focus {
-            outline: none;
-          }
           &.locked {
             pointer-events: none;
+
+            &:hover {
+              cursor: default;
+            }
           }
           &.selected {
-            outline: -webkit-focus-ring-color auto 5px;
             transform: translateZ(10px);
             z-index: 10000;
             &:hover {

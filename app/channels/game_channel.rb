@@ -88,7 +88,7 @@ class GameChannel < ApplicationCable::Channel
         object.update(json)
       end
 
-      keys |= %w(related_x related_y rotate)
+      keys |= %w(related_x related_y rotate is_locked player_num)
       ActionCable.server.broadcast(game_stream,
                                    action: :update_game_objects,
                                    keys: keys,
@@ -234,7 +234,7 @@ class GameChannel < ApplicationCable::Channel
     end
     keys = %w(id is_locked player_num lock_version)
     if success
-      ActionCable.server.broadcast(game_stream, action: :lock_success, object_ids: data['ids'])
+      ActionCable.server.broadcast(user_stream, action: :lock_success, object_ids: data['ids'])
       ActionCable.server.broadcast(game_stream,
                                    action: :update_game_objects,
                                    keys: keys,
@@ -354,7 +354,8 @@ class GameChannel < ApplicationCable::Channel
       sleep(time_interval)
       try_require_lock(game_object, count: count - 1)
     else
-      raise(e)
+      puts e.inspect, e.backtrace
+      return false
     end
   end
 end

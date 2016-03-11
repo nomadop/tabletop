@@ -231,6 +231,7 @@ class GameObjectContainer extends Component {
       const keys = ['id', 'container_id', 'container_type', 'lock_version', 'center_x', 'center_y'];
       App.game.update_game_objects(objects.map(serializeGameObject.bind(null, keys)), keys);
     }
+    this.refs.body.focus();
   }
 
   handleDestroyGameObjects() {
@@ -355,7 +356,7 @@ class GameObjectContainer extends Component {
     const { playerAreas, gameObjects, authentication } = this.props;
 
     return (
-      <div className="game-object-container" onKeyDown={this.handleKeyDown.bind(this)}>
+      <div className="game-object-container" ref="body" tabIndex="1" onKeyDown={this.handleKeyDown.bind(this)}>
         { playerAreas.map(area => this.renderPlayerArea(area, authentication.player_num)) }
         { gameObjects.filter(object => !object.container_id).map(object => this.renderGameObject(object, authentication.player_num)) }
       </div>
@@ -405,4 +406,4 @@ function dispatcher(dispatch) {
   }, dispatch);
 }
 
-export default connect(gameObjectContainerSelector, dispatcher)(GameObjectContainer);
+export default connect(gameObjectContainerSelector, dispatcher, null, { withRef: true })(GameObjectContainer);

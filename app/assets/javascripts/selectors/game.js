@@ -20,9 +20,14 @@ const metaSelector = createSelector(
 );
 
 const playerAreasSelector = createSelector(
+  authenticationSelector,
   playerAreaByIdSelector,
   playerAreaIdsSelector,
-  (playerAreaById, playerAreaIds) => playerAreaIds.map(id => playerAreaById[id])
+  (authentication, playerAreaById, playerAreaIds) => playerAreaIds.map(id => {
+    const area = playerAreaById[id];
+    area.isOwner = area.player_num === authentication.player_num;
+    return area;
+  })
 );
 
 const gameObjectsSelector = createSelector(
@@ -47,9 +52,13 @@ const gameObjectsSelector = createSelector(
       if (object.container_type === 'Deck') {
         const deck = deckById[object.container_id];
         deck.innerObjects.push(object);
+        object.container = deck;
       } else if (object.container_type === 'PlayerArea') {
         const area = areaById[object.container_id];
         area.innerObjects.push(object);
+        object.container = area;
+      } else {
+        object.container = null;
       }
 
       return object;

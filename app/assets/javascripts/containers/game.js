@@ -98,10 +98,6 @@ class Game extends Component {
     if (this.state.drawMode) {
       return false;
     }
-
-    if (this.props.camera !== nextProps.camera) {
-      this.setState({ cameraMoving: true });
-    }
   }
 
   handleDisableKeyEvent(isDisabled) {
@@ -273,14 +269,19 @@ class Game extends Component {
       });
       const { gameObjects, selectedObjects, authentication } = this.props;
       const boxingObjects = gameObjects.filter(object => {
-        const {center_x, center_y, is_locked, player_num, container_id, container_type} = object;
-        const checkDeck = !container_id || container_type !== 'Deck';
-        if (!checkDeck) {
+        const {center_x, center_y, is_locked, player_num, container, container_type} = object;
+        const checkAccess = !is_locked || player_num === authentication.player_num;
+        if (!checkAccess) {
           return false;
         }
 
-        const checkAccess = !is_locked || player_num === authentication.player_num;
-        if (!checkAccess) {
+        const checkDeck = container && container_type === 'Deck';
+        if (checkDeck) {
+          return false;
+        }
+
+        const checkContainer = container && container_type === 'PlayerArea' && container.player_num !== authentication.player_num;
+        if (checkContainer) {
           return false;
         }
 
@@ -294,6 +295,7 @@ class Game extends Component {
         if (!checkY) {
           return false;
         }
+
 
         return true;
       });
@@ -320,6 +322,7 @@ class Game extends Component {
         this.props.moveCameraHorizontal(-movementX / scale);
         this.props.moveCameraVertical(-movementY / scale);
       }
+      this.setState({ cameraMoving: true });
     } else if (!this.props.isDragging) {
       const checker = t => {
         return (
@@ -339,6 +342,7 @@ class Game extends Component {
   }
 
   handleMouseUp(event) {
+    event.preventDefault();
     if (this.state.drawMode) {
       if (confirm('确定创建区域?')) {
         const { centerX, centerY, width, height, rotate } = this.extractDrawBoxProperties(event);
@@ -355,6 +359,7 @@ class Game extends Component {
     } else if (this.state.selectMode) {
       window.selectMode = false;
       this.setState({ selectMode: false });
+      this.refs.gameObjectContainer.getWrappedInstance().refs.body.focus();
     } else {
       this.setState({ cameraMoving: false });
     }
@@ -584,7 +589,7 @@ class Game extends Component {
         <PerspectiveLayer width={width} height={height} camera={camera}>
           <DirectorLayer width={width} height={height} camera={camera}>
             {this.renderCoordination()}
-            <GameObjectContainer authentication={authentication} extractMouseEvent={this.extractMouseEvent.bind(this)}/>
+            <GameObjectContainer ref="gameObjectContainer" authentication={authentication} extractMouseEvent={this.extractMouseEvent.bind(this)}/>
             {this.renderDrawBox()}
           </DirectorLayer>
         </PerspectiveLayer>

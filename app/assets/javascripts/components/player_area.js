@@ -58,7 +58,7 @@ export default class PlayerArea extends Component {
       <div className="area-header">
         <span className="title">{title}</span>
         <span className="control">
-          <i className="fa fa-retweet" onClick={this.handleSetCamera.bind(this)}/>
+          <i className="fa fa-video-camera" onClick={this.handleSetCamera.bind(this)}/>
           <i className="fa fa-cog"/>
           <i className="fa fa-times" onClick={this.handleDestroy}/>
         </span>
