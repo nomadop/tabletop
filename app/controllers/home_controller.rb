@@ -19,7 +19,7 @@ class HomeController < ApplicationController
       app: 'game',
       authentication: current_user && current_user.auth_info,
       debug: params[:debug] == 'true' ? true : false,
-      room: @room.as_json(only: [:id]),
+      room: @room.as_json(only: [:id, :name, :max_player], methods: [:player_count]),
       game: @room.game.as_json(only: [:id, :name, :module, :start_scale]),
     }
     render component: 'Root', props: props

@@ -65,6 +65,44 @@
       pointer-events: all;
     }
 
+    .header {
+      position: absolute;
+      top: 0;
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      font-size: 1rem;
+
+      .room-control {
+        pointer-events: all;
+        padding: 0.5em;
+        background: rgba(233, 233, 233, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.3);
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+
+        > span {
+          margin: 0 0.2em;
+          padding: 0.2em 0.5em;
+          border-radius: 0.2em;
+          border: 1px inset transparent;
+        }
+
+        .button {
+          &:hover, a:hover {
+            cursor: pointer;
+            color: #6699cc;
+            background: transparent;
+          }
+
+          &.active {
+            background: gray;
+            border-color: darkgray;
+          }
+        }
+      }
+    }
+
     .footer {
       position: absolute;
       width: 100%;
@@ -289,7 +327,6 @@
           cursor: nesw-resize;
         }
       }
-
     }
 
     .game-pane {
@@ -348,6 +385,16 @@
           height: 100%;
           overflow: auto;
         }
+      }
+    }
+
+    .game-menu {
+      .pane-body {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
       }
     }
 

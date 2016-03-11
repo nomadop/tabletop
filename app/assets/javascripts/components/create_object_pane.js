@@ -86,7 +86,12 @@ export default class CreateObjectPane extends Component {
 
   render() {
     return (
-      <GamePane className="create-object-pane" title="创建新物件" width={385} height={550} resizeable={true}>
+      <GamePane className="create-object-pane"
+                title="创建新物件"
+                width={385} height={550}
+                resizeable={true}
+                onClose={this.props.onClose}
+      >
         <div className="filter-bar">
           {this.renderFilterTabs()}
           <span className="filter-fill"/>
@@ -103,5 +108,6 @@ export default class CreateObjectPane extends Component {
 CreateObjectPane.propTypes = {
   meta: PropTypes.array,
   devMode: PropTypes.bool,
+  onClose: PropTypes.func,
   systemWarning: PropTypes.func,
 };

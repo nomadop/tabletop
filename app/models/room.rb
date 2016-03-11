@@ -16,6 +16,10 @@ class Room < ApplicationRecord
   scope :dev, ->{ where(dev: true) }
   scope :play, ->{ where(dev: nil) }
 
+  def player_count
+    players.count
+  end
+
   def join(user)
     if players.available.any?
       player = players.available.take

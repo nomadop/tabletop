@@ -44,6 +44,8 @@ class Game extends Component {
       height: undefined,
       drawMode: false,
       selectMode: false,
+      gameMenu: false,
+      createObjectPane: false,
     };
   }
 
@@ -197,6 +199,7 @@ class Game extends Component {
   }
 
   handleMouseDown(event) {
+    this.mouseDownEvent = event.nativeEvent;
     this.mouseDownInfo = this.extractMouseEvent(event);
 
     const selectedIds = this.props.selectedIds;
@@ -209,7 +212,7 @@ class Game extends Component {
 
   extractDrawBoxProperties() {
     const camera = this.props.camera;
-    const mouseInfo = window.lastMouseInfo;
+    const mouseInfo = this.extractMouseEvent(window.lastMouseInfo);
     const topY = this.mouseDownInfo.y.original;
     const leftX = this.mouseDownInfo.x.original;
     const rightX = mouseInfo.x.original;
@@ -233,7 +236,7 @@ class Game extends Component {
   }
 
   handleMouseMove(event) {
-    window.lastMouseInfo = this.extractMouseEvent(event);
+    window.lastMouseMoveEvent = event.nativeEvent;
     if (!event.buttons) {
       return;
     }
@@ -321,7 +324,7 @@ class Game extends Component {
           t.getAttribute('class') === 'pop-up-layer'
         ));
       };
-      if (this.searchEventPath(event, checker)) {
+      if (this.searchEventPath(this.mouseDownEvent, checker)) {
         return;
       }
 
@@ -396,6 +399,18 @@ class Game extends Component {
     });
   }
 
+  handleToggleGameMenu() {
+    const gameMenu = this.state.gameMenu;
+    this.setState({ gameMenu: !gameMenu });
+  }
+
+  handleToggleCreateObjectPane(open) {
+    this.setState({
+      gameMenu: false,
+      createObjectPane: open,
+    });
+  }
+
   resizeGameWindow() {
     this.setState({
       width: window.innerWidth,
@@ -430,12 +445,15 @@ class Game extends Component {
   renderGameMenu() {
     const { room } = this.props;
 
-    return (
-      <GamePane className="game-menu" title="菜单" width={240} height={480}>
-        <a href={`/rooms/${room.id}/leave`} data-method="post">离开房间</a>
-        <a href={`/rooms/${room.id}`} data-method="delete">关闭房间</a>
-      </GamePane>
-    )
+    if (this.state.gameMenu) {
+      return (
+        <GamePane className="game-menu" width={240} height={480} noHeader={true}>
+          <a href="javascript:" onClick={this.handleToggleCreateObjectPane.bind(this, true)}>创建新物件</a>
+          <a href={`/rooms/${room.id}/leave`} data-method="post">离开房间</a>
+          <a href={`/rooms/${room.id}`} data-method="delete">关闭房间</a>
+        </GamePane>
+      );
+    }
   }
 
   renderActionBlocker(style) {
@@ -454,8 +472,22 @@ class Game extends Component {
     }
   }
 
+  renderCreateObjectPane() {
+    const { meta, dev_mode } = this.props;
+    if (this.state.createObjectPane) {
+      return (
+        <CreateObjectPane meta={meta}
+                          devMode={dev_mode}
+                          onClose={this.handleToggleCreateObjectPane.bind(this, false)}
+                          systemWarning={this.handleSystemMessage.bind(this, 'warning')}
+        />
+      );
+    }
+  }
+
   renderPopUpLayer(width, height) {
-    const { meta, messages, dev_mode } = this.props;
+    const { messages, room, game } = this.props;
+    const { gameMenu } = this.state;
     const style = {
       width,
       height,
@@ -465,6 +497,23 @@ class Game extends Component {
       <div className="pop-up-layer">
         {this.renderActionBlocker(style)}
         {this.renderSelectBox()}
+        <div className="header" style={{top: 0}}>
+          <div className="room-control">
+            <span className="room-title">{`${room.name}(${game.name})`}</span>
+            <span className="player-num button">
+              {`${room.player_count} / ${room.max_player} `}
+              <i className="fa fa-user"/>
+            </span>
+            <span className={`game-menu button${gameMenu ? ' active' : ''}`}
+                  onClick={this.handleToggleGameMenu.bind(this)}
+            >
+              <i className="fa fa-cog"/>
+            </span>
+            <span className="leave-room button">
+              <a href={`/rooms/${room.id}/leave`} data-method="post"><i className="fa fa-sign-out"/></a>
+            </span>
+          </div>
+        </div>
         <div className="footer" style={{bottom: -height || 0}}>
           <MessagePane messages={messages}
                        disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
@@ -474,7 +523,7 @@ class Game extends Component {
           <div className="footer-right">
             <div className="pane-container">
               {this.renderGameMenu()}
-              <CreateObjectPane meta={meta} devMode={dev_mode} systemWarning={this.handleSystemMessage.bind(this, 'warning')}/>
+              {this.renderCreateObjectPane()}
               {this.renderCreateMetaPane()}
             </div>
           </div>

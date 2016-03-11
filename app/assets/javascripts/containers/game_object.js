@@ -59,8 +59,9 @@ class GameObjectContainer extends Component {
           attrs.multipleDragOffsetX = fakeDraggingComponent.multipleDragOffsetX;
           attrs.multipleDragOffsetY = fakeDraggingComponent.multipleDragOffsetY;
         } else {
-          attrs.center_x = window.lastMouseInfo.x.screen;
-          attrs.center_y = window.lastMouseInfo.y.screen;
+          const lastMouseInfo = this.props.extractMouseEvent(window.lastMouseMoveEvent);
+          attrs.center_x = lastMouseInfo.x.screen;
+          attrs.center_y = lastMouseInfo.y.screen;
           attrs.multipleDragOffsetX = 0;
           attrs.multipleDragOffsetY = 0;
         }
@@ -121,11 +122,11 @@ class GameObjectContainer extends Component {
     const { selectedIds, selectedObjects } = this.props;
     const isFlipped = !selectedObjects.some(object => object.is_fliped);
     this.props.flipGameObjects(selectedIds, isFlipped);
+    const serializeKeys = ['id', 'is_fliped', 'lock_version'];
     const updates = selectedObjects.map(object => {
-      const serializeKeys = ['id', 'is_fliped', 'lock_version'];
       return serializeGameObject(serializeKeys, Object.assign({}, object, { is_fliped: isFlipped }));
     });
-    App.game.update_game_objects(updates);
+    App.game.update_game_objects(updates, serializeKeys);
   }
 
   handleRotateGameObjects(rotate) {
@@ -143,7 +144,7 @@ class GameObjectContainer extends Component {
       });
       this.props.rotateGameObjects(updates);
       const keys = ['id', 'rotate', 'center_x', 'center_y', 'lock_version'];
-      App.game.update_game_objects(updates.map(serializeGameObject.bind(null, keys)));
+      App.game.update_game_objects(updates.map(serializeGameObject.bind(null, keys)), keys);
     }
   }
 
@@ -169,12 +170,12 @@ class GameObjectContainer extends Component {
     this.props.dragGameObjects(selectedIds);
   }
 
-  handleDragGameObjects() {
+  handleDragGameObjects(event) {
     if (!this.draggingComponents.length) {
       return;
     }
 
-    const mouseInfo = window.lastMouseInfo;
+    const mouseInfo = this.props.extractMouseEvent(event);
     this.draggingComponents.forEach(component => {
       component.setState({
         centerX: mouseInfo.x.original + component.multipleDragOffsetX,
@@ -208,13 +209,14 @@ class GameObjectContainer extends Component {
       }
       gameObject.multipleDragOffsetX = null;
       gameObject.multipleDragOffsetY = null;
+      const lastMouseInfo = this.props.extractMouseEvent(window.lastMouseMoveEvent);
       return {
         id: gameObject.id,
         container_id: containerId ? Number(containerId) : null,
         container_type: containerType,
         lock_version: gameObject.lock_version,
-        center_x: component.state.centerX || window.lastMouseInfo.x.original,
-        center_y: component.state.centerY || window.lastMouseInfo.y.original,
+        center_x: component.state.centerX || lastMouseInfo.x.original,
+        center_y: component.state.centerY || lastMouseInfo.y.original,
       };
     });
     if (!success) {

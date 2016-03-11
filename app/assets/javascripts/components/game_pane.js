@@ -12,8 +12,8 @@ export default class GamePane extends Component {
     this.state = {
       width,
       height,
-      display: MINIMUM,
-      focus: false,
+      display: NORMAL,
+      focus: true,
     };
     this.dragging = false;
     this.dragHandler = this.handleDrag.bind(this);
@@ -118,7 +118,10 @@ export default class GamePane extends Component {
   }
 
   renderHeader() {
-    const { title } = this.props;
+    const { title, noHeader } = this.props;
+    if (noHeader) {
+      return;
+    }
 
     return (
       <div className="pane-header" draggable="true" onDragStart={this.handleDragStart.bind(this)}>
@@ -155,4 +158,5 @@ GamePane.propTypes = {
   resizeable: PropTypes.bool,
   className: PropTypes.string,
   onClose: PropTypes.func,
+  noHeader: PropTypes.bool,
 };
