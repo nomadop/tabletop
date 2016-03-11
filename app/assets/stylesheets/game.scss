@@ -358,11 +358,11 @@
         .control {
           display: flex;
           flex-wrap: nowrap;
+          align-items: center;
         }
 
         .fa {
-          margin: 0 0.2em;
-          font-size: 1.5em;
+          margin-left: 0.5em;
 
           &:hover {
             cursor: pointer;

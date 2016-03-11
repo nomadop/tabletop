@@ -17,6 +17,7 @@ import {
   startDrawingGameObject,
   endDrawingGameObject,
   removePlayerArea,
+  toggleEditObjectPane,
 } from '../actions/game';
 import { setCamera } from '../actions/camera';
 import { rotateByPoint } from '../utils/coordination_transformer';
@@ -301,6 +302,8 @@ class GameObjectContainer extends Component {
       return this.handleToggleDeck();
     case 46:
       return this.handleDestroyGameObjects();
+    case 77:
+      return this.handleOpenEditObjectPane();
     default:
       return;
     }
@@ -316,6 +319,11 @@ class GameObjectContainer extends Component {
     const unselectIds = ids || this.props.selectedIds;
     this.props.unselectGameObjects(unselectIds);
     App.game.release_game_objects(unselectIds);
+  }
+
+  handleOpenEditObjectPane() {
+    const { selectedIds } = this.props;
+    selectedIds.map(id => this.props.toggleEditObjectPane(id, true));
   }
 
   renderGameObject(object, playerNum) {
@@ -385,6 +393,7 @@ GameObjectContainer.propTypes = {
   endDrawingGameObject: PropTypes.func,
   removePlayerArea: PropTypes.func,
   setCamera: PropTypes.func,
+  toggleEditObjectPane: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -403,6 +412,7 @@ function dispatcher(dispatch) {
     endDrawingGameObject,
     removePlayerArea,
     setCamera,
+    toggleEditObjectPane,
   }, dispatch);
 }
 

@@ -18,6 +18,7 @@ import {
   REMOVE_PLAYER_AREA,
   TOGGLE_CREATE_META_PANE,
   TOGGLE_CREATE_OBJECT_PANE,
+  TOGGLE_EDIT_OBJECT_PANE,
   TOGGLE_GAME_MENU,
 } from '../actions/action_types';
 import camera from './camera';
@@ -287,10 +288,31 @@ function showCreateMetaPane(state = false, action) {
   }
 }
 
+function editObjectPaneIds(state = [], action) {
+  switch (action.type) {
+  case TOGGLE_EDIT_OBJECT_PANE:
+    const newState = state.slice();
+    const { isShown, gameObjectId } = action;
+    const index = newState.indexOf(gameObjectId);
+    if (isShown && index < 0) {
+      newState.push(gameObjectId);
+    }
+
+    if (!isShown && index >= 0) {
+      newState.splice(index, 1);
+    }
+
+    return newState;
+  default:
+    return state;
+  }
+}
+
 const gamePanes = combineReducers({
   showGameMenu,
   showCreateObjectPane,
   showCreateMetaPane,
+  editObjectPaneIds,
 });
 
 export default combineReducers({

@@ -12,7 +12,26 @@ const playerAreaIdsSelector = state => state.playerAreas.ids;
 const gameObjectByIdSelector = state => state.gameObjects.byId;
 const gameObjectIdsSelector = state => state.gameObjects.ids;
 const isDraggingSelector = state => state.gameObjects.isDragging;
-const gamePanesSelector = state => state.gamePanes;
+const showGameMenuSelector = state => state.gamePanes.showGameMenu;
+const showCreateObjectPaneSelector = state => state.gamePanes.showCreateObjectPane;
+const showCreateMetaPaneSelector = state => state.gamePanes.showCreateMetaPane;
+const editObjectPaneIdsSelector = state => state.gamePanes.editObjectPaneIds;
+
+const editObjectPanesSelector = createSelector(
+  gameObjectByIdSelector,
+  editObjectPaneIdsSelector,
+  (gameObjectById, gameObjectIds) => gameObjectIds.map(id => gameObjectById[id])
+);
+
+const gamePanesSelector = createSelector(
+  showGameMenuSelector,
+  showCreateMetaPaneSelector,
+  showCreateObjectPaneSelector,
+  editObjectPanesSelector,
+  (showGameMenu, showCreateMetaPane, showCreateObjectPane, editObjectPanes) => {
+    return { showGameMenu, showCreateMetaPane, showCreateObjectPane, editObjectPanes };
+  }
+);
 
 const metaSelector = createSelector(
   metaByIdSelector,

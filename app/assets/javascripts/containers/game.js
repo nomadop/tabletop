@@ -5,6 +5,7 @@ import PerspectiveLayer from '../components/perspective_layer';
 import DirectorLayer from '../components/director_layer';
 import CoordinationLayer from '../components/coordination_layer';
 import CreateObjectPane from '../components/create_object_pane';
+import EditObjectPane from '../components/edit_object_pane';
 import GamePane from '../components/game_pane';
 import MessagePane from '../components/message-pane';
 import DragBox from 'components/drag_box';
@@ -24,6 +25,7 @@ import {
   toggleCreateMetaPane,
   toggleCreateObjectPane,
   toggleGameMenu,
+  toggleEditObjectPane,
 } from '../actions/game';
 import { receiveMessages } from '../actions/message';
 import {
@@ -501,6 +503,14 @@ class Game extends Component {
     }
   }
 
+  renderEditObjectPane(gameObject) {
+    return (
+      <EditObjectPane gameObject={gameObject}
+                      onClose={this.props.toggleEditObjectPane.bind(null, gameObject.id, false)}
+      />
+    )
+  }
+
   renderPopUpLayer(width, height) {
     const { messages, room, game, gamePanes } = this.props;
     const style = {
@@ -540,6 +550,7 @@ class Game extends Component {
               {this.renderGameMenu()}
               {this.renderCreateObjectPane()}
               {this.renderCreateMetaPane()}
+              {gamePanes.editObjectPanes.map(gameObject => this.renderEditObjectPane(gameObject))}
             </div>
           </div>
         </div>
@@ -627,6 +638,7 @@ Game.propTypes = {
   toggleCreateMetaPane: PropTypes.func,
   toggleCreateObjectPane: PropTypes.func,
   toggleGameMenu: PropTypes.func,
+  toggleEditObjectPane: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -644,6 +656,7 @@ function dispatcher(dispatch) {
     toggleCreateMetaPane,
     toggleCreateObjectPane,
     toggleGameMenu,
+    toggleEditObjectPane,
   }, dispatch);
 }
 

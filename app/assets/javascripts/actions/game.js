@@ -17,6 +17,7 @@ import {
   REMOVE_GAME_OBJECT_META,
   TOGGLE_CREATE_META_PANE,
   TOGGLE_CREATE_OBJECT_PANE,
+  TOGGLE_EDIT_OBJECT_PANE,
   TOGGLE_GAME_MENU,
 } from './action_types';
 import { receiveMessages } from './message';
@@ -153,6 +154,14 @@ export function toggleGameMenu(isShown) {
 export function toggleCreateObjectPane(isShown) {
   return {
     type: TOGGLE_CREATE_OBJECT_PANE,
+    isShown,
+  };
+}
+
+export function toggleEditObjectPane(gameObjectId, isShown) {
+  return {
+    type: TOGGLE_EDIT_OBJECT_PANE,
+    gameObjectId,
     isShown,
   };
 }
