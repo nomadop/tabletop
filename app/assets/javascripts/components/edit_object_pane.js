@@ -1,5 +1,8 @@
 import React, { Component, PropTypes } from 'react';
+import update from 'react-addons-update';
 import GamePane from './game_pane';
+import Marker from './marker';
+import classNames from '../utils/class_names';
 
 export default class EditObjectPane extends Component {
   constructor() {
@@ -7,7 +10,10 @@ export default class EditObjectPane extends Component {
 
     this.state = {
       scale: 1,
+      tool: 'pointer',
+      markers: this.props.gameObject.markers.slice(),
     };
+    this.markerIdCounter = 0;
   }
 
   get editorStyle() {
@@ -39,6 +45,57 @@ export default class EditObjectPane extends Component {
     this.setState({ scale: scale + offset });
   }
 
+  handleSetTool(tool) {
+    this.setState({ tool });
+  }
+
+  handleAddMarker(event) {
+    const { tool, markers } = this.state;
+    if (tool === 'pointer') {
+      return;
+    }
+
+    const { offsetX, offsetY } = event.nativeEvent;
+    this.markerIdCounter++;
+    const marker = {
+      id: 'temp' + this.markerIdCounter,
+      marker_type: tool,
+      top: offsetY,
+      left: offsetX,
+      scale: 1,
+      rotate: 0,
+    };
+
+    switch (tool) {
+    case 'text':
+      marker.content = { text: '' };
+      break;
+    default:
+      return console.log('unknown tool');
+    }
+
+    const newMarker = markers.slice();
+    newMarker.push(marker);
+    this.setState({
+      tool: 'pointer',
+      markers: newMarker,
+    });
+  }
+
+  handleUpdateMarker(markerId, updater) {
+    const { markers } = this.state;
+    const newMarker = markers.map(marker => {
+      if (marker.id === markerId) {
+        return update(marker, updater);
+      }
+
+      return marker;
+    });
+    this.setState({
+      markers: newMarker,
+    });
+  }
+
   renderToolbox() {
     return (
       <div className="toolbox">
@@ -48,18 +105,28 @@ export default class EditObjectPane extends Component {
         <span className="tool" onClick={this.handleZoom.bind(this, -0.2)}>
           <i className="fa fa-fw fa-search-minus"/>
         </span>
-        <span className="tool"><i className="fa fa-fw fa-mouse-pointer"/></span>
-        <span className="tool"><i className="fa fa-fw fa-square-o"/></span>
-        <span className="tool"><i className="fa fa-fw fa-font"/></span>
-        <span className="tool"><i className="fa fa-fw fa-eraser"/></span>
+        <span className="tool" onClick={this.handleSetTool.bind(this, 'pointer')}>
+          <i className="fa fa-fw fa-mouse-pointer"/>
+        </span>
+        <span className="tool" onClick={this.handleSetTool.bind(this, 'rect')}>
+          <i className="fa fa-fw fa-square-o"/>
+        </span>
+        <span className="tool" onClick={this.handleSetTool.bind(this, 'text')}>
+          <i className="fa fa-fw fa-font"/>
+        </span>
       </div>
     );
   }
 
   renderEditor() {
+    const { tool, markers } = this.state;
     return (
-      <div className="editor">
-        <span className="game-object" style={this.editorStyle}/>
+      <div className={classNames('editor', tool)}>
+        <div className="game-object" style={this.editorStyle} onClick={this.handleAddMarker.bind(this)}>
+          {markers.map(marker => (
+            <Marker key={marker.id} marker={marker} editMode={true} update={this.handleUpdateMarker.bind(this, marker.id)}/>
+          ))}
+        </div>
       </div>
     );
   }

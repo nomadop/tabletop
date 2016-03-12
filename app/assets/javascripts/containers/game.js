@@ -104,7 +104,7 @@ class Game extends Component {
   }
 
   handleDisableKeyEvent(isDisabled) {
-    this.isKeyEventDisabled = isDisabled;
+    window.isKeyEventDisabled = isDisabled;
   }
 
   handleKeyDown(e) {
@@ -113,7 +113,7 @@ class Game extends Component {
       return;
     }
 
-    if (this.isKeyEventDisabled) {
+    if (window.isKeyEventDisabled) {
       return;
     }
 
@@ -157,7 +157,7 @@ class Game extends Component {
   }
 
   handleKeyUp(e) {
-    if (this.isKeyEventDisabled) {
+    if (window.isKeyEventDisabled) {
       return;
     }
 

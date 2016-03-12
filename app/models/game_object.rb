@@ -16,6 +16,10 @@ class GameObject < ApplicationRecord
   def as_json(opts = {})
     opts[:except] ||= []
     opts[:except] |= [:room_id, :player_id, :deck_index, :created_at, :updated_at]
+    opts[:methods] ||= []
+    opts[:methods] |= [:player_num, :related_x, :related_y, :related_rotate]
+    opts[:include] ||= []
+    opts[:include] |= [:markers]
     super(opts)
   end
 

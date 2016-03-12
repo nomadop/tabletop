@@ -413,6 +413,28 @@
         justify-content: center;
         align-items: center;
         overflow: auto;
+
+        &.rect {
+          cursor: crosshair;
+        }
+
+        &.text {
+          cursor: text;
+        }
+
+        .game-object {
+          position: relative;
+          overflow: hidden;
+
+          .marker {
+            position: absolute;
+            cursor: default;
+
+            &.edit {
+              cursor: move;
+            }
+          }
+        }
       }
 
       .marker-pane {

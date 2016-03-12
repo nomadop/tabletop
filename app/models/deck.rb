@@ -47,7 +47,7 @@ class Deck < ApplicationRecord
     object = target_id.nil? ? top : inner_objects.find(target_id)
     if object
       attrs = game_object
-                .as_json(only: [:center_x, :center_y, :rotate, :is_fliped])
+                .old_as_json(only: [:center_x, :center_y, :rotate, :is_fliped])
                 .merge(player_id.nil? ? {container: nil} : {container: nil, player_id: player_id, is_locked: true})
       Deck.transaction do
         GameObject.transaction do
@@ -71,7 +71,7 @@ class Deck < ApplicationRecord
     sync_attrs = [:center_x, :center_y, :rotate, :is_fliped]
     GameObject.transaction do
       game_objects.each.with_index(1) do |deck_object, index|
-        attrs = game_object.as_json(only: sync_attrs).merge(container: self, deck_index: deck_index + index, is_locked: false)
+        attrs = game_object.old_as_json(only: sync_attrs).merge(container: self, deck_index: deck_index + index, is_locked: false)
         deck_object.update(attrs)
       end
     end
@@ -84,7 +84,7 @@ class Deck < ApplicationRecord
   def resume_inner_objects
     position = game_object.nil? ?
       {center_x: 0, center_y: 0, rotate: 0} :
-      game_object.as_json(only: [:center_x, :center_y, :rotate])
+      game_object.old_as_json(only: [:center_x, :center_y, :rotate])
     inner_objects.update_all(position.merge(container_id: nil, container_type: nil))
   end
 
