@@ -504,8 +504,11 @@ class Game extends Component {
   }
 
   renderEditObjectPane(gameObject) {
+    const { meta } = this.props;
     return (
-      <EditObjectPane gameObject={gameObject}
+      <EditObjectPane key={gameObject.id}
+                      meta={meta.filter(metum => metum.game_id === null)}
+                      gameObject={gameObject}
                       onClose={this.props.toggleEditObjectPane.bind(null, gameObject.id, false)}
       />
     )

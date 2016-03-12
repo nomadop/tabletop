@@ -169,7 +169,7 @@
             max-height: 36px;
             border-radius: 50%;
           }
-          
+
           .msg-body {
             width: calc(100% - 36px);
             display: flex;
@@ -235,7 +235,6 @@
               }
             }
           }
-
 
           &.self {
             flex-direction: row-reverse;
@@ -379,10 +378,17 @@
         }
       }
 
+      &.open .pane-header {
+        border-radius: 5px 5px 0 0;
+      }
+
       .pane-body {
+        position: relative;
         width: 100%;
-        height: calc(100% - 37px);
+        height: calc(100% - 34px);
         overflow: auto;
+        border-radius: 0 0 5px 5px;
+        box-sizing: border-box;
 
         iframe {
           width: 100%;
@@ -392,14 +398,64 @@
       }
     }
 
-    .game-menu {
-      .pane-body {
-        height: 100%;
+    .edit-object-pane .pane-body {
+      background-color: lightgray;
+      padding: 8px;
+      display: flex;
+      align-items: stretch;
+
+      .editor {
+        flex: 3 75%;
+        position: relative;
+        background-color: white;
+        border: 2px inset darkgray;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+      }
+
+      .marker-pane {
+        flex: 1 25%;
+        padding: 8px;
+
+        .preview {
+          max-width: 50px;
+          max-height: 50px;
+        }
+
+        .upload {
+          width: 150px;
+        }
+      }
+
+      .toolbox {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 8px;
+        padding-top: 4px;
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
+        font-size: 2em;
+
+        .tool {
+          margin: 4px;
+
+          &:hover {
+            cursor: pointer;
+            color: #6699cc;
+          }
+        }
       }
+    }
+
+    .game-menu .pane-body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
     }
 
     .create-object-pane .pane-body {

@@ -9,7 +9,7 @@ class RoomsController < ApplicationController
     room = Room.find(params[:id])
 
     render json: {
-      game_object_meta: room.game.game_object_meta,
+      game_object_meta: GameObjectMetum.where(game: [room.game, nil]),
       game_objects: room.game_objects.includes(:meta, :room, :player).as_json(methods: [:player_num, :related_x, :related_y, :related_rotate]),
       decks: room.decks,
       player_areas: room.player_areas,

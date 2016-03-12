@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classNames from '../utils/class_names';
 
 const MAXIMUM = 'maximum';
 const MINIMUM = 'minimum';
@@ -132,13 +133,16 @@ export default class GamePane extends Component {
   }
 
   renderBody() {
-    const content = this.state.display === 'minimum' ? null : this.props.children;
-    return <div className="pane-body">{content}</div>
+    if (this.state.display !== MINIMUM) {
+      return <div className="pane-body">{this.props.children}</div>
+    }
   }
 
   render() {
+    const { className } = this.props;
+    const { display } = this.state;
     return (
-      <div className={`game-pane ${this.props.className}`}
+      <div className={classNames({'game-pane': true, className, open: display !== MINIMUM})}
            tabIndex="1"
            style={this.style}
            onFocus={this.handleFocus.bind(this, true)}
