@@ -49,37 +49,49 @@ export default class EditObjectPane extends Component {
     this.setState({ tool });
   }
 
-  handleAddMarker(event) {
-    const { tool, markers } = this.state;
-    if (tool === 'pointer') {
-      return;
-    }
+  handleAddMarker(type, content) {
+    const { markers } = this.state;
+    const newMarker = markers.slice();
 
-    const { offsetX, offsetY } = event.nativeEvent;
     this.markerIdCounter++;
     const marker = {
       id: 'temp' + this.markerIdCounter,
-      marker_type: tool,
-      top: offsetY,
-      left: offsetX,
+      marker_type: type,
+      top: 0,
+      left: 0,
       scale: 1,
       rotate: 0,
+      content,
     };
 
-    switch (tool) {
-    case 'text':
-      marker.content = { text: '' };
-      break;
-    default:
-      return console.log('unknown tool');
-    }
-
-    const newMarker = markers.slice();
     newMarker.push(marker);
     this.setState({
-      tool: 'pointer',
       markers: newMarker,
     });
+  }
+
+  handleAddImageMarker() {
+    const src = this.refs.preview.src;
+    if (src && src.length) {
+      const content = {
+        src,
+      };
+      this.handleAddMarker('image', content);
+    } else {
+      this.props.systemWarning('必须先选择一个图标');
+    }
+  }
+
+  handleAddIconMarker() {
+    const value = this.refs.iconClass.value;
+    if (value.length) {
+      const content = {
+        class_name: value,
+      };
+      this.handleAddMarker('icon', content);
+    } else {
+      this.props.systemWarning('class不能为空');
+    }
   }
 
   handleUpdateMarker(markerId, updater) {
@@ -111,9 +123,6 @@ export default class EditObjectPane extends Component {
         <span className="tool" onClick={this.handleSetTool.bind(this, 'rect')}>
           <i className="fa fa-fw fa-square-o"/>
         </span>
-        <span className="tool" onClick={this.handleSetTool.bind(this, 'text')}>
-          <i className="fa fa-fw fa-font"/>
-        </span>
       </div>
     );
   }
@@ -122,7 +131,7 @@ export default class EditObjectPane extends Component {
     const { tool, markers } = this.state;
     return (
       <div className={classNames('editor', tool)}>
-        <div className="game-object" style={this.editorStyle} onClick={this.handleAddMarker.bind(this)}>
+        <div className="game-object" style={this.editorStyle}>
           {markers.map(marker => (
             <Marker key={marker.id} marker={marker} editMode={true} update={this.handleUpdateMarker.bind(this, marker.id)}/>
           ))}
@@ -136,7 +145,10 @@ export default class EditObjectPane extends Component {
       <div className="marker-pane">
         <img src="" alt="preview" className="preview" ref="preview"/>
         <input type="file" className="upload" onChange={this.handleFileChange.bind(this)}/>
-        <button>添加</button>
+        <button onClick={this.handleAddImageMarker.bind(this)}>添加</button>
+        <span className="spliter"/>
+        <input type="text" ref="iconClass"/>
+        <button onClick={this.handleAddIconMarker.bind(this)}>添加</button>
       </div>
     );
   }

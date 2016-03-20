@@ -510,6 +510,7 @@ class Game extends Component {
                       meta={meta.filter(metum => metum.game_id === null)}
                       gameObject={gameObject}
                       onClose={this.props.toggleEditObjectPane.bind(null, gameObject.id, false)}
+                      systemWarning={this.handleSystemMessage.bind(this, 'warning')}
       />
     )
   }

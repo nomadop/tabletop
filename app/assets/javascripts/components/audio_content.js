@@ -66,7 +66,7 @@ export default class AudioContent extends Component {
             {newAudio ? <i className="fa fa-circle"/> : null}
           </span>
           <span className="playing">
-            <i className={`fa fa-volume-${playing ? 'up' : 'off'}`}/>
+            <i className={`fa fa-volume-off${playing ? ' fa-play' : ''}`}/>
           </span>
           <span className="content-arrow"/>
         </span>

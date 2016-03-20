@@ -49,6 +49,34 @@
   display: block;
 }
 
+@keyframes fa-play {
+  0% {
+    content: '\f026';
+  }
+
+  33% {
+    content: '\f027';
+  }
+
+  66% {
+    content: '\f028';
+  }
+}
+
+@-webkit-keyframes fa-play {
+  0% {
+    content: '\f026';
+  }
+
+  33% {
+    content: '\f027';
+  }
+
+  66% {
+    content: '\f028';
+  }
+}
+
 .game-window {
   position: fixed;
   left: 0;
@@ -226,11 +254,15 @@
                 align-items: center;
 
                 .fa-volume-off {
-                  margin: 0 6px;
+                  width: 1.28571429em;
+                  text-align: left;
+                  margin: 0 -2px;
                 }
 
-                .fa-volume-up {
-                  color: #6699cc;
+                .fa-play:before {
+                  content: '\f026';
+                  animation: fa-play 1s infinite;
+                  -webkit-animation: fa-play 1s infinite;
                 }
               }
             }
@@ -448,6 +480,13 @@
 
         .upload {
           width: 150px;
+        }
+
+        .spliter {
+          width: 100%;
+          display: block;
+          border: 1px inset #cccccc;
+          margin: 1em 0;
         }
       }
 
