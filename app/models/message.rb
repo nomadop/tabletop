@@ -1,5 +1,5 @@
 class Message < ApplicationRecord
-  after_create :publish
+  after_create :publish_text
   after_create :encode_voice
 
   enum msg_type: [ :text, :audio ]
@@ -41,10 +41,14 @@ class Message < ApplicationRecord
     to.nil? ? room_stream : to_user_stream
   end
 
+  def publish
+    ActionCable.server.broadcast(stream, action: :new_message, message: self)
+  end
+
   private
 
-  def publish
-    ActionCable.server.broadcast(stream, action: :new_message, message: self) if text?
+  def publish_text
+    publish if text?
   end
 
   def encode_voice

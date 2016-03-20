@@ -53,3 +53,6 @@ gem 'font-awesome-rails'
 gem 'carrierwave', :github => 'carrierwaveuploader/carrierwave', :branch => 'master'
 gem 'mini_magick'
 gem 'sidekiq'
+
+gem 'sinatra', :github => 'sinatra/sinatra', :branch => 'master', require: false
+gem 'slim'

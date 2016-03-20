@@ -320,8 +320,7 @@ class GameChannel < ApplicationCable::Channel
       t = Tempfile.new(%w(voice .mp3))
       t.binmode
       t.write(blob)
-      msg = current_user.room.messages.audio.create(from: current_user, level: :normal, mp3: t)
-      ActionCable.server.broadcast(game_stream, action: :new_message, message: msg)
+      current_user.room.messages.audio.create(from: current_user, level: :normal, mp3: t)
     else
       current_user.room.messages.create(from: current_user, level: :normal, content: data['content'])
     end

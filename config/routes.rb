@@ -1,3 +1,5 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
   resources :rooms do
     member do
@@ -22,4 +24,5 @@ Rails.application.routes.draw do
 
   # Serve websocket cable requests in-process
   mount ActionCable.server => '/cable'
+  mount Sidekiq::Web, at: '/sidekiq'
 end
