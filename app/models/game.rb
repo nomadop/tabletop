@@ -3,6 +3,8 @@ class Game < ApplicationRecord
 
   has_many :game_object_meta, dependent: :destroy
   has_many :rooms, dependent: :destroy
+  has_many :game_flows, dependent: :destroy
+  has_one :start_flow, -> { start_flow }, class_name: 'GameFlow'
 
   validates :module, uniqueness: true, presence: true
 

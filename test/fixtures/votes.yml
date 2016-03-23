@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  room_id: 1
+  access: MyString
+  options: MyText
+  default: MyString
+
+two:
+  room_id: 1
+  access: MyString
+  options: MyText
+  default: MyString

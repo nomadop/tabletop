@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  room_id: 1
+  game_flow_id: 1
+  message: MyString
+
+two:
+  room_id: 1
+  game_flow_id: 1
+  message: MyString

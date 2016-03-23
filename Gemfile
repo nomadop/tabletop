@@ -54,5 +54,5 @@ gem 'carrierwave', :github => 'carrierwaveuploader/carrierwave', :branch => 'mas
 gem 'mini_magick'
 gem 'sidekiq'
 
-gem 'sinatra', :github => 'sinatra/sinatra', :branch => 'master', require: false
+gem 'sinatra', :github => 'sinatra/sinatra', :branch => 'master', :require => false
 gem 'slim'

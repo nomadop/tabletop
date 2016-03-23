@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160311155418) do
+ActiveRecord::Schema.define(version: 20170322072456) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,21 @@ ActiveRecord::Schema.define(version: 20160311155418) do
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.integer  "room_id",                     null: false
+  end
+
+  create_table "flow_transitions", force: :cascade do |t|
+    t.integer  "from_flow_id"
+    t.integer  "to_flow_id"
+    t.string   "keyword"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  create_table "game_flows", force: :cascade do |t|
+    t.integer  "game_id"
+    t.json     "actions",    default: []
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "game_object_meta", force: :cascade do |t|
@@ -107,12 +122,24 @@ ActiveRecord::Schema.define(version: 20160311155418) do
 
   create_table "players", force: :cascade do |t|
     t.integer  "user_id"
-    t.integer  "room_id",    null: false
-    t.integer  "number",     null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer  "room_id",                 null: false
+    t.integer  "number",                  null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "vote_status"
+    t.string   "vote"
+    t.integer  "role",        default: 0
+    t.integer  "status",      default: 0
     t.index ["room_id", "number"], name: "index_players_on_room_id_and_number", unique: true, using: :btree
     t.index ["user_id"], name: "index_players_on_user_id", unique: true, using: :btree
+  end
+
+  create_table "room_flows", force: :cascade do |t|
+    t.integer  "room_id"
+    t.integer  "game_flow_id"
+    t.string   "message"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -145,6 +172,14 @@ ActiveRecord::Schema.define(version: 20160311155418) do
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["nickname"], name: "index_users_on_nickname", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  end
+
+  create_table "votes", force: :cascade do |t|
+    t.integer  "room_id"
+    t.integer  "status",     default: 0
+    t.json     "options",    default: []
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
 end

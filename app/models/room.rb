@@ -12,9 +12,22 @@ class Room < ApplicationRecord
   has_many :users, through: :players
   has_many :player_areas, dependent: :destroy
   has_many :messages, dependent: :destroy
+  has_one :flow, class_name: 'RoomFlow', dependent: :destroy
+  has_one :vote, dependent: :destroy
 
   scope :dev, ->{ where(dev: true) }
   scope :play, ->{ where(dev: nil) }
+
+  def start_player_vote(voters, votees)
+    voters.update_all(vote_status: :open)
+    vote.status = :open
+    vote.options = votees.map { |votee| [votee.id, votee.inspect] }
+    vote.save
+  end
+
+  def set_flow_message(message)
+    flow.update(message: message)
+  end
 
   def player_count
     players.count
@@ -48,6 +61,14 @@ class Room < ApplicationRecord
 
   def create_host_player
     players.create(user: host)
+  end
+
+  def create_flow
+    RoomFlow.create()
+  end
+
+  def create_vote
+
   end
 
   def copy_objects_from_dev

@@ -6,6 +6,13 @@ class Player < ApplicationRecord
   has_one :area, class_name: 'PlayerArea'
 
   scope :available, ->{ where(user: nil) }
+  enum role: [:无, :村民, :狼人]
+  enum status: [:alive, :dead, :dying]
+  enum vote_status: [:open, :close, :voted]
+
+  def inspect
+    "玩家#{number}(#{user.nil? ? '空闲' : user.username})"
+  end
 
   private
 
