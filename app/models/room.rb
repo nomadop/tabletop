@@ -2,6 +2,8 @@ class Room < ApplicationRecord
   include Rails.application.routes.url_helpers
 
   after_create :create_host_player
+  after_create :create_flow
+  after_create :create_vote
   after_create :copy_objects_from_dev
 
   belongs_to :game
@@ -18,11 +20,28 @@ class Room < ApplicationRecord
   scope :dev, ->{ where(dev: true) }
   scope :play, ->{ where(dev: nil) }
 
-  def start_player_vote(voters, votees)
-    voters.update_all(vote_status: :open)
-    vote.status = :open
-    vote.options = votees.map { |votee| [votee.id, votee.inspect] }
-    vote.save
+  def start_flow(restart: false)
+    fail 'low is running' unless flow.game_flow.end_flow? || restart
+
+    flow.update(game_flow: game.start_flow)
+    flow_log('GameFlow Start...', clear: true)
+    ExecuteFlowJob.perform_later(flow.id)
+  end
+
+  def flow_log(message, clear: false)
+    File.open(Rails.root.join('log', 'room_flow', "#{id}.log"), clear ? 'w' : 'a+') do |logfile|
+      logfile.puts message
+    end
+  end
+
+  def flow_message
+    flow.message
+  end
+
+  def start_player_vote(voters, votees, default: nil)
+    voters.update_all(vote_status: 0)
+    options = votees.map { |votee| [votee.id, votee.inspect] }
+    vote.update(status: :open, options: options, default: default)
   end
 
   def set_flow_message(message)
@@ -64,11 +83,11 @@ class Room < ApplicationRecord
   end
 
   def create_flow
-    RoomFlow.create()
+    RoomFlow.create(room: self, game_flow: game.start_flow)
   end
 
   def create_vote
-
+    Vote.create(room: self)
   end
 
   def copy_objects_from_dev

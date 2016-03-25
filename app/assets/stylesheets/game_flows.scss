@@ -1,0 +1,15 @@
+// Place all the styles related to the game_flows controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.transitions-field {
+  i {
+    display: inline-block;
+  }
+}
+
+.actions-field {
+  .parameter-field {
+    margin-left: 2em;
+  }
+}

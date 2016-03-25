@@ -1,0 +1,2 @@
+module GameFlowsHelper
+end

@@ -1,6 +1,6 @@
 class Vote < ApplicationRecord
   belongs_to :room
-  has_many :voters, -> { open } , through: :room, source: :players
+  has_many :voters, -> { voted } , through: :room, source: :players
 
   enum status: [:close, :open]
 

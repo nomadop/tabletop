@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170322072456) do
+ActiveRecord::Schema.define(version: 20170322072457) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 20170322072456) do
   end
 
   create_table "game_flows", force: :cascade do |t|
+    t.string   "name"
     t.integer  "game_id"
     t.json     "actions",    default: []
     t.datetime "created_at",              null: false
@@ -180,6 +181,7 @@ ActiveRecord::Schema.define(version: 20170322072456) do
     t.json     "options",    default: []
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.string   "default"
   end
 
 end

@@ -1,0 +1,154 @@
+<script type="text/javascript" charset="utf-8">
+  var flows = JSON.parse('<%= raw(game.flows.to_json(only: [:id, :name])) %>');
+
+  function add_transition(to_flow_id, keyword) {
+    var transitionNode = '<div class="transition"> \
+          <select name="transition[to_flow_id]" id="transition_to_flow_id">';
+    flows.forEach(function (flow) {
+      transitionNode += `<option value="${flow.id}" ${flow.id === to_flow_id ? 'selected' : ''}>${flow.name}</option>`;
+    });
+    transitionNode += `</select> \
+        <input type="text" name="keyword" id="keyword" value="${keyword || ''}"> \
+        <i class="fa fa-minus" onclick="remove_transition(this)"></i> \
+        </div>`;
+    $('.transitions-field > .fa-plus').before(transitionNode);
+  }
+
+  function remove_transition(target) {
+    $(target.parentNode).remove();
+  }
+
+  function add_action(action) {
+    var name = action.name;
+    delete action.name;
+    var parameters = Object.keys(action).map(function (key) {
+      return {
+        key: key,
+        value: action[key],
+      };
+    });
+
+    var actionNode = ` \
+        <div class="action"> \
+          Name: \
+          <input type="text" name="name" value="${name || ''}"/> \
+          <i class="fa fa-minus" onclick="remove_transition(this)"></i> \
+          <div class="parameter-field">`;
+    parameters.forEach(function (parameter) {
+      var value = parameter.value;
+      actionNode += ` \
+          <div class="parameter"> \
+          <input type="text" name="key" value="${parameter.key}"/>: \
+          <input type="text" name="value" value='${typeof value === 'string' ? value : JSON.stringify(value)}'/> \
+          <i class="fa fa-minus" onclick="remove_transition(this)"></i> \
+          </div>`;
+    });
+    actionNode += ` \
+          <i class="fa fa-plus" onclick="add_parameter(this)"></i> \
+          </div> \
+        </div>`;
+    $('.actions-field > .fa-plus').before(actionNode);
+  }
+
+  function add_parameter(target, key, value) {
+    var parameterField = target.parentNode;
+    var parameterNode = ` \
+        <div class="parameter"> \
+        <input type="text" name="key" value="${key || ''}"/>: \
+        <input type="text" name="value" value="${value || ''}"/> \
+        <i class="fa fa-minus" onclick="remove_transition(this)"></i> \
+        </div>`;
+    $(parameterField).find('.fa-plus').before(parameterNode);
+  }
+
+  function serialize_transitions() {
+    var transitions = Array.apply(null, document.querySelectorAll('.transition'));
+    var json = transitions.map(function (transition) {
+      var select = transition.querySelector('select');
+      var input = transition.querySelector('input');
+      return {
+        to_flow_id: select.value,
+        keyword: input.value,
+      };
+    });
+
+    console.log(json);
+    document.querySelector('#game_flow_to_transitions').value = JSON.stringify(json);
+  }
+
+  function serialize_actions() {
+    var actions = Array.apply(null, document.querySelectorAll('.action'));
+    var json = actions.map(function (action) {
+      var name = action.querySelector('input[name="name"]').value;
+      var result = { name: name };
+      var parameters = Array.apply(null, action.querySelectorAll('.parameter'));
+      parameters.forEach(function (parameter) {
+        var key = parameter.querySelector('input[name="key"]').value;
+        var value = parameter.querySelector('input[name="value"]').value;
+        try {
+          result[key] = JSON.parse(value);
+        } catch(_) {
+          result[key] = value;
+        }
+      });
+      return result;
+    });
+
+    console.log(json);
+    document.querySelector('#game_flow_actions').value = JSON.stringify(json);
+  }
+
+  function serialize_form() {
+    serialize_actions();
+    serialize_transitions();
+  }
+
+  $(document).ready(function () {
+    <% game_flow.to_transitions.each do |transition| %>
+    add_transition(<%= transition.to_flow_id %>, '<%= transition.keyword %>');
+    <% end %>
+    <% game_flow.actions.each do |action| %>
+    add_action(JSON.parse('<%= raw(action.to_json) %>'));
+    <% end %>
+  })
+</script>
+
+<%= form_for([game, game_flow]) do |f| %>
+  <% if game_flow.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(game_flow.errors.count, "error") %> prohibited this game_flow from being saved:</h2>
+
+      <ul>
+        <% game_flow.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :game %>
+    <%= text_field_tag :game, game.name, disabled: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div class="field actions-field">
+    <%= f.label :actions %>
+    <%= f.hidden_field :actions, value: game_flow.actions.to_json %>
+    <i class="fa fa-plus" onclick="add_action({})"></i>
+  </div>
+
+  <div class="field transitions-field">
+    <%= f.label :to_transitions %>
+    <%= f.hidden_field :to_transitions, value: '[]' %>
+    <i class="fa fa-plus" onclick="add_transition()"></i>
+  </div>
+
+  <div class="actions">
+    <%= f.submit 'Submit', onclick: 'serialize_form()' %>
+  </div>
+<% end %>

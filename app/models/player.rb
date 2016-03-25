@@ -8,7 +8,7 @@ class Player < ApplicationRecord
   scope :available, ->{ where(user: nil) }
   enum role: [:无, :村民, :狼人]
   enum status: [:alive, :dead, :dying]
-  enum vote_status: [:open, :close, :voted]
+  enum vote_status: [:open_to_vote, :close_to_vote, :voted]
 
   def inspect
     "玩家#{number}(#{user.nil? ? '空闲' : user.username})"

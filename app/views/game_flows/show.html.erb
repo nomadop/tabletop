@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Game:</strong>
+  <%= @game.name %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @game_flow.name %>
+</p>
+
+<p>
+  <strong>Actions:</strong>
+  <%= @game_flow.actions.as_json %>
+</p>
+
+<p>
+  <strong>Transitions:</strong>
+  <%= @game_flow.to_transitions.as_json(only: [:to_flow_id, :keyword]) %>
+</p>
+
+<%= link_to 'Edit', edit_game_game_flow_path(@game, @game_flow) %> |
+<%= link_to 'Back', game_game_flows_path(@game) %>

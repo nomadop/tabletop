@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Game Flow</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Actions</th>
+      <th>Transitions</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @game_flows.each do |game_flow| %>
+      <tr>
+        <td><%= game_flow.id %></td>
+        <td><%= game_flow.name %></td>
+        <td><%= game_flow.actions.map { |action| action['name'] } %></td>
+        <td><%= game_flow.to_transitions.pluck(:keyword, :to_flow_id).to_h %></td>
+        <td><%= link_to 'Show', [@game, game_flow] %></td>
+        <td><%= link_to 'Edit', edit_game_game_flow_path(@game, game_flow) %></td>
+        <td><%= link_to 'Destroy', [@game, game_flow], method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Game Flow', new_game_game_flow_path(@game) %>
