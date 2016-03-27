@@ -11,6 +11,8 @@ export default class GamePane extends Component {
 
     const { width, height } = this.props;
     this.state = {
+      top: (window.innerHeight - height) / 2,
+      left: (window.innerWidth - width) / 2,
       width,
       height,
       display: NORMAL,
@@ -42,8 +44,8 @@ export default class GamePane extends Component {
     default:
       const { top, left, width, height } = this.state;
       return {
-        top: top || (window.innerHeight - height) / 2,
-        left: left || (window.innerWidth - width) / 2,
+        top,
+        left,
         width,
         height,
         zIndex: focus ? 1 : 0,
@@ -77,20 +79,52 @@ export default class GamePane extends Component {
 
   handleMaximum() {
     if (this.props.resizeable) {
-      this.setState({display: MAXIMUM});
+      this.setState({ display: MAXIMUM });
     }
   }
 
   handleMinimum() {
-    this.setState({display: MINIMUM});
+    this.setState({ display: MINIMUM });
   }
 
   handleResume() {
-    this.setState({display: NORMAL});
+    this.setState({ display: NORMAL });
   }
 
   handleFocus(focus) {
     this.setState({ focus });
+  }
+
+  handleResize(direction, event) {
+    const { clientX, clientY } = event;
+    if (!clientY && !clientX) {
+      return;
+    }
+
+    const { top, left, width, height } = this.state;
+    let newWidth = clientX - left;
+    let newHeight = clientY - top;
+
+    if (newWidth < 240) {
+      newWidth = 240;
+    }
+
+    if (newHeight < 360) {
+      newHeight = 360;
+    }
+
+    const newState = {};
+    if (direction & 1 && newHeight !== height) {
+      newState.height = newHeight;
+    }
+
+    if (direction & 2 && newWidth !== width) {
+      newState.width = newWidth;
+    }
+
+    if (Object.keys(newState).length) {
+      this.setState(newState);
+    }
   }
 
   renderHeaderControl() {
@@ -138,6 +172,16 @@ export default class GamePane extends Component {
     }
   }
 
+  renderResizer() {
+    if (this.props.resizeable && this.state.display === NORMAL) {
+      return ([
+        <span className="resizer right-resizer" key="rr" onDrag={this.handleResize.bind(this, 2)} draggable="true"/>,
+        <span className="resizer bottom-resizer" key="br" onDrag={this.handleResize.bind(this, 1)} draggable="true"/>,
+        <span className="resizer bottom-right-resizer" key="brr" onDrag={this.handleResize.bind(this, 3)} draggable="true"/>,
+      ]);
+    }
+  }
+
   render() {
     const { className } = this.props;
     const { display } = this.state;
@@ -150,6 +194,7 @@ export default class GamePane extends Component {
       >
         {this.renderHeader()}
         {this.renderBody()}
+        {this.renderResizer()}
       </div>
     );
   }

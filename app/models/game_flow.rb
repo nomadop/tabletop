@@ -85,22 +85,24 @@ class GameFlow < ApplicationRecord
   def update_player_role(who: nil, role: nil)
     fail 'Invalid parameters' if who.nil? || role.nil?
 
-    player = if who.is_a?(Fixnum)
-               @room.players.where(number: who).take
-             else
-               @room.players.where(role: who).take
-             end
+    player =
+      if who.is_a?(Fixnum)
+        @room.players.where(number: who).take
+      else
+        @room.players.where(role: who).take
+      end
     player.update(role: role)
   end
 
   def update_player_status(who: nil, status: nil)
     fail 'Invalid parameters' if who.nil? || status.nil?
 
-    player = if who.is_a?(Fixnum) || /\d+/ =~ who
-               @room.players.find(who)
-             else
-               @room.players.where(role: who).take
-             end
+    player =
+      if who.is_a?(Fixnum) || /\d+/ =~ who
+        @room.players.find(who)
+      else
+        @room.players.where(role: who).take
+      end
     player.update(status: status)
   end
 
@@ -118,7 +120,7 @@ class GameFlow < ApplicationRecord
       @room.set_flow_message(first[0] || vote.default)
     else
       equals = result.select { |r| r[1] == first[1] }
-      @room.set_flow_message("equals:#{equals.map{ |r| r[1] }.to_json}")
+      @room.set_flow_message("equals:#{equals.map { |r| r[1] }.to_json}")
     end
     vote.close!
   end
@@ -126,5 +128,18 @@ class GameFlow < ApplicationRecord
   def charge_dying(_)
     dying_players = @room.players.dying
     dying_players.update_all(status: 1)
+  end
+
+  def broadcast_data(to: nil, **data)
+    if to
+      players = @room.players
+      players = players.where(to['where']) if to['where']
+      players = players.where.not(to['not']) if to['not']
+      players.includes(:user).find_each do |player|
+        ActionCable.server.broadcast("game##{player.user.id}", data) if player.user
+      end
+    else
+      ActionCable.server.broadcast("game@room#{@room.id}", data)
+    end
   end
 end

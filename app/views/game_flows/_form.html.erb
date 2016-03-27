@@ -18,6 +18,26 @@
     $(target.parentNode).remove();
   }
 
+  function move_up_action(target) {
+    var actionNode = target.parentNode;
+    var previousActionNode = actionNode.previousElementSibling;
+    if (previousActionNode.className !== 'action') {
+      return false;
+    }
+
+    $(previousActionNode).before(actionNode);
+  }
+
+  function move_down_action(target) {
+    var actionNode = target.parentNode;
+    var nextActionNode = actionNode.nextElementSibling;
+    if (nextActionNode.className !== 'action') {
+      return false;
+    }
+
+    $(nextActionNode).after(actionNode);
+  }
+
   function add_action(action) {
     var name = action.name;
     delete action.name;
@@ -30,6 +50,8 @@
 
     var actionNode = ` \
         <div class="action"> \
+          <i class="fa fa-arrow-up" onclick="move_up_action(this)"></i> \
+          <i class="fa fa-arrow-down" onclick="move_down_action(this)"></i> \
           Name: \
           <input type="text" name="name" value="${name || ''}"/> \
           <i class="fa fa-minus" onclick="remove_transition(this)"></i> \

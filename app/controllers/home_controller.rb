@@ -20,7 +20,7 @@ class HomeController < ApplicationController
       authentication: current_user && current_user.auth_info,
       debug: params[:debug] == 'true' ? true : false,
       room: @room.as_json(only: [:id, :name, :max_player], methods: [:player_count]),
-      game: @room.game.as_json(only: [:id, :name, :module, :start_scale]),
+      game: @room.game.as_json(only: [:id, :name, :module, :start_scale, :game_type]),
     }
     render component: 'Root', props: props
   end
@@ -36,7 +36,7 @@ class HomeController < ApplicationController
       authentication: current_user && current_user.auth_info,
       debug: params[:debug] == 'true' ? true : false,
       room: dev_room.as_json(only: [:id, :name, :max_player], methods: [:player_count]),
-      game: game.as_json(only: [:id, :name, :module, :start_scale]),
+      game: game.as_json(only: [:id, :name, :module, :start_scale, :game_type]),
       dev_mode: true,
     }
     render component: 'Root', props: props

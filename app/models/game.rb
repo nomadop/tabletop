@@ -5,6 +5,7 @@ class Game < ApplicationRecord
   has_many :rooms, dependent: :destroy
   has_many :flows, dependent: :destroy, class_name: 'GameFlow'
   has_one :start_flow, -> { start_flow }, class_name: 'GameFlow'
+  enum game_type: [:boardgame, :chat_game]
 
   validates :module, uniqueness: true, presence: true
 

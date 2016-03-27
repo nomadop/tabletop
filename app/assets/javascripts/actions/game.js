@@ -4,6 +4,7 @@ import {
   RECEIVE_GAME_OBJECTS,
   RECEIVE_DECKS,
   RECEIVE_PLAYER_AREAS,
+  RECEIVE_PLAYERS,
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECTS,
   ROTATE_GAME_OBJECTS,
@@ -19,6 +20,7 @@ import {
   TOGGLE_CREATE_OBJECT_PANE,
   TOGGLE_EDIT_OBJECT_PANE,
   TOGGLE_GAME_MENU,
+  TOGGLE_PLAYER_PANE,
 } from './action_types';
 import { receiveMessages } from './message';
 
@@ -57,6 +59,13 @@ export function receivePlayerAreas(playerAreas) {
   };
 }
 
+export function receivePlayers(players) {
+  return {
+    type: RECEIVE_PLAYERS,
+    players,
+  };
+}
+
 export function fetchGameData(roomId) {
   return (dispatch) => {
     fetch(`/rooms/${roomId}/game_data`)
@@ -67,6 +76,7 @@ export function fetchGameData(roomId) {
         dispatch(receivePlayerAreas(json.player_areas));
         dispatch(receiveGameObjects(json.game_objects));
         dispatch(receiveMessages(json.messages));
+        dispatch(receivePlayers(json.players));
       });
   };
 }
@@ -169,6 +179,13 @@ export function toggleEditObjectPane(gameObjectId, isShown) {
 export function toggleCreateMetaPane(isShown) {
   return {
     type: TOGGLE_CREATE_META_PANE,
+    isShown,
+  };
+}
+
+export function togglePlayerPane(isShown) {
+  return {
+    type: TOGGLE_PLAYER_PANE,
     isShown,
   };
 }

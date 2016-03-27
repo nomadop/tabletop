@@ -15,7 +15,9 @@ const isDraggingSelector = state => state.gameObjects.isDragging;
 const showGameMenuSelector = state => state.gamePanes.showGameMenu;
 const showCreateObjectPaneSelector = state => state.gamePanes.showCreateObjectPane;
 const showCreateMetaPaneSelector = state => state.gamePanes.showCreateMetaPane;
+const showPlayerPaneSelector = state => state.gamePanes.showPlayerPane;
 const editObjectPaneIdsSelector = state => state.gamePanes.editObjectPaneIds;
+const playersSelector = state => state.players;
 
 const editObjectPanesSelector = createSelector(
   gameObjectByIdSelector,
@@ -27,9 +29,10 @@ const gamePanesSelector = createSelector(
   showGameMenuSelector,
   showCreateMetaPaneSelector,
   showCreateObjectPaneSelector,
+  showPlayerPaneSelector,
   editObjectPanesSelector,
-  (showGameMenu, showCreateMetaPane, showCreateObjectPane, editObjectPanes) => {
-    return { showGameMenu, showCreateMetaPane, showCreateObjectPane, editObjectPanes };
+  (showGameMenu, showCreateMetaPane, showCreateObjectPane, showPlayerPane, editObjectPanes) => {
+    return { showGameMenu, showCreateMetaPane, showCreateObjectPane, showPlayerPane, editObjectPanes };
   }
 );
 
@@ -115,8 +118,9 @@ export const gameContainerSelector = createSelector(
   gameObjectsSelector,
   selectedObjectsSelector,
   gamePanesSelector,
-  (camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects, gamePanes) => {
-    return { camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects, gamePanes };
+  playersSelector,
+  (camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects, gamePanes, players) => {
+    return { camera, meta, selectedIds, isDragging, messages, gameObjects, selectedObjects, gamePanes, players };
   }
 );
 

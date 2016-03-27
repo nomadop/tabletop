@@ -6,6 +6,7 @@ import {
   RECEIVE_GAME_OBJECTS,
   RECEIVE_DECKS,
   RECEIVE_PLAYER_AREAS,
+  RECEIVE_PLAYERS,
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECTS,
   ROTATE_GAME_OBJECTS,
@@ -20,6 +21,7 @@ import {
   TOGGLE_CREATE_OBJECT_PANE,
   TOGGLE_EDIT_OBJECT_PANE,
   TOGGLE_GAME_MENU,
+  TOGGLE_PLAYER_PANE,
 } from '../actions/action_types';
 import camera from './camera';
 import messages from './message';
@@ -112,6 +114,18 @@ const playerAreas = combineReducers({
   byId: playerAreaById,
   ids: playerAreaIds,
 });
+
+function players(state = [], action) {
+  switch (action.type) {
+  case RECEIVE_PLAYERS:
+    return action.players;
+  //case REMOVE_PLAYER:
+  //  updater[action.areaNumber] = { $set: null };
+  //  return update(state, updater);
+  default:
+    return state;
+  }
+}
 
 function gameObjectById(state = {}, action) {
   const updater = {};
@@ -288,6 +302,15 @@ function showCreateMetaPane(state = false, action) {
   }
 }
 
+function showPlayerPane(state = false, action) {
+  switch (action.type) {
+  case TOGGLE_PLAYER_PANE:
+    return action.isShown;
+  default:
+    return state;
+  }
+}
+
 function editObjectPaneIds(state = [], action) {
   switch (action.type) {
   case TOGGLE_EDIT_OBJECT_PANE:
@@ -312,6 +335,7 @@ const gamePanes = combineReducers({
   showGameMenu,
   showCreateObjectPane,
   showCreateMetaPane,
+  showPlayerPane,
   editObjectPaneIds,
 });
 
@@ -323,4 +347,5 @@ export default combineReducers({
   playerAreas,
   messages,
   gamePanes,
+  players,
 });

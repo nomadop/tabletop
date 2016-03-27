@@ -46,30 +46,33 @@ export default class MessagePane extends Component {
       return;
     }
 
-    let width = clientX - 10;
-    let height = window.innerHeight - clientY + 10;
-    if (width > 640) {
-      width = 640;
-    } else if (width < 320) {
-      width = 320;
+    const { width, height } = this.state;
+    let newWidth = clientX - 10;
+    let newHeight = window.innerHeight - clientY + 10;
+    if (newWidth > 480) {
+      newWidth = 480;
+    } else if (newWidth < 320) {
+      newWidth = 320;
     }
 
-    if (height > 480) {
-      height = 480;
-    } else if (height < 240) {
-      height = 240;
+    if (newHeight > window.innerHeight - 60) {
+      newHeight = window.innerHeight - 60;
+    } else if (newHeight < 240) {
+      newHeight = 240;
     }
 
     const newState = {};
-    if (direction & 1) {
-      newState.height = height;
+    if (direction & 1 && newHeight !== height) {
+      newState.height = newHeight;
     }
 
-    if (direction & 2) {
-      newState.width = width;
+    if (direction & 2 && newWidth !== width) {
+      newState.width = newWidth;
     }
 
-    this.setState(newState);
+    if (Object.keys(newState).length) {
+      this.setState(newState);
+    }
   }
 
   getMessageClassName(msg) {

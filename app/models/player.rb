@@ -10,6 +10,10 @@ class Player < ApplicationRecord
   enum status: [:alive, :dead, :dying]
   enum vote_status: [:open_to_vote, :close_to_vote, :voted]
 
+  def username
+    user.username
+  end
+
   def inspect
     "玩家#{number}(#{user.nil? ? '空闲' : user.username})"
   end

@@ -10,6 +10,7 @@ import GamePane from '../components/game_pane';
 import MessagePane from '../components/message-pane';
 import DragBox from 'components/drag_box';
 import GameObjectContainer from './game_object';
+import PlayerPane from '../components/player_pane'
 import {
   moveCameraHorizontal,
   moveCameraVertical,
@@ -26,6 +27,7 @@ import {
   toggleCreateObjectPane,
   toggleGameMenu,
   toggleEditObjectPane,
+  togglePlayerPane,
 } from '../actions/game';
 import { receiveMessages } from '../actions/message';
 import {
@@ -419,6 +421,11 @@ class Game extends Component {
     this.props.toggleGameMenu(!showGameMenu);
   }
 
+  handleTogglePlayerPane() {
+    const showPlayerPane = this.props.gamePanes.showPlayerPane;
+    this.props.togglePlayerPane(!showPlayerPane);
+  }
+
   handleToggleCreateObjectPane(open) {
     this.props.toggleCreateObjectPane(open);
   }
@@ -464,6 +471,18 @@ class Game extends Component {
           {dev_mode ? <a href="javascript:" onClick={this.props.toggleCreateMetaPane.bind(null, true)}>创建元物件</a> : null}
           <a href={`/rooms/${room.id}/leave`} data-method="post">离开房间</a>
           <a href={`/rooms/${room.id}`} data-method="delete">关闭房间</a>
+        </GamePane>
+      );
+    }
+  }
+
+  renderPlayerPane() {
+    const { players, gamePanes } = this.props;
+
+    if (gamePanes.showPlayerPane) {
+      return (
+        <GamePane title="玩家信息"  width={480} height={360} resizeable>
+          <PlayerPane players={players}/>
         </GamePane>
       );
     }
@@ -529,7 +548,8 @@ class Game extends Component {
         <div className="header" style={{top: 0}}>
           <div className="room-control">
             <span className="room-title">{`${room.name}(${game.name})`}</span>
-            <span className="player-num button">
+            <span className={`player-num button${gamePanes.showPlayerPane ? ' active' : ''}`}
+                  onClick={this.handleTogglePlayerPane.bind(this)}>
               {`${room.player_count} / ${room.max_player} `}
               <i className="fa fa-user"/>
             </span>
@@ -554,6 +574,7 @@ class Game extends Component {
               {this.renderGameMenu()}
               {this.renderCreateObjectPane()}
               {this.renderCreateMetaPane()}
+              {this.renderPlayerPane()}
               {gamePanes.editObjectPanes.map(gameObject => this.renderEditObjectPane(gameObject))}
             </div>
           </div>
@@ -582,7 +603,7 @@ class Game extends Component {
     }
   }
 
-  render() {
+  renderBoardgame() {
     const { width, height, cameraMoving } = this.state;
     const { camera, authentication } = this.props;
 
@@ -614,6 +635,34 @@ class Game extends Component {
       </div>
     );
   }
+
+  renderChatGame() {
+    const { width, height } = this.state;
+
+    const style = {
+      width,
+      height,
+    };
+
+    return (
+      <div className="game-window" style={style}>
+        {this.renderPopUpLayer(width, height)}
+      </div>
+    )
+  }
+
+  render() {
+    const { game } = this.props;
+
+    switch (game.game_type) {
+    case 'boardgame':
+      return this.renderBoardgame();
+    case 'chat_game':
+      return this.renderChatGame();
+    default:
+      raise('unknown game type');
+    }
+  }
 }
 
 Game.propTypes = {
@@ -643,6 +692,7 @@ Game.propTypes = {
   toggleCreateObjectPane: PropTypes.func,
   toggleGameMenu: PropTypes.func,
   toggleEditObjectPane: PropTypes.func,
+  togglePlayerPane: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -661,6 +711,7 @@ function dispatcher(dispatch) {
     toggleCreateObjectPane,
     toggleGameMenu,
     toggleEditObjectPane,
+    togglePlayerPane,
   }, dispatch);
 }
 
