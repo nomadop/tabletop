@@ -6,6 +6,7 @@ class Player < ApplicationRecord
   has_one :area, class_name: 'PlayerArea'
 
   scope :available, ->{ where(user: nil) }
+  scope :active, ->{ where.not(user: nil) }
   enum role: [:无, :村民, :狼人]
   enum status: [:alive, :dead, :dying]
   enum vote_status: [:open_to_vote, :close_to_vote, :voted]

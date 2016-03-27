@@ -17,8 +17,19 @@ class Message < ApplicationRecord
     super(opts)
   end
 
+  def level_name
+    case level.to_s
+    when 'warning'
+      '警告'
+    when 'error'
+      '错误'
+    else
+      '信息'
+    end
+  end
+
   def from_name
-    from.nil? ? '系统信息' : from.username;
+    from.nil? ? "系统#{level_name}" : from.username;
   end
 
   def from_avatar

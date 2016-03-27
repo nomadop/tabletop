@@ -54,6 +54,21 @@ class GameFlow < ApplicationRecord
     @room.messages.create(level: level, to: to, content: content) if content
   end
 
+  def check_role(role: nil, count: nil, plus: 0, multiply: 1)
+    fail 'Invalid arguments' if role.nil? || count.nil?
+    count =
+      case count
+      when Fixnum then count
+      when /^\d+$/ then count.to_i
+      when 'active_players' then @room.players.active.count
+      else fail "Invalid count `#{count}'"
+      end
+
+    roles = @room.flow.infos['roles'] || []
+    roles.select! { |r| r =~ Regexp.new(role) }
+    @room.set_flow_message(roles.count <=> count * multiply + plus)
+  end
+
   def check_player(player: {}, count: nil)
     fail 'Invalid count' if count.nil?
 

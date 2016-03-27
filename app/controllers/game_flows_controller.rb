@@ -30,7 +30,7 @@ class GameFlowsController < ApplicationController
 
     respond_to do |format|
       if @game_flow.save
-        format.html { redirect_to [@game, @game_flow], notice: 'Game object metum was successfully created.' }
+        format.html { redirect_to [@game, @game_flow], notice: 'Game flow was successfully created.' }
         format.json { render :show, status: :created, location: [@game, @game_flow] }
       else
         format.html { render :new }
@@ -45,7 +45,7 @@ class GameFlowsController < ApplicationController
     @game_flow.to_transitions.destroy_all
     respond_to do |format|
       if @game_flow.update(game_flow_params)
-        format.html { redirect_to [@game, @game_flow], notice: 'Game object metum was successfully updated.' }
+        format.html { redirect_to [@game, @game_flow], notice: 'Game flow was successfully updated.' }
         format.json { render :show, status: :ok, location: [@game, @game_flow] }
       else
         format.html { render :edit }
@@ -59,7 +59,7 @@ class GameFlowsController < ApplicationController
   def destroy
     @game_flow.destroy
     respond_to do |format|
-      format.html { redirect_to game_game_flows_path(@game), notice: 'Game object metum was successfully destroyed.' }
+      format.html { redirect_to game_game_flows_path(@game), notice: 'Game flow was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

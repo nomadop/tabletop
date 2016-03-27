@@ -535,7 +535,7 @@ class Game extends Component {
   }
 
   renderPopUpLayer(width, height) {
-    const { messages, room, game, gamePanes } = this.props;
+    const { messages, room, game, authentication, gamePanes } = this.props;
     const style = {
       width,
       height,
@@ -567,7 +567,8 @@ class Game extends Component {
           <MessagePane messages={messages}
                        disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
                        sendMessage={this.handleSendMessage.bind(this)}
-                       authentication={this.props.authentication}
+                       authentication={authentication}
+                       game={game}
           />
           <div className="footer-right">
             <div className="pane-container">

@@ -11,10 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170322072458) do
+ActiveRecord::Schema.define(version: 20170322072460) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "hstore"
 
   create_table "decks", force: :cascade do |t|
     t.string   "sub_type",                    null: false
@@ -75,13 +76,14 @@ ActiveRecord::Schema.define(version: 20170322072458) do
 
   create_table "games", force: :cascade do |t|
     t.string   "name"
-    t.string   "module",                  null: false
+    t.string   "module",                   null: false
     t.float    "start_scale"
     t.string   "max_player"
     t.text     "description"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
     t.integer  "game_type",   default: 0
+    t.json     "roles",       default: []
     t.index ["module"], name: "index_games_on_module", unique: true, using: :btree
   end
 
@@ -140,8 +142,9 @@ ActiveRecord::Schema.define(version: 20170322072458) do
     t.integer  "room_id"
     t.integer  "game_flow_id"
     t.string   "message"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.json     "infos",        default: {}
   end
 
   create_table "rooms", force: :cascade do |t|

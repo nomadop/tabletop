@@ -5,6 +5,14 @@ import AudioContent from './audio_content';
 export default class MessagePane extends Component {
   constructor() {
     super(...arguments);
+    const { game_type } = this.props.game;
+
+    if (game_type === 'chat_game' && setTimeout) {
+      setTimeout(this.setState.bind(this, {
+        width: 320,
+        height: window.innerHeight - 60,
+      }), 100);
+    }
 
     this.state = {
       width: 320,
@@ -125,6 +133,19 @@ export default class MessagePane extends Component {
     );
   }
 
+  renderResizer() {
+    const { game_type } = this.props.game;
+    if (game_type === 'chat_game') {
+      return <span className="resizer right-resizer" onDrag={this.handleNSResize.bind(this, 2)} draggable="true"/>;
+    } else {
+      return [
+        <span className="resizer top-resizer" key="tr" onDrag={this.handleNSResize.bind(this, 1)} draggable="true"/>,
+        <span className="resizer right-resizer" key="rr" onDrag={this.handleNSResize.bind(this, 2)} draggable="true"/>,
+        <span className="resizer top-right-resizer" key="trr" onDrag={this.handleNSResize.bind(this, 3)} draggable="true"/>,
+      ];
+    }
+  }
+
   render() {
     const { disableKeyEvent, messages } = this.props;
 
@@ -143,9 +164,7 @@ export default class MessagePane extends Component {
           />
           <span className="send" onClick={this.handleSendMessage.bind(this)}>发送</span>
         </div>
-        <span className="resizer top-resizer" onDrag={this.handleNSResize.bind(this, 1)} draggable="true"/>
-        <span className="resizer right-resizer" onDrag={this.handleNSResize.bind(this, 2)} draggable="true"/>
-        <span className="resizer top-right-resizer" onDrag={this.handleNSResize.bind(this, 3)} draggable="true"/>
+        {this.renderResizer()}
       </div>
     );
   }
@@ -156,4 +175,5 @@ MessagePane.propTypes = {
   disableKeyEvent: PropTypes.func,
   sendMessage: PropTypes.func,
   authentication: PropTypes.object,
+  game: PropTypes.object,
 };
