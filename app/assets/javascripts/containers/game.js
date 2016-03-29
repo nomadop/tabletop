@@ -569,6 +569,7 @@ class Game extends Component {
                        sendMessage={this.handleSendMessage.bind(this)}
                        authentication={authentication}
                        game={game}
+                       systemMessage={this.handleSystemMessage.bind(this)}
           />
           <div className="footer-right">
             <div className="pane-container">

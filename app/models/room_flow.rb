@@ -3,6 +3,10 @@ class RoomFlow < ApplicationRecord
   belongs_to :game_flow
   has_many :to_transitions, through: :game_flow
 
+  def roles
+    infos['roles']
+  end
+
   def add_role(role)
     fail "Invalid role `#{role}' for game `#{room.game.name}'" unless room.game.roles.include?(role)
 
@@ -12,10 +16,12 @@ class RoomFlow < ApplicationRecord
   end
 
   def remove_role(role)
-    return unless infos.has_key?('roles') && infos['roles'].is_a?(Array)
+    return false unless infos.has_key?('roles') && infos['roles'].is_a?(Array)
 
     index = infos['roles'].find_index(role)
-    infos.delete_at(index)
+    return false if index.nil?
+
+    infos['roles'].delete_at(index)
     save
   end
 

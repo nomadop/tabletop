@@ -68,6 +68,16 @@ App.game = App.cable.subscriptions.create "GameChannel",
   destroy_meta: (ids) ->
     @perform 'destroy_meta', ids: ids
 
+  add_role: (role) ->
+    @perform 'add_role', role: role
+
+  remove_role: (role) ->
+    @perform 'remove_role', role: role
+
+  start_flow: (arg) ->
+    restart = if arg == 'restart' then 'true' else 'false'
+    @perform 'start_flow', restart: restart
+
 window.addEventListener 'beforeunload', ->
   App.game.unsubscribe()
   return

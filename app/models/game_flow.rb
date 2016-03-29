@@ -35,11 +35,27 @@ class GameFlow < ApplicationRecord
     action.delete(:name)
     fail "Unknown action `#{action_name}'" unless private_methods.include?(action_name.to_sym)
 
-    action.each { |k, v| action[k] = @room.flow_message if v == '$MSG' }
+    action.each do |k, v|
+      value = v.is_a?(String) ? v.gsub(/`([\w_]+)`/) { send("get_#{$1}") } : v
+      action[k] = value
+    end
     send(action_name, action)
   end
 
   private
+
+  def get_message
+    @room.flow.message
+  end
+
+  def assign_role
+    roles = @room.flow.infos['roles']
+    roles.shuffle
+    @room.players.active.find_each.with_index do |player, index|
+      player.update(role: roles[index])
+      @room.messages.create(level: :info, to: player.user, content: "你的角色是`#{role}`")
+    end
+  end
 
   def transit(wait: 0)
     wait = wait.to_i
@@ -65,7 +81,7 @@ class GameFlow < ApplicationRecord
       end
 
     roles = @room.flow.infos['roles'] || []
-    roles.select! { |r| r =~ Regexp.new(role) }
+    roles = roles.select { |r| r == role || r =~ Regexp.new(role) }
     @room.set_flow_message(roles.count <=> count * multiply + plus)
   end
 

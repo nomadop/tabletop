@@ -337,8 +337,46 @@ class GameChannel < ApplicationCable::Channel
       current_user.room.messages.create(level: :info, content: "#{current_user.username}移除了#{a_meta.first(3).map(&:name)}等#{a_meta.size}个元物件.")
       ActionCable.server.broadcast(game_stream, action: :destroy_meta, meta_ids: data['ids'])
     else
-      ActionCable.server.broadcast(user_stream, action: :error, error: {message: 'no access'})
+      ActionCable.server.broadcast(user_stream, action: :error, error: { message: 'no access' })
     end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
+  end
+
+  def add_role(data)
+    role = data['role']
+    room = current_user.room
+    flow = room.flow.reload
+    if flow.add_role(role)
+      room.messages.create(
+        level: :info,
+        content: "#{current_user.username}添加了一个角色'#{role}', 现在的角色有: #{flow.roles}"
+      )
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
+  end
+
+  def remove_role(data)
+    role = data['role']
+    room = current_user.room
+    flow = room.flow.reload
+    if flow.remove_role(role)
+      room.messages.create(
+        level: :info,
+        content: "#{current_user.username}移除了一个角色'#{role}', 现在的角色有: #{flow.roles}"
+      )
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
+  end
+
+  def start_flow(data)
+    restart = data['restart'] == 'true' ? true : false
+    current_user.room.reload.start_flow(restart: restart)
   rescue StandardError => e
     puts e.inspect, e.backtrace
     ActionCable.server.broadcast(user_stream, action: :error, message: e.message)

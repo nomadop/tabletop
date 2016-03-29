@@ -42,9 +42,20 @@ export default class MessagePane extends Component {
   handleSendMessage() {
     const input = this.refs.input;
     const message = input.value;
-    if (message.length) {
-      input.value = '';
-      this.props.sendMessage(message);
+    input.value = '';
+    if (!message.length) {
+      return;
+    }
+
+    if (!message.startsWith('/')) {
+      return this.props.sendMessage(message);
+    }
+
+    const [command, argument] = message.slice(1).split(/ +/);
+    if (command in App.game) {
+      App.game[command](argument);
+    } else {
+      this.props.systemMessage('error', '命令不存在');
     }
   }
 
@@ -176,4 +187,5 @@ MessagePane.propTypes = {
   sendMessage: PropTypes.func,
   authentication: PropTypes.object,
   game: PropTypes.object,
+  systemMessage: PropTypes.func,
 };
