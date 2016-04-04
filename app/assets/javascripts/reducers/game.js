@@ -22,6 +22,8 @@ import {
   TOGGLE_EDIT_OBJECT_PANE,
   TOGGLE_GAME_MENU,
   TOGGLE_PLAYER_PANE,
+  START_VOTE,
+  END_VOTE,
 } from '../actions/action_types';
 import camera from './camera';
 import messages from './message';
@@ -331,12 +333,51 @@ function editObjectPaneIds(state = [], action) {
   }
 }
 
+function voteOptions(state = [], action) {
+  switch (action.type) {
+  case START_VOTE:
+    return action.options;
+  case END_VOTE:
+    return [];
+  default:
+    return state;
+  }
+}
+
+function voteTimeout(state = 0, action) {
+  switch (action.type) {
+  case START_VOTE:
+    return action.timeout;
+  case END_VOTE:
+    return 0;
+  default:
+    return state;
+  }
+}
+function voteState(state = 'close', action) {
+  switch (action.type) {
+  case START_VOTE:
+    return 'open';
+  case END_VOTE:
+    return 'close';
+  default:
+    return state;
+  }
+}
+
+const votePane = combineReducers({
+  voteOptions,
+  voteTimeout,
+  voteState,
+});
+
 const gamePanes = combineReducers({
   showGameMenu,
   showCreateObjectPane,
   showCreateMetaPane,
   showPlayerPane,
   editObjectPaneIds,
+  votePane,
 });
 
 export default combineReducers({

@@ -382,6 +382,21 @@ class GameChannel < ApplicationCable::Channel
     ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
   end
 
+  def confirm_vote(data)
+    vote = data['vote']
+    player = current_user.player.reload
+    room = current_user.room
+    if player.open_to_vote?
+      player.update(vote: vote, vote_status: :voted)
+      room.messages.create(level: :info, to: current_user, content: '投票成功!')
+    else
+      room.messages.create(level: :error, to: current_user, content: '投票失败: 没到投票时间或你没有投票资格')
+    end
+  rescue StandardError => e
+    puts e.inspect, e.backtrace
+    ActionCable.server.broadcast(user_stream, action: :error, message: e.message)
+  end
+
   private
 
   def try_require_lock(game_object, count: 3, time_interval: 0.1)

@@ -40,8 +40,11 @@ class Room < ApplicationRecord
 
   def start_player_vote(voters, votees, default: nil)
     voters.update_all(vote_status: 0)
-    options = votees.map { |votee| [votee.id, votee.inspect] }
+    options = votees.order(:number).map { |votee| [votee.id, votee.inspect] }
     vote.update(status: :open, options: options, default: default)
+    voters.active.each do |voter|
+      ActionCable.server.broadcast("game##{voter.user.id}", action: 'start_vote', options: options, timeout: 60)
+    end
   end
 
   def set_flow_message(message)

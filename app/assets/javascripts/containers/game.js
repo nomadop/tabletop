@@ -11,6 +11,7 @@ import MessagePane from '../components/message-pane';
 import DragBox from 'components/drag_box';
 import GameObjectContainer from './game_object';
 import PlayerPane from '../components/player_pane'
+import VotePane from '../components/vote_pane';
 import {
   moveCameraHorizontal,
   moveCameraVertical,
@@ -28,6 +29,8 @@ import {
   toggleGameMenu,
   toggleEditObjectPane,
   togglePlayerPane,
+  startVote,
+  endVote,
 } from '../actions/game';
 import { receiveMessages } from '../actions/message';
 import {
@@ -77,6 +80,8 @@ class Game extends Component {
       case 'lock_failed':
       case 'lock_error':
         return setTimeout(() => window.requiringLock = false, 100);
+      case 'start_vote':
+        return this.props.startVote(data.options, data.timeout);
       case 'error':
         return this.handleSystemMessage('error', data.message);
       default:
@@ -430,6 +435,14 @@ class Game extends Component {
     this.props.toggleCreateObjectPane(open);
   }
 
+  handleConfirmVote(vote) {
+    if (vote) {
+      App.game.confirm_vote(vote);
+    }
+
+    this.props.endVote();
+  }
+
   resizeGameWindow() {
     this.setState({
       width: window.innerWidth,
@@ -481,8 +494,21 @@ class Game extends Component {
 
     if (gamePanes.showPlayerPane) {
       return (
-        <GamePane title="玩家信息"  width={480} height={360} resizeable>
+        <GamePane title="玩家信息"  width={480} height={360} resizeable onClose={this.handleTogglePlayerPane.bind(this)}>
           <PlayerPane players={players}/>
+        </GamePane>
+      );
+    }
+  }
+
+  renderVotePane() {
+    const { gamePanes } = this.props;
+    const votePane = gamePanes.votePane;
+
+    if (votePane.voteState === 'open') {
+      return (
+        <GamePane title="投票"  width={240} height={360} uncloseable>
+          <VotePane {...votePane} confirmVote={this.handleConfirmVote.bind(this)} systemMessage={this.handleSystemMessage.bind(this)}/>
         </GamePane>
       );
     }
@@ -577,6 +603,7 @@ class Game extends Component {
               {this.renderCreateObjectPane()}
               {this.renderCreateMetaPane()}
               {this.renderPlayerPane()}
+              {this.renderVotePane()}
               {gamePanes.editObjectPanes.map(gameObject => this.renderEditObjectPane(gameObject))}
             </div>
           </div>
@@ -695,6 +722,8 @@ Game.propTypes = {
   toggleGameMenu: PropTypes.func,
   toggleEditObjectPane: PropTypes.func,
   togglePlayerPane: PropTypes.func,
+  startVote: PropTypes.func,
+  endVote: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -714,6 +743,8 @@ function dispatcher(dispatch) {
     toggleGameMenu,
     toggleEditObjectPane,
     togglePlayerPane,
+    startVote,
+    endVote,
   }, dispatch);
 }
 

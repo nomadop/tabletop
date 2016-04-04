@@ -23,7 +23,7 @@ class GameFlow < ApplicationRecord
 
   def execute
     @room.flow_log("Flow Start: #{name}")
-    fail 'No room specified' unless instance_variable_defined?(:@room)
+    raise_error 'No room specified' unless instance_variable_defined?(:@room)
 
     actions.each { |action| execute_action(action) }
   end
@@ -33,7 +33,7 @@ class GameFlow < ApplicationRecord
     action = action.symbolize_keys
     action_name = action[:name]
     action.delete(:name)
-    fail "Unknown action `#{action_name}'" unless private_methods.include?(action_name.to_sym)
+    raise_error "Unknown action `#{action_name}'" unless private_methods.include?(action_name.to_sym)
 
     action.each do |k, v|
       value = v.is_a?(String) ? v.gsub(/`([\w_]+)`/) { send("get_#{$1}") } : v
@@ -48,12 +48,13 @@ class GameFlow < ApplicationRecord
     @room.flow.message
   end
 
-  def assign_role
+  def assign_role(_)
     roles = @room.flow.infos['roles']
-    roles.shuffle
-    @room.players.active.find_each.with_index do |player, index|
-      player.update(role: roles[index])
-      @room.messages.create(level: :info, to: player.user, content: "你的角色是`#{role}`")
+    3.times { roles.shuffle! }
+    @room.players.order(:number).active.find_each.with_index do |player, index|
+      role = roles[index]
+      player.update(role: role)
+      create_message(level: :info, to: player.user, content: "你的角色是`#{role}`")
     end
   end
 
@@ -67,17 +68,17 @@ class GameFlow < ApplicationRecord
   end
 
   def send_message(level: 'info', to: nil, content: nil)
-    @room.messages.create(level: level, to: to, content: content) if content
+    create_message(level: level, to: to, content: content) if content
   end
 
   def check_role(role: nil, count: nil, plus: 0, multiply: 1)
-    fail 'Invalid arguments' if role.nil? || count.nil?
+    raise_error 'Invalid arguments' if role.nil? || count.nil?
     count =
       case count
       when Fixnum then count
       when /^\d+$/ then count.to_i
       when 'active_players' then @room.players.active.count
-      else fail "Invalid count `#{count}'"
+      else raise_error "Invalid count `#{count}'"
       end
 
     roles = @room.flow.infos['roles'] || []
@@ -86,7 +87,7 @@ class GameFlow < ApplicationRecord
   end
 
   def check_player(player: {}, count: nil)
-    fail 'Invalid count' if count.nil?
+    raise_error 'Invalid count' if count.nil?
 
     players = @room.players
     players = players.where(player['where']) if player['where']
@@ -114,7 +115,7 @@ class GameFlow < ApplicationRecord
   end
 
   def update_player_role(who: nil, role: nil)
-    fail 'Invalid parameters' if who.nil? || role.nil?
+    raise_error 'Invalid parameters' if who.nil? || role.nil?
 
     player =
       if who.is_a?(Fixnum)
@@ -126,20 +127,25 @@ class GameFlow < ApplicationRecord
   end
 
   def update_player_status(who: nil, status: nil)
-    fail 'Invalid parameters' if who.nil? || status.nil?
+    raise_error 'Invalid parameters' if who.nil? || status.nil?
 
     player =
-      if who.is_a?(Fixnum) || /\d+/ =~ who
-        @room.players.find(who)
+      case who
+      when 'all' then @room.players
+      when Fixnum, /\d+/ then @room.players.find(who)
       else
-        @room.players.where(role: who).take
+        if @room.game.roles.include?(who)
+          @room.players.where(role: who).take
+        else
+          raise_error "Unknown player selector `#{who}'"
+        end
       end
     player.update(status: status)
   end
 
   def check_vote(_)
     vote = @room.vote
-    fail 'Vote is not open' unless vote.open?
+    raise_error 'Vote is not open' unless vote.open?
 
     result = vote.result.to_a.sort_by { |r| r[1] }
     first = result[0]
@@ -158,7 +164,12 @@ class GameFlow < ApplicationRecord
 
   def charge_dying(_)
     dying_players = @room.players.dying
-    dying_players.update_all(status: 1)
+    if dying_players.any?
+      create_message(level: :info, content: "#{dying_players.to_a}出局")
+      dying_players.update_all(status: 1)
+    else
+      create_message(level: :info, content: '没有玩家出局')
+    end
   end
 
   def broadcast_data(to: nil, **data)
@@ -166,11 +177,22 @@ class GameFlow < ApplicationRecord
       players = @room.players
       players = players.where(to['where']) if to['where']
       players = players.where.not(to['not']) if to['not']
-      players.includes(:user).find_each do |player|
-        ActionCable.server.broadcast("game##{player.user.id}", data) if player.user
+      players.active.includes(:user).find_each do |player|
+        ActionCable.server.broadcast("game##{player.user.id}", data)
       end
     else
       ActionCable.server.broadcast("game@room#{@room.id}", data)
     end
+  end
+
+  def create_message(level: :info, to: nil, content: nil)
+    raise_error 'Content can not be nil' if content.nil?
+    msg = @room.messages.create(level: level, to: to, content: content)
+    @room.flow_log("send message: #{msg.as_json(only: [:level, :to, :content])}")
+  end
+
+  def raise_error(message)
+    @room.flow_log("raise error: #{message}")
+    fail message
   end
 end

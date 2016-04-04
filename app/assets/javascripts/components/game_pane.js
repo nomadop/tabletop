@@ -130,7 +130,7 @@ export default class GamePane extends Component {
   renderHeaderControl() {
     const controls = [];
     const display = this.state.display;
-    const { resizeable, onClose } = this.props;
+    const { resizeable, onClose, uncloseable } = this.props;
     if (display !== MINIMUM) {
       controls.push(<i className="fa fa-minus" key="minimum" onClick={this.handleMinimum.bind(this)}/>);
     } else {
@@ -148,7 +148,11 @@ export default class GamePane extends Component {
       controls.push(<i className={className + "fa fa-compress"} key="maximum" onClick={this.handleResume.bind(this)}/>);
     }
 
-    controls.push(<i className="fa fa-times" key="close" onClick={onClose}/>);
+    if (uncloseable) {
+      controls.push(<i className="fa fa-times disabled" key="close"/>);
+    } else {
+      controls.push(<i className="fa fa-times" key="close" onClick={onClose}/>);
+    }
     return <div className="control">{controls}</div>;
   }
 
@@ -208,4 +212,5 @@ GamePane.propTypes = {
   className: PropTypes.string,
   onClose: PropTypes.func,
   noHeader: PropTypes.bool,
+  uncloseable: PropTypes.bool,
 };

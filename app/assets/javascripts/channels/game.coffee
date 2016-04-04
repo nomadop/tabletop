@@ -78,6 +78,9 @@ App.game = App.cable.subscriptions.create "GameChannel",
     restart = if arg == 'restart' then 'true' else 'false'
     @perform 'start_flow', restart: restart
 
+  confirm_vote: (vote) ->
+    @perform 'confirm_vote', vote: vote
+
 window.addEventListener 'beforeunload', ->
   App.game.unsubscribe()
   return

@@ -21,6 +21,8 @@ import {
   TOGGLE_EDIT_OBJECT_PANE,
   TOGGLE_GAME_MENU,
   TOGGLE_PLAYER_PANE,
+  START_VOTE,
+  END_VOTE,
 } from './action_types';
 import { receiveMessages } from './message';
 
@@ -187,5 +189,19 @@ export function togglePlayerPane(isShown) {
   return {
     type: TOGGLE_PLAYER_PANE,
     isShown,
+  };
+}
+
+export function startVote(options, timeout) {
+  return {
+    type: START_VOTE,
+    options,
+    timeout,
+  };
+}
+
+export function endVote() {
+  return {
+    type: END_VOTE,
   };
 }

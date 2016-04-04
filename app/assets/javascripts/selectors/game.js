@@ -17,6 +17,7 @@ const showCreateObjectPaneSelector = state => state.gamePanes.showCreateObjectPa
 const showCreateMetaPaneSelector = state => state.gamePanes.showCreateMetaPane;
 const showPlayerPaneSelector = state => state.gamePanes.showPlayerPane;
 const editObjectPaneIdsSelector = state => state.gamePanes.editObjectPaneIds;
+const votePaneSelector = state => state.gamePanes.votePane;
 const playersSelector = state => state.players;
 
 const editObjectPanesSelector = createSelector(
@@ -31,8 +32,9 @@ const gamePanesSelector = createSelector(
   showCreateObjectPaneSelector,
   showPlayerPaneSelector,
   editObjectPanesSelector,
-  (showGameMenu, showCreateMetaPane, showCreateObjectPane, showPlayerPane, editObjectPanes) => {
-    return { showGameMenu, showCreateMetaPane, showCreateObjectPane, showPlayerPane, editObjectPanes };
+  votePaneSelector,
+  (showGameMenu, showCreateMetaPane, showCreateObjectPane, showPlayerPane, editObjectPanes, votePane) => {
+    return { showGameMenu, showCreateMetaPane, showCreateObjectPane, showPlayerPane, editObjectPanes, votePane };
   }
 );
 

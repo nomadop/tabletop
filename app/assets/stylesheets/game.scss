@@ -649,6 +649,18 @@
         }
       }
     }
+
+    .vote-pane {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+
+      .vote-option {
+        width: 150px;
+        margin: 4px;
+      }
+    }
   }
 
   .perspective-layer {
