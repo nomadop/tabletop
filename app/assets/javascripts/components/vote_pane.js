@@ -3,26 +3,44 @@ import ReactDOM from 'react-dom';
 
 export default class VotePane extends Component {
   componentDidMount() {
+    this.startTime = Date.now();
+    this.countingDown = setInterval(this.handleCountingDown.bind(this), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.countingDown);
+  }
+
+  handleCountingDown() {
     const { voteTimeout } = this.props;
-    this.timeout = setTimeout(this.handleConfirmVote.bind(this), voteTimeout * 1000);
+    const countDown = voteTimeout - (Date.now() - this.startTime) / 1000;
+    if (countDown <= 0) {
+      return this.handleConfirmVote();
+    }
+
+    const progress = countDown / voteTimeout;
+    const countDownNode = this.refs.countDown;
+    countDownNode.innerHTML = Math.round(countDown);
+    countDownNode.style.color = `rgb(${Math.round(255 * (1 - progress))}, ${Math.round(255 * progress)}, 0)`;
   }
 
   handleConfirmVote() {
-    clearTimeout(this.timeout);
     const { confirmVote, systemMessage } = this.props;
     const checked = ReactDOM.findDOMNode(this).querySelector('input:checked');
     const voteValue = checked ? checked.value : null;
     if (!voteValue) {
       systemMessage('warning', "你没有选择投票选项, 作弃权处理");
     }
+
     confirmVote(voteValue);
   }
 
   render() {
-    const { voteOptions } = this.props;
+    const { voteOptions, voteTimeout } = this.props;
 
     return (
       <div className="vote-pane" style={this.style}>
+        <span className="count-down" ref="countDown">{voteTimeout}</span>
         {voteOptions.map((option, index) => (
           <span className="vote-option">
             <input type="radio" ref={`vote${index}`} name="voteOption" value={option[0]}/>

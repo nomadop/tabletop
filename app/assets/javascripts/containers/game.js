@@ -31,6 +31,7 @@ import {
   togglePlayerPane,
   startVote,
   endVote,
+  clearMessages,
 } from '../actions/game';
 import { receiveMessages } from '../actions/message';
 import {
@@ -82,6 +83,8 @@ class Game extends Component {
         return setTimeout(() => window.requiringLock = false, 100);
       case 'start_vote':
         return this.props.startVote(data.options, data.timeout);
+      case 'clear_messages':
+        return this.props.clearMessages();
       case 'error':
         return this.handleSystemMessage('error', data.message);
       default:
@@ -724,6 +727,7 @@ Game.propTypes = {
   togglePlayerPane: PropTypes.func,
   startVote: PropTypes.func,
   endVote: PropTypes.func,
+  clearMessages: PropTypes.func,
 };
 
 function dispatcher(dispatch) {
@@ -745,6 +749,7 @@ function dispatcher(dispatch) {
     togglePlayerPane,
     startVote,
     endVote,
+    clearMessages,
   }, dispatch);
 }
 

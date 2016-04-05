@@ -1,6 +1,6 @@
 import update from 'react-addons-update';
 import { combineReducers } from 'redux';
-import { RECEIVE_MESSAGES } from '../actions/action_types';
+import { RECEIVE_MESSAGES, CLEAR_MESSAGES } from '../actions/action_types';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
 
 function messageById(state = {}, action) {
@@ -9,6 +9,8 @@ function messageById(state = {}, action) {
   case RECEIVE_MESSAGES:
     action.messages.forEach(message => updater[message.id] = { $set: message });
     return update(state, updater);
+  case CLEAR_MESSAGES:
+    return {};
   default:
     return state;
   }
@@ -19,6 +21,8 @@ function messageIds(state = [], action) {
   case RECEIVE_MESSAGES:
     const newIds = action.messages.map(message => message.id);
     return arrayPlus(state, newIds);
+  case CLEAR_MESSAGES:
+    return [];
   default:
     return state;
   }

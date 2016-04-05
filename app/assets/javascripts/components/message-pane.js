@@ -96,7 +96,7 @@ export default class MessagePane extends Component {
 
   getMessageClassName(msg) {
     const classNames = ['message', msg.level];
-    if (msg.from_name === this.props.authentication.username) {
+    if (msg.from_player === this.props.authentication.player_num) {
       classNames.push('self');
     }
 

@@ -1,7 +1,7 @@
 class RoomsController < ApplicationController
   protect_from_forgery except: [:create]
 
-  before_action :authenticate_user!, except: [:game_data]
+  before_action :authenticate_user!
   before_action :require_out_room, only: [:create, :join]
   before_action :require_in_room, only: [:destroy, :leave]
 
@@ -13,7 +13,7 @@ class RoomsController < ApplicationController
       game_objects: room.game_objects.includes(:meta, :room, :player, :markers),
       decks: room.decks,
       player_areas: room.player_areas,
-      messages: room.messages.includes(:from).last(100),
+      messages: room.messages.includes(:from, :to).where(to: [current_user, nil]).order(:created_at).last(100),
       players: room.players.as_json(only: :number, include: {user: {only: [], methods: [:username, :avatar_info]}})
     }
   end

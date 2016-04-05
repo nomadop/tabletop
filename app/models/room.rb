@@ -23,6 +23,9 @@ class Room < ApplicationRecord
   def start_flow(restart: false)
     fail 'low is running' unless flow.game_flow.end_flow? || restart
 
+    ActionCable.server.broadcast("game@room#{id}", action: 'clear_messages')
+    messages.destroy_all
+    messages.create(level: :info, content: '已清理聊天记录')
     flow.update(game_flow: game.start_flow)
     flow_log('GameFlow Start...', clear: true)
     ExecuteFlowJob.perform_later(flow.id)

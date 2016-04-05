@@ -23,6 +23,7 @@ import {
   TOGGLE_PLAYER_PANE,
   START_VOTE,
   END_VOTE,
+  CLEAR_MESSAGES,
 } from './action_types';
 import { receiveMessages } from './message';
 
@@ -70,8 +71,9 @@ export function receivePlayers(players) {
 
 export function fetchGameData(roomId) {
   return (dispatch) => {
-    fetch(`/rooms/${roomId}/game_data`)
-      .then(response => response.json())
+    fetch(`/rooms/${roomId}/game_data`, {
+      credentials: 'same-origin',
+    }).then(response => response.json())
       .then(json => {
         dispatch(receiveGameObjectMeta(json.game_object_meta));
         dispatch(receiveDecks(json.decks));
@@ -203,5 +205,11 @@ export function startVote(options, timeout) {
 export function endVote() {
   return {
     type: END_VOTE,
+  };
+}
+
+export function clearMessages() {
+  return {
+    type: CLEAR_MESSAGES,
   };
 }

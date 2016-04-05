@@ -11,7 +11,7 @@ class Message < ApplicationRecord
 
   def as_json(opts = {})
     opts[:methods] ||= []
-    opts[:methods] |= [:from_name, :from_avatar, :from_player]
+    opts[:methods] |= [:from_name, :from_avatar, :from_player, :to_name, :to_avatar, :to_player]
     opts[:except] ||= []
     opts[:except] |= [:room_id, :from_id, :to_id, :created_at, :updated_at]
     super(opts)
@@ -38,6 +38,18 @@ class Message < ApplicationRecord
 
   def from_player
     from.nil? ? nil : from.player_num;
+  end
+
+  def to_name
+    to.nil? ? "系统#{level_name}" : to.username;
+  end
+
+  def to_avatar
+    to.nil? ? AvatarUploader.anonymous.thumb.url : to.avatar_info.thumb.url
+  end
+
+  def to_player
+    to.nil? ? nil : to.player_num;
   end
 
   def room_stream
