@@ -26,9 +26,9 @@ class Room < ApplicationRecord
     ActionCable.server.broadcast("game@room#{id}", action: 'clear_messages')
     messages.destroy_all
     messages.create(level: :info, content: '已清理聊天记录')
-    flow.update(game_flow: game.start_flow)
+    flow.update(game_flow: game.start_flow, flow_version: flow.flow_version + 1)
     flow_log('GameFlow Start...', clear: true)
-    ExecuteFlowJob.perform_later(flow.id)
+    ExecuteFlowJob.perform_later(flow.id, flow.flow_version)
   end
 
   def flow_log(message, clear: false)

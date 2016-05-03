@@ -61,9 +61,9 @@ class GameFlow < ApplicationRecord
   def transit(wait: 0)
     wait = wait.to_i
     if wait > 0
-      TransitFlowJob.set(wait: wait.seconds).perform_later(@room.flow.id)
+      TransitFlowJob.set(wait: wait.seconds).perform_later(@room.flow.id, @version)
     else
-      TransitFlowJob.perform_now(@room.flow.id)
+      TransitFlowJob.perform_now(@room.flow.id, @version)
     end
   end
 

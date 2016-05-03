@@ -25,12 +25,13 @@ class RoomFlow < ApplicationRecord
     save
   end
 
-  def execute
+  def execute(version)
     game_flow.instance_variable_set(:@room, room)
+    game_flow.instance_variable_set(:@version, version)
     game_flow.execute
   end
 
-  def transit
+  def transit(version)
     fail 'Can not transit end flow' if to_transitions.empty?
 
     msg = message || ''
@@ -42,7 +43,7 @@ class RoomFlow < ApplicationRecord
     if target_transition
       update(game_flow: target_transition.to_flow)
       room.flow_log("Transit to #{target_transition.to_flow.name} with keyword #{target_transition.keyword} and message #{msg}")
-      ExecuteFlowJob.perform_later(id)
+      ExecuteFlowJob.perform_later(id, version)
     else
       fail "Invalid message `#{msg}'"
     end

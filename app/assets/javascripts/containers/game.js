@@ -304,13 +304,7 @@ class Game extends Component {
           return false;
         }
 
-        const checkY = y > top && y < top + height2;
-        if (!checkY) {
-          return false;
-        }
-
-
-        return true;
+        return y > top && y < top + height2;
       });
       const selectingObjects = arrayMinus(boxingObjects, selectedObjects);
       if (selectingObjects.length) {
