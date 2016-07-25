@@ -2,7 +2,7 @@
 source 'https://ruby.taobao.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '>= 5.0.0.beta2', '< 5.1'
+gem 'rails', '>= 5.0.0.rc2', '< 5.1'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 gem 'pg'
@@ -45,9 +45,9 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'react-rails', '~> 1.5.0'
 gem 'redis'
-gem 'sass-rails'
+gem 'sass-rails', '~> 5.0.5'
 gem 'browserify-rails'
-gem 'devise', :github => 'plataformatec/devise', :branch => 'master'
+gem 'devise', '~>4.2.0'
 gem 'rubocop'
 gem 'font-awesome-rails'
 gem 'carrierwave', :github => 'carrierwaveuploader/carrierwave', :branch => 'master'
