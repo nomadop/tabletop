@@ -15,6 +15,7 @@ module Tabletop
     config.browserify_rails.commandline_options = '-t babelify'
     config.active_job.queue_adapter = :sidekiq
     config.action_cable.allowed_request_origins = ['http://localhost:3000', 'https://localhost:3000', 'https://192.168.3.4:3000']
-    config.force_ssl = true
+    # config.force_ssl = true
+    config.autoload_paths << "#{Rails.root}/app/models/flow_actions"
   end
 end

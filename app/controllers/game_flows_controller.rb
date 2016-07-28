@@ -5,7 +5,7 @@ class GameFlowsController < ApplicationController
   # GET /game/1/flows
   # GET /game/1/flows.json
   def index
-    @game_flows = @game.flows.order(:id)
+    @game_flows = @game.flows.includes(:to_transitions).order(:id)
   end
 
   # GET /game/1/flows/1
@@ -26,6 +26,7 @@ class GameFlowsController < ApplicationController
   # POST /game/1/flows.json
   def create
     @game_flow = @game.flows.new(game_flow_params)
+    @game_flow.flow_action_maps.each { |action_map| action_map.game_flow = @game_flow }
     @game_flow.to_transitions.each { |transition| transition.from_flow = @game_flow }
 
     respond_to do |format|
@@ -42,6 +43,7 @@ class GameFlowsController < ApplicationController
   # PATCH/PUT /game/1/flows/1
   # PATCH/PUT /game/1/flows/1.json
   def update
+    @game_flow.flow_action_maps.destroy_all
     @game_flow.to_transitions.destroy_all
     respond_to do |format|
       if @game_flow.update(game_flow_params)
@@ -76,10 +78,11 @@ class GameFlowsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def game_flow_params
-    game_flow_params = params.require(:game_flow).permit(:name, :actions, :to_transitions)
-    game_flow_params[:actions] = JSON.parse(game_flow_params[:actions])
-    transition_creater = instance_variable_defined?(:@game_flow) ? @game_flow.to_transitions : FlowTransition
-    game_flow_params[:to_transitions] = transition_creater.create JSON.parse(game_flow_params[:to_transitions])
+    game_flow_params = params.require(:game_flow).permit(:name, :flow_action_maps, :to_transitions)
+    action_map_creator = instance_variable_defined?(:@game_flow) ? @game_flow.flow_action_maps : FlowActionMap
+    game_flow_params[:flow_action_maps] = action_map_creator.create JSON.parse(game_flow_params[:flow_action_maps])
+    transition_creator = instance_variable_defined?(:@game_flow) ? @game_flow.to_transitions : FlowTransition
+    game_flow_params[:to_transitions] = transition_creator.create JSON.parse(game_flow_params[:to_transitions])
     game_flow_params
   end
 end

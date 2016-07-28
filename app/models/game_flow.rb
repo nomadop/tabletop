@@ -4,6 +4,8 @@ class GameFlow < ApplicationRecord
   has_many :to_transitions, foreign_key: :from_flow_id, class_name: 'FlowTransition'
   has_many :from_flows, through: :from_transitions
   has_many :to_flows, through: :to_transitions
+  has_many :flow_action_maps, dependent: :destroy
+  has_many :flow_actions, through: :flow_action_maps
   scope :start_flow, -> do
     joins('LEFT JOIN "flow_transitions" ON "flow_transitions"."to_flow_id" = "game_flows"."id"')
       .group(:id).having('count(flow_transitions.id) = 0')
@@ -11,6 +13,19 @@ class GameFlow < ApplicationRecord
   scope :end_flow, -> do
     joins('LEFT JOIN "flow_transitions" ON "flow_transitions"."from_flow_id" = "game_flows"."id"')
       .group(:id).having('count(flow_transitions.id) = 0')
+  end
+
+  def convert_actions
+    actions.each.with_index(1) do |action, index|
+      key = action['name']
+      action.delete('name')
+      flow_action = FlowAction.find_by(key: key)
+      raise "Unknown action `#{key}'" if flow_action.nil?
+
+      unless flow_action_maps.where(flow_action: flow_action).exists?
+        flow_action_maps.create(flow_action: flow_action, number: index, arguments: action)
+      end
+    end
   end
 
   def start_flow?
@@ -25,21 +40,19 @@ class GameFlow < ApplicationRecord
     @room.flow_log("Flow Start: #{name}")
     raise_error 'No room specified' unless instance_variable_defined?(:@room)
 
-    actions.each { |action| execute_action(action) }
+    flow_action_maps.includes(:flow_action).each { |action_map| execute_action(action_map) }
   end
 
-  def execute_action(action)
-    @room.flow_log("Action execute: #{action}")
-    action = action.symbolize_keys
-    action_name = action[:name]
-    action.delete(:name)
-    raise_error "Unknown action `#{action_name}'" unless private_methods.include?(action_name.to_sym)
+  def execute_action(action_map)
+    action = action_map.flow_action
+    arguments = action_map.arguments.symbolize_keys
+    @room.flow_log("Action execute: #{action.name}, arguments: #{arguments}")
 
-    action.each do |k, v|
+    arguments.each do |k, v|
       value = v.is_a?(String) ? v.gsub(/`([\w_]+)`/) { send("get_#{$1}") } : v
-      action[k] = value
+      arguments[k] = value
     end
-    send(action_name, action)
+    send(action.key, arguments)
   end
 
   private

@@ -79,6 +79,8 @@
 
 .game-window {
   position: fixed;
+  height: 100%;
+  width: 100%;
   left: 0;
   top: 0;
   transform-style: preserve-3d;
@@ -90,6 +92,9 @@
   .pop-up-layer {
     transform: perspective(0) translateZ(10000px);
     pointer-events: none;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 
     .action-blocker {
       position: absolute;
@@ -137,6 +142,7 @@
 
     .footer {
       position: absolute;
+      bottom: 0;
       width: 100%;
       display: flex;
       justify-content: space-between;

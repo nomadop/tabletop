@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170322072461) do
+ActiveRecord::Schema.define(version: 20170322072463) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,24 @@ ActiveRecord::Schema.define(version: 20170322072461) do
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.integer  "room_id",                     null: false
+  end
+
+  create_table "flow_action_maps", force: :cascade do |t|
+    t.integer  "game_flow_id"
+    t.integer  "flow_action_id"
+    t.integer  "number"
+    t.json     "arguments"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  create_table "flow_actions", force: :cascade do |t|
+    t.string   "key"
+    t.string   "name"
+    t.json     "arguments"
+    t.text     "description"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "flow_transitions", force: :cascade do |t|

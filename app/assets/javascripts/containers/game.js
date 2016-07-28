@@ -83,6 +83,8 @@ class Game extends Component {
         return setTimeout(() => window.requiringLock = false, 100);
       case 'start_vote':
         return this.props.startVote(data.options, data.timeout);
+      case 'end_vote':
+        return this.props.endVote();
       case 'clear_messages':
         return this.props.clearMessages();
       case 'error':
@@ -586,7 +588,7 @@ class Game extends Component {
             </span>
           </div>
         </div>
-        <div className="footer" style={{bottom: -height || 0}}>
+        <div className="footer">
           <MessagePane messages={messages}
                        disableKeyEvent={this.handleDisableKeyEvent.bind(this)}
                        sendMessage={this.handleSendMessage.bind(this)}

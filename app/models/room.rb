@@ -21,9 +21,10 @@ class Room < ApplicationRecord
   scope :play, ->{ where(dev: nil) }
 
   def start_flow(restart: false)
-    fail 'low is running' unless flow.game_flow.end_flow? || restart
+    fail 'flow is running' unless flow.nil? || flow.game_flow.end_flow? || flow.game_flow.start_flow? || restart
 
     ActionCable.server.broadcast("game@room#{id}", action: 'clear_messages')
+    ActionCable.server.broadcast("game@room#{id}", action: 'end_vote')
     messages.destroy_all
     messages.create(level: :info, content: '已清理聊天记录')
     flow.update(game_flow: game.start_flow, flow_version: flow.flow_version + 1)
