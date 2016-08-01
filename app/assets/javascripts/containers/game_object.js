@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GameObject from '../components/game_object';
 import PlayerArea from '../components/player_area';
+import * as KeyCode from '../utils/key_codes';
 import {
   selectGameObject,
   unselectGameObjects,
@@ -291,18 +292,18 @@ class GameObjectContainer extends Component {
   }
 
   handleKeyDown(event) {
-    switch (event.keyCode) {
-    case 80:
+    switch (event.keyCode.toString()) {
+    case KeyCode.P:
       return this.handleCreateDeck();
-    case 70:
+    case KeyCode.F:
       return this.handleFlipGameObjects();
-    case 82:
+    case KeyCode.R:
       return this.handleRotateGameObjects(45);
-    case 69:
+    case KeyCode.E:
       return this.handleToggleDeck();
-    case 46:
+    case KeyCode.DEL:
       return this.handleDestroyGameObjects();
-    case 77:
+    case KeyCode.M:
       return this.handleOpenEditObjectPane();
     default:
       return;

@@ -12,6 +12,7 @@ import DragBox from 'components/drag_box';
 import GameObjectContainer from './game_object';
 import PlayerPane from '../components/player_pane'
 import VotePane from '../components/vote_pane';
+import * as KeyCode from '../utils/key_codes';
 import {
   moveCameraHorizontal,
   moveCameraVertical,
@@ -133,30 +134,30 @@ class Game extends Component {
       console.log(keyCode);
     }
     switch (keyCode.toString()) {
-    case '65':
+    case KeyCode.A:
       return this.props.moveCameraHorizontal(-50);
-    case '87':
+    case KeyCode.W:
       return this.props.moveCameraVertical(-50);
-    case '68':
+    case KeyCode.D:
       return this.props.moveCameraHorizontal(50);
-    case '83':
+    case KeyCode.S:
       return this.props.moveCameraVertical(50);
-    case '187':
+    case KeyCode.PLUS:
       return this.props.zoomCamera(0.01);
-    case '189':
+    case KeyCode.MINUS:
       return this.props.zoomCamera(-0.01);
-    case '37':
+    case KeyCode.LEFT:
       return this.props.rotateCameraHorizontal(10);
-    case '39':
+    case KeyCode.RIGHT:
       return this.props.rotateCameraHorizontal(-10);
-    case '38':
+    case KeyCode.UP:
       return this.props.rotateCameraVertical(1);
-    case '40':
+    case KeyCode.DOWN:
       return this.props.rotateCameraVertical(-1);
-    case '72':
+    case KeyCode.H:
       this.mouseDownInfo = null;
       return this.setState({ drawMode: !this.state.drawMode });
-    case '75':
+    case KeyCode.K:
       if (this.recording) {
         return;
       }
@@ -173,7 +174,7 @@ class Game extends Component {
       return;
     }
 
-    if (e.keyCode === 75) {
+    if (e.keyCode.toString() === KeyCode.K) {
       this.recording = false;
       stopRecording(() => getBase64(this.handleSendMessage.bind(this, '')));
     }
