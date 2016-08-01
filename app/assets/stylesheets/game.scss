@@ -794,6 +794,22 @@
             border: 1px solid black;
           }
         }
+
+        .flow-object {
+          border: 3px solid darkgray;
+          background-color: darkgray;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .flow-name {
+            pointer-events: none;
+            font-size: 16px;
+            font-weight: bolder;
+            color: black;
+            text-shadow: -3px -3px 3px #fff, 3px -3px 3px #fff, -3px 3px 3px #fff, 3px 3px 3px #fff;
+          }
+        }
       }
     }
   }

@@ -14,7 +14,8 @@ class RoomsController < ApplicationController
       decks: room.decks,
       player_areas: room.player_areas,
       messages: room.messages.includes(:from, :to).where(to: [current_user, nil]).order(:created_at).last(100),
-      players: room.players.as_json(only: :number, include: {user: {only: [], methods: [:username, :avatar_info]}})
+      players: room.players.as_json(only: :number, include: {user: {only: [], methods: [:username, :avatar_info]}}),
+      game_flows: room.game.flows.includes(:flow_actions)
     }
   end
 

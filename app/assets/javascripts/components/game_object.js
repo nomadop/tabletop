@@ -74,6 +74,10 @@ export default class GameObject extends Component {
       }
     }
 
+    if (gameObject.meta_type === 'GameFlow') {
+      classNames.push('flow-object');
+    }
+
     if (gameObject.player_num) {
       classNames.push(`player${gameObject.player_num}`);
     }
@@ -143,6 +147,20 @@ export default class GameObject extends Component {
     );
   }
 
+  renderFlowObject(flow) {
+    return (
+      <div
+        className={this.className}
+        style={this.style}
+        tabIndex="1"
+        onMouseDown={this.handleMouseDown.bind(this)}
+        onMouseMove={this.handleMouseMove.bind(this)}
+      >
+        <span className="flow-name">{flow.name}</span>
+      </div>
+    );
+  }
+
   renderInnerObjects(deck) {
     if (!deck.is_expanded) {
       return;
@@ -201,6 +219,8 @@ export default class GameObject extends Component {
     const { gameObject } = this.props;
     if (gameObject.meta_type === 'Deck' && gameObject.id !== 'fakeDragging') {
       return this.renderDeckObject();
+    } else if (gameObject.meta_type === 'GameFlow') {
+      return this.renderFlowObject(gameObject.meta);
     } else {
       return this.renderNormalObject();
     }

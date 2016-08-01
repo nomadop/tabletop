@@ -7,6 +7,8 @@ const metaByIdSelector = state => state.meta.byId;
 const metaIdsSelector = state => state.meta.ids;
 const deckByIdSelector = state => state.decks.byId;
 const deckIdsSelector = state => state.decks.ids;
+const gameFlowByIdSelector = state => state.gameFlows.byId;
+const gameFlowIdsSelector = state => state.gameFlows.ids;
 const playerAreaByIdSelector = state => state.playerAreas.byId;
 const playerAreaIdsSelector = state => state.playerAreas.ids;
 const gameObjectByIdSelector = state => state.gameObjects.byId;
@@ -59,30 +61,40 @@ const gameObjectsSelector = createSelector(
   metaByIdSelector,
   deckByIdSelector,
   deckIdsSelector,
+  gameFlowByIdSelector,
+  gameFlowIdsSelector,
   playerAreaByIdSelector,
   playerAreaIdsSelector,
   gameObjectByIdSelector,
   gameObjectIdsSelector,
-  (metaById, deckById, deckIds, areaById, areaIds, gameObjectById, gameObjectIds) => {
+  (metaById, deckById, deckIds, gameFlowById, gameFlowIds, areaById, areaIds, gameObjectById, gameObjectIds) => {
     deckIds.forEach(id => deckById[id].innerObjects = []);
     areaIds.forEach(id => areaById[id].innerObjects = []);
     return gameObjectIds.map(id => {
       const object = gameObjectById[id];
-      if (object.meta_type === 'Deck') {
+      switch (object.meta_type) {
+      case 'Deck':
         object.meta = deckById[object.meta_id];
-      } else {
+        break;
+      case 'GameFlow':
+        object.meta = gameFlowById[object.meta_id];
+        break;
+      default:
         object.meta = metaById[object.meta_id];
       }
 
-      if (object.container_type === 'Deck') {
+      switch (object.container_type) {
+      case 'Deck':
         const deck = deckById[object.container_id];
         deck.innerObjects.push(object);
         object.container = deck;
-      } else if (object.container_type === 'PlayerArea') {
+        break;
+      case 'PlayerArea':
         const area = areaById[object.container_id];
         area.innerObjects.push(object);
         object.container = area;
-      } else {
+        break;
+      default:
         object.container = null;
       }
 

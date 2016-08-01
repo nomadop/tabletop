@@ -681,16 +681,7 @@ class Game extends Component {
   }
 
   render() {
-    const { game } = this.props;
-
-    switch (game.game_type) {
-    case 'boardgame':
-      return this.renderBoardgame();
-    case 'chat_game':
-      return this.renderChatGame();
-    default:
-      raise('unknown game type');
-    }
+    return this.renderBoardgame();
   }
 }
 

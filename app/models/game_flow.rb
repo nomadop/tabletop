@@ -6,6 +6,7 @@ class GameFlow < ApplicationRecord
   has_many :to_flows, through: :to_transitions
   has_many :flow_action_maps, dependent: :destroy
   has_many :flow_actions, through: :flow_action_maps
+  has_many :game_objects, as: :meta, dependent: :destroy
   scope :start_flow, -> do
     joins('LEFT JOIN "flow_transitions" ON "flow_transitions"."to_flow_id" = "game_flows"."id"')
       .group(:id).having('count(flow_transitions.id) = 0')

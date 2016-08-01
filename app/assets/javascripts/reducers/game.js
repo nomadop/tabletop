@@ -5,6 +5,7 @@ import {
   REMOVE_GAME_OBJECT_META,
   RECEIVE_GAME_OBJECTS,
   RECEIVE_DECKS,
+  RECEIVE_GAME_FLOWS,
   RECEIVE_PLAYER_AREAS,
   RECEIVE_PLAYERS,
   SELECT_GAME_OBJECT,
@@ -86,6 +87,34 @@ const decks = combineReducers({
   ids: deckIds,
 });
 
+function gameFlowById(state = {}, action) {
+  const updater = {};
+  switch (action.type) {
+  case RECEIVE_GAME_FLOWS:
+    action.gameFlows.forEach(gameFlow => updater[gameFlow.id] = {
+      $set: Object.assign(gameFlow, { width: 100, height: 100 })
+    });
+    return update(state, updater);
+  default:
+    return state;
+  }
+}
+
+function gameFlowIds(state = [], action) {
+  switch (action.type) {
+  case RECEIVE_GAME_FLOWS:
+    const newIds = action.gameFlows.map(gameFlow => gameFlow.id);
+    return arrayPlus(state, newIds);
+  default:
+    return state;
+  }
+}
+
+const gameFlows = combineReducers({
+  byId: gameFlowById,
+  ids: gameFlowIds,
+});
+
 function playerAreaById(state = {}, action) {
   const updater = {};
   switch (action.type) {
@@ -121,9 +150,9 @@ function players(state = [], action) {
   switch (action.type) {
   case RECEIVE_PLAYERS:
     return action.players;
-  //case REMOVE_PLAYER:
-  //  updater[action.areaNumber] = { $set: null };
-  //  return update(state, updater);
+    //case REMOVE_PLAYER:
+    //  updater[action.areaNumber] = { $set: null };
+    //  return update(state, updater);
   default:
     return state;
   }
@@ -388,5 +417,6 @@ export default combineReducers({
   playerAreas,
   messages,
   gamePanes,
+  gameFlows,
   players,
 });

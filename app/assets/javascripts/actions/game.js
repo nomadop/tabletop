@@ -5,6 +5,7 @@ import {
   RECEIVE_DECKS,
   RECEIVE_PLAYER_AREAS,
   RECEIVE_PLAYERS,
+  RECEIVE_GAME_FLOWS,
   SELECT_GAME_OBJECT,
   FLIP_GAME_OBJECTS,
   ROTATE_GAME_OBJECTS,
@@ -69,6 +70,13 @@ export function receivePlayers(players) {
   };
 }
 
+export function receiveGameFlows(gameFlows) {
+  return {
+    type: RECEIVE_GAME_FLOWS,
+    gameFlows,
+  };
+}
+
 export function fetchGameData(roomId) {
   return (dispatch) => {
     fetch(`/rooms/${roomId}/game_data`, {
@@ -78,6 +86,7 @@ export function fetchGameData(roomId) {
         dispatch(receiveGameObjectMeta(json.game_object_meta));
         dispatch(receiveDecks(json.decks));
         dispatch(receivePlayerAreas(json.player_areas));
+        dispatch(receiveGameFlows(json.game_flows));
         dispatch(receiveGameObjects(json.game_objects));
         dispatch(receiveMessages(json.messages));
         dispatch(receivePlayers(json.players));
