@@ -153,7 +153,7 @@ export default class EditObjectPane extends Component {
     );
   }
 
-  render() {
+  renderNormalObject() {
     const { gameObject } = this.props;
     return (
       <GamePane className="edit-object-pane"
@@ -167,9 +167,33 @@ export default class EditObjectPane extends Component {
       </GamePane>
     );
   }
+
+  renderFlowObject() {
+    const { game, gameObject } = this.props;
+    return (
+      <GamePane className="edit-object-pane"
+                title={`编辑${gameObject.meta.name}`}
+                width={480} height={640}
+                onClose={this.props.onClose}
+      >
+        <iframe src={`/games/${game.id}/game_flows/${gameObject.meta_id}/edit`} frameBorder="0"></iframe>
+      </GamePane>
+    );
+  }
+
+  render() {
+    const { gameObject } = this.props;
+    switch (gameObject.meta_type) {
+    case 'GameFlow':
+      return this.renderFlowObject();
+    default:
+      return this.renderNormalObject();
+    }
+  }
 }
 
 EditObjectPane.propTypes = {
+  game: PropTypes.object,
   meta: PropTypes.array,
   gameObject: PropTypes.object,
   onClose: PropTypes.func,

@@ -43,7 +43,6 @@
     var action = actions.find(function (act) {
       return act.id === action_map.flow_action_id;
     });
-    console.log(action_map, action);
     var parameters = action_map.arguments || [];
 
     var actionNode = ` \
@@ -109,7 +108,6 @@
       };
     });
 
-    console.log(json);
     document.querySelector('#game_flow_to_transitions').value = JSON.stringify(json);
   }
 
@@ -137,7 +135,6 @@
       return result;
     });
 
-    console.log(json);
     document.querySelector('#game_flow_flow_action_maps').value = JSON.stringify(json);
   }
 

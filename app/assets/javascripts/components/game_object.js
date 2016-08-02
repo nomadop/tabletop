@@ -157,6 +157,7 @@ export default class GameObject extends Component {
         onMouseMove={this.handleMouseMove.bind(this)}
       >
         <span className="flow-name">{flow.name}</span>
+        {flow.flow_actions.map(action => <span className="flow-action">{action.name}</span>)}
       </div>
     );
   }
