@@ -5,7 +5,7 @@ import {
   ROTATE_CAMERA_HORIZONTAL,
   ROTATE_CAMERA_VERTICAL,
   SET_CAMERA,
-} from './action_types';
+} from '../constants/action_types';
 
 export function moveCameraHorizontal(offset) {
   return {

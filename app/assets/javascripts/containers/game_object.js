@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GameObject from '../components/game_object';
 import PlayerArea from '../components/player_area';
-import * as KeyCode from '../utils/key_codes';
+import * as KeyCode from '../constants/key_codes';
 import {
   selectGameObject,
   unselectGameObjects,

@@ -1,4 +1,4 @@
-import { NEW_MESSAGE } from './action_types';
+import { NEW_MESSAGE } from '../constants/action_types';
 
 export function newMessage(message) {
   return {

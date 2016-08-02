@@ -1,6 +1,6 @@
 import update from 'react-addons-update';
 import { combineReducers } from 'redux';
-import { RECEIVE_MESSAGES, CLEAR_MESSAGES } from '../actions/action_types';
+import { RECEIVE_MESSAGES, CLEAR_MESSAGES } from '../constants/action_types';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
 
 function messageById(state = {}, action) {

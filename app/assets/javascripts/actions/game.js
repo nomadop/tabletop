@@ -25,7 +25,7 @@ import {
   START_VOTE,
   END_VOTE,
   CLEAR_MESSAGES,
-} from './action_types';
+} from '../constants/action_types';
 import { receiveMessages } from './message';
 
 export function receiveGameObjects(gameObjects) {

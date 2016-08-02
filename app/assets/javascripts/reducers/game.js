@@ -25,7 +25,7 @@ import {
   TOGGLE_PLAYER_PANE,
   START_VOTE,
   END_VOTE,
-} from '../actions/action_types';
+} from '../constants/action_types';
 import camera from './camera';
 import messages from './message';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';

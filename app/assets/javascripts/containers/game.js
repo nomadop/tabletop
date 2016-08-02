@@ -12,7 +12,7 @@ import DragBox from 'components/drag_box';
 import GameObjectContainer from './game_object';
 import PlayerPane from '../components/player_pane'
 import VotePane from '../components/vote_pane';
-import * as KeyCode from '../utils/key_codes';
+import * as KeyCode from '../constants/key_codes';
 import {
   moveCameraHorizontal,
   moveCameraVertical,

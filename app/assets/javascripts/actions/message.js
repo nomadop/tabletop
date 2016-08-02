@@ -1,4 +1,4 @@
-import { RECEIVE_MESSAGES } from './action_types';
+import { RECEIVE_MESSAGES } from '../constants/action_types';
 
 export function receiveMessages(messages) {
   return {

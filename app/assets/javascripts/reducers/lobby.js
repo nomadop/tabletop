@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { NEW_MESSAGE } from '../actions/action_types';
+import { NEW_MESSAGE } from '../constants/action_types';
 
 function messages(state = [], action) {
   const newState = state.slice();

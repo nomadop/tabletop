@@ -6,7 +6,7 @@ import {
   ROTATE_CAMERA_HORIZONTAL,
   ROTATE_CAMERA_VERTICAL,
   SET_CAMERA,
-} from '../actions/action_types';
+} from '../constants/action_types';
 
 let rotateCache;
 let rotateRad;
