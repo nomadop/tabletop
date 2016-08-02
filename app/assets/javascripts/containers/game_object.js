@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GameObject from '../components/game_object';
 import PlayerArea from '../components/player_area';
+import FlowTransition from '../components/flow_transition';
 import * as KeyCode from '../constants/key_codes';
 import {
   selectGameObject,
@@ -361,13 +362,27 @@ class GameObjectContainer extends Component {
     />
   }
 
+  renderFlowTransition(transition) {
+    const id = transition.id;
+    return <FlowTransition
+      key={id}
+      from={transition.from.object}
+      to={transition.to.object}
+    />
+  }
+
   render() {
     const { playerAreas, gameObjects, authentication } = this.props;
 
+    const filteredObjects = gameObjects.filter(object => !object.container_id);
+    const transitions = gameObjects.filter(object => object.meta_type === 'GameFlow').reduce((result, object) => {
+      return result.concat(object.meta.to_transitions);
+    }, []);
     return (
       <div className="game-object-container" ref="body" tabIndex="1" onKeyDown={this.handleKeyDown.bind(this)}>
         { playerAreas.map(area => this.renderPlayerArea(area, authentication.player_num)) }
-        { gameObjects.filter(object => !object.container_id).map(object => this.renderGameObject(object, authentication.player_num)) }
+        { transitions.map(transition => this.renderFlowTransition(transition)) }
+        { filteredObjects.map(object => this.renderGameObject(object, authentication.player_num)) }
       </div>
     );
   }

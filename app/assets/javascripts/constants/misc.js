@@ -1,0 +1,1 @@
+export const FLOW_OBJECT_SIZE = 100;

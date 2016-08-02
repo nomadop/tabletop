@@ -26,6 +26,7 @@ import {
   START_VOTE,
   END_VOTE,
 } from '../constants/action_types';
+import { FLOW_OBJECT_SIZE } from '../constants/misc';
 import camera from './camera';
 import messages from './message';
 import { arrayPlus, arrayMinus } from 'utils/array_enhancement';
@@ -92,7 +93,7 @@ function gameFlowById(state = {}, action) {
   switch (action.type) {
   case RECEIVE_GAME_FLOWS:
     action.gameFlows.forEach(gameFlow => updater[gameFlow.id] = {
-      $set: Object.assign(gameFlow, { width: 100, height: 100 })
+      $set: Object.assign(gameFlow, { width: FLOW_OBJECT_SIZE, height: FLOW_OBJECT_SIZE })
     });
     return update(state, updater);
   default:

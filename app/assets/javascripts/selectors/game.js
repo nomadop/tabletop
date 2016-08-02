@@ -77,7 +77,13 @@ const gameObjectsSelector = createSelector(
         object.meta = deckById[object.meta_id];
         break;
       case 'GameFlow':
-        object.meta = gameFlowById[object.meta_id];
+        const flow = gameFlowById[object.meta_id];
+        flow.to_transitions.forEach(t => {
+          t.from = flow;
+          t.to = gameFlowById[t.to_flow_id];
+        });
+        object.meta = flow;
+        flow.object = object;
         break;
       default:
         object.meta = metaById[object.meta_id];

@@ -228,7 +228,7 @@
               padding: 0 4px;
               background: white;
               border-radius: 0 4px 4px 4px;
-              box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.42);
+              box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.42);
 
               .content-arrow {
                 position: absolute;
@@ -378,7 +378,7 @@
       border: 1px solid black;
       border-radius: 5px;
       pointer-events: all;
-      box-shadow: 3px 3px 5px 0 rgba(0,0,0,0.42);
+      box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, 0.42);
 
       &:focus {
         outline: none;
@@ -808,6 +808,159 @@
             font-weight: bolder;
             color: black;
             text-shadow: -3px -3px 3px #fff, 3px -3px 3px #fff, -3px 3px 3px #fff, 3px 3px 3px #fff;
+          }
+        }
+
+        .flow-transaction-box {
+          pointer-events: none;
+          position: absolute;
+
+          > div {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+          }
+
+          .top-left {
+            top: 0;
+            left: 0;
+          }
+
+          .top-right {
+            top: 0;
+            left: 50%;
+          }
+
+          .bottom-left {
+            top: 50%;
+            left: 0;
+          }
+
+          .bottom-right {
+            top: 50%;
+            left: 50%;
+          }
+
+          .direction-arrow {
+            position: absolute;
+          }
+
+          &.horizontal {
+            .direction-arrow {
+              width: 0;
+              height: 0;
+              border-top: 10px solid transparent;
+              border-bottom: 10px solid transparent;
+            }
+
+            &.right-down, &.right-up {
+              .direction-arrow {
+                border-left: 10px solid black;
+                right: -1px;
+              }
+            }
+
+            &.left-down, &.left-up {
+              .direction-arrow {
+                border-right: 10px solid black;
+                left: 5px;
+              }
+            }
+
+            &.right-down, &.left-down {
+              .direction-arrow {
+                bottom: -11px;
+              }
+            }
+
+            &.right-up, &.left-up {
+              .direction-arrow {
+                top: -11px;
+              }
+            }
+          }
+
+          &.vertical {
+            .direction-arrow {
+              width: 0;
+              height: 0;
+              border-left: 10px solid transparent;
+              border-right: 10px solid transparent;
+            }
+
+            &.right-down, &.left-down {
+              .direction-arrow {
+                border-top: 10px solid black;
+                bottom: -1px;
+              }
+            }
+
+            &.right-up, &.left-up {
+              .direction-arrow {
+                border-bottom: 10px solid black;
+                top: 5px;
+              }
+            }
+
+            &.right-down, &.right-up {
+              .direction-arrow {
+                right: -11px;
+              }
+            }
+
+            &.left-down, &.left-up {
+              .direction-arrow {
+                left: -9px;
+              }
+            }
+          }
+
+          &.right-down, &.left-up {
+            &.horizontal {
+              .top-left {
+                border-top: 2px solid black;
+                border-right: 2px solid black;
+              }
+              .bottom-right {
+                border-left: 2px solid black;
+                border-bottom: 2px solid black;
+              }
+            }
+
+            &.vertical {
+              .top-left {
+                border-left: 2px solid black;
+                border-bottom: 2px solid black;
+              }
+              .bottom-right {
+                border-top: 2px solid black;
+                border-right: 2px solid black;
+              }
+            }
+          }
+
+          &.left-down, &.right-up {
+            &.horizontal {
+              .top-right {
+                border-top: 2px solid black;
+                border-left: 2px solid black;
+              }
+              .bottom-left {
+                border-right: 2px solid black;
+                border-bottom: 2px solid black;
+              }
+            }
+
+            &.vertical {
+              .top-right {
+                border-right: 2px solid black;
+                border-bottom: 2px solid black;
+              }
+              .bottom-left {
+                border-top: 2px solid black;
+                border-left: 2px solid black;
+              }
+            }
           }
         }
       }
