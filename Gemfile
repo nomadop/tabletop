@@ -2,14 +2,14 @@
 source 'https://ruby.taobao.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '>= 5.0.0.rc2', '< 5.1'
+gem 'rails', '~> 5.1.4'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 gem 'pg'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
-gem 'coffee-rails', '~> 4.1.0'
+gem 'coffee-rails', '~> 4.2.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
@@ -18,7 +18,7 @@ gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.0'
+gem 'jbuilder', '~> 2.7.0'
 # Use Puma as the app server
 gem 'puma'
 
@@ -43,16 +43,13 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-gem 'react-rails', '~> 1.5.0'
 gem 'redis'
-gem 'sass-rails', '~> 5.0.5'
-gem 'browserify-rails'
-gem 'devise', '~>4.2.0'
+gem 'sass-rails', '~> 5.0.7'
+gem 'devise', '~> 4.3.0'
 gem 'rubocop'
 gem 'font-awesome-rails'
 gem 'carrierwave', :github => 'carrierwaveuploader/carrierwave', :branch => 'master'
 gem 'mini_magick'
 gem 'sidekiq'
 
-gem 'sinatra', :github => 'sinatra/sinatra', :branch => 'master', :require => false
 gem 'slim'
