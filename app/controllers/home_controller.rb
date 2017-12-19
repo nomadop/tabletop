@@ -4,25 +4,25 @@ class HomeController < ApplicationController
   before_action :require_out_room, only: [:lobby]
 
   def lobby
-    props = {
+    @props = {
       app: 'lobby',
       debug: params[:debug] == 'true' ? true : false,
       authentication: current_user && current_user.auth_info,
       games: Game.all.as_json(only: [:id, :name]),
       rooms: Room.play.as_json(only: [:name], methods: [:join_path]),
     }
-    render component: 'Root', props: props
+    render 'root'
   end
 
   def game
-    props = {
+    @props = {
       app: 'game',
       authentication: current_user && current_user.auth_info,
       debug: params[:debug] == 'true' ? true : false,
       room: @room.as_json(only: [:id, :name, :max_player], methods: [:player_count]),
       game: @room.game.as_json(only: [:id, :name, :module, :start_scale, :game_type]),
     }
-    render component: 'Root', props: props
+    render 'root'
   end
 
   def dev
@@ -31,7 +31,7 @@ class HomeController < ApplicationController
     return redirect_to '/game', notice: 'You are already in another room' if current_user.room && current_user.room != dev_room
     dev_room.join(current_user) if current_user.room.nil?
 
-    props = {
+    @props = {
       app: 'game',
       authentication: current_user && current_user.auth_info,
       debug: params[:debug] == 'true' ? true : false,
@@ -39,11 +39,11 @@ class HomeController < ApplicationController
       game: game.as_json(only: [:id, :name, :module, :start_scale, :game_type]),
       dev_mode: true,
     }
-    render component: 'Root', props: props
+    render 'root'
   end
 
   def recorder
-    props = { app: 'recorder' }
-    render component: 'Root', props: props
+    @props = {app: 'recorder'}
+    render 'root'
   end
 end

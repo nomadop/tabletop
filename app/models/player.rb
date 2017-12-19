@@ -1,7 +1,7 @@
 class Player < ApplicationRecord
   before_create :generate_number
 
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :room
   has_one :area, class_name: 'PlayerArea'
 

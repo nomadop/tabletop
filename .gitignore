@@ -28,3 +28,6 @@ public/res
 public/uploads
 public/audios
 exports
+/public/packs
+/public/packs-test
+/node_modules
